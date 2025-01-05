@@ -39,7 +39,8 @@ public class ConfigService
         var param = await _context.Parameters.SingleAsync(x => x.Sleutel == key);
         if (key == "year")
         {
-            int newYear = await NewSeasonSeed.Seed(_context, false);
+            int newYear = int.Parse(value);
+            await NewSeasonSeed.Seed(_context, false, newYear);
             param.Value = newYear.ToString();
         }
         else
