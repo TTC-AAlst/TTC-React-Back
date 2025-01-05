@@ -52,11 +52,13 @@ try
     var app = builder.Build();
     if (app.Environment.IsDevelopment())
     {
+        Log.Information("Starting Development Server with Swagger");
         app.UseSwagger();
         app.UseSwaggerUI();
     }
     else
     {
+        Log.Information("Starting Release Server with Https");
         app.UseHsts();
         app.UseHttpsRedirection();
     }
