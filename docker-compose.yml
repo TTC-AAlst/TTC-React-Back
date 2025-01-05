@@ -13,7 +13,7 @@ services:
       MYSQL_USER:
       MYSQL_PASSWORD:
     ports:
-      - "33060:3306"
+      - "7202:3306"
     networks:
       - ttcnet
     volumes:
