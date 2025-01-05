@@ -6,12 +6,12 @@ public class OpposingTeam
     /// <summary>
     /// Team A, B, C, ...
     /// </summary>
-    public string TeamCode { get; set; }
+    public string? TeamCode { get; set; }
 
     public int ClubId { get; set; }
     #endregion
 
-    public OpposingTeam(int clubId, string teamCode)
+    public OpposingTeam(int clubId, string? teamCode)
     {
         TeamCode = teamCode;
         ClubId = clubId;
@@ -21,7 +21,7 @@ public class OpposingTeam
     {
 
     }
-    public static OpposingTeam? Create(int? clubId, string teamCode)
+    public static OpposingTeam? Create(int? clubId, string? teamCode)
     {
         if (!clubId.HasValue) return null;
         return new OpposingTeam(clubId.Value, teamCode);

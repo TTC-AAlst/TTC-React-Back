@@ -59,7 +59,7 @@ public class MatchesController
     public async Task<IEnumerable<OtherMatch>> GetOpponentMatches(int teamId, int? clubId = null, string? teamCode = null)
     {
         // This is also called from Team Week display where there is no opponent
-        var opponent = clubId.HasValue ? OpposingTeam.Create(clubId, teamCode ?? "") : null;
+        var opponent = clubId.HasValue ? OpposingTeam.Create(clubId, teamCode) : null;
         var result = await _service.GetOpponentMatches(teamId, opponent);
         _user.CleanSensitiveData(result);
         return result;
