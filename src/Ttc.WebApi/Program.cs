@@ -59,8 +59,8 @@ try
     else
     {
         Log.Information("Starting Release Server with Https");
-        app.UseHsts();
-        app.UseHttpsRedirection();
+        // app.UseHsts();
+        // app.UseHttpsRedirection();
     }
 
     var serviceMetadataBehavior = app.Services.GetRequiredService<CoreWCF.Description.ServiceMetadataBehavior>();

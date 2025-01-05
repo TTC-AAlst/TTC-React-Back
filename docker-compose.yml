@@ -34,9 +34,9 @@ services:
       - ttcnet
     environment:
       - ASPNETCORE_ENVIRONMENT=Release
-      - ASPNETCORE_URLS=https://+:4003;http://+:8080
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=stockoma
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/dev_cert.pfx
+      # - ASPNETCORE_URLS=https://+:4003;http://+:8080
+      # - ASPNETCORE_Kestrel__Certificates__Default__Password=stockoma
+      # - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/dev_cert.pfx
     volumes:
       - ./upload:/upload
       - ./https:/https
