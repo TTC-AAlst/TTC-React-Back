@@ -67,7 +67,7 @@ try
     serviceMetadataBehavior.HttpGetEnabled = true;
 
     app.UseCors();
-    app.UseHttpsRedirection();
+    // app.UseHttpsRedirection();
     app.UseAuthentication();
     app.UseAuthorization();
     app.Use(async (context, next) =>

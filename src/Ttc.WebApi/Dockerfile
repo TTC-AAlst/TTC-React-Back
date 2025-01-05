@@ -12,12 +12,12 @@ COPY src/Ttc.UnitTests/*.csproj ./src/Ttc.UnitTests/
 
 RUN dotnet restore
 
-COPY src/Ttc.WebApi/. ./src/Ttc.WebApi/
-COPY src/Frenoy.Api/. ./src/Frenoy.Api/
-COPY src/Ttc.DataAccess/. ./src/Ttc.DataAccess/
-COPY src/Ttc.DataEntities/. ./src/Ttc.DataEntities/
-COPY src/Ttc.Model/. ./src/Ttc.Model/
 COPY src/Ttc.UnitTests/. ./src/Ttc.UnitTests/
+COPY src/Ttc.DataEntities/. ./src/Ttc.DataEntities/
+COPY src/Ttc.DataAccess/. ./src/Ttc.DataAccess/
+COPY src/Ttc.Model/. ./src/Ttc.Model/
+COPY src/Frenoy.Api/. ./src/Frenoy.Api/
+COPY src/Ttc.WebApi/. ./src/Ttc.WebApi/
 
 WORKDIR /source/src/Ttc.WebApi
 RUN dotnet publish -c Release -o /app
