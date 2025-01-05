@@ -2,6 +2,7 @@ using CoreWCF.Configuration;
 using CoreWCF.Description;
 using Serilog;
 using Serilog.Context;
+using Serilog.Events;
 using System.Text.Json.Serialization;
 using Ttc.DataAccess;
 using Ttc.Model.Core;
@@ -19,6 +20,7 @@ Log.Logger = new LoggerConfiguration()
         outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}",
         shared: true
     )
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
     .CreateLogger();
 
 Log.Information("Starting up...");
