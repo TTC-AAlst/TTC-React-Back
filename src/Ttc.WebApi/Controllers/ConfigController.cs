@@ -47,23 +47,17 @@ public class ConfigController
     [HttpGet]
     [Route("Log/Get")]
     [AllowAnonymous]
-    public HttpResponseMessage GetLogging()
+    public string GetLogging()
     {
-        //FileAppender rootAppender = ((Hierarchy)LogManager.GetRepository())
-        //    .Root.Appenders.OfType<FileAppender>()
-        //    .FirstOrDefault();
+        string logDir = Path.Combine(Directory.GetCurrentDirectory(), "logs");
+        _logger.Information($"Looking for last log dir in: {logDir}");
+        string fileName = Directory
+            .GetFiles(logDir, "*.txt")
+            .OrderByDescending(x => x)
+            .First();
 
-        var resp = new HttpResponseMessage(HttpStatusCode.OK);
-
-        //if (rootAppender == null)
-        //{
-        //    resp.Content = new StringContent("No log4net FileAppender configured!", System.Text.Encoding.UTF8, "text/plain");
-        //}
-        //else
-        //{
-        //    resp.Content = new StringContent(System.IO.File.ReadAllText(rootAppender.File), System.Text.Encoding.UTF8, "text/plain");
-        //}
-        return resp;
+        _logger.Information($"Current log file: {fileName}");
+        return File.ReadAllText(fileName);
     }
 }
 
