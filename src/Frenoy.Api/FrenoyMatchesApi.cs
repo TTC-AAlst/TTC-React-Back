@@ -503,7 +503,8 @@ public class FrenoyMatchesApi : FrenoyApiBase
     private static readonly Regex VttlDivisionRegex = new(@"Afdeling (\d+)(\w*)");
     private static readonly Regex SportaDivisionRegex = new(@"(\d)(\w)?");
     private const string MatchTypeJeugd = "6";
-    private const string MatchTypeMen = "2";
+    private const string MatchTypeVttlMen = "2";
+    private const string MatchTypeSportaMen = "4";
     private TeamEntity CreateTeam(TeamEntryType frenoyTeam)
     {
         var team = new TeamEntity();
@@ -516,8 +517,8 @@ public class FrenoyMatchesApi : FrenoyApiBase
         }
         else
         {
-            if (frenoyTeam.MatchType != MatchTypeMen)
-                throw new Exception($"Expected MatchType to be {MatchTypeMen}. Was={frenoyTeam.MatchType}");
+            if (frenoyTeam.MatchType != MatchTypeVttlMen && frenoyTeam.MatchType != MatchTypeSportaMen)
+                throw new Exception($"Expected MatchType to be SportaMen={MatchTypeSportaMen} or VttlMen={MatchTypeVttlMen}. Was={frenoyTeam.MatchType}");
 
             team.Competition = _settings.Competition;
         }
