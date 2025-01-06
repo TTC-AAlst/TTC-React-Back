@@ -40,8 +40,8 @@ public class ConfigService
         if (key == "year")
         {
             int newYear = int.Parse(value);
-            await NewSeasonSeed.Seed(_context, false, newYear);
             param.Value = newYear.ToString();
+            await NewSeasonSeed.Seed(_context, false, newYear);
         }
         else
         {

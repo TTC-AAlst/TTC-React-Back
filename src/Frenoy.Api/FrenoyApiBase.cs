@@ -31,7 +31,7 @@ public class FrenoyApiBase
         _forceSync = forceSync;
         _db = ttcDbContext;
 
-        bool isVttl = comp == Competition.Vttl;
+        bool isVttl = comp is Competition.Vttl or Competition.Jeugd;
         _currentSeason = _db.CurrentSeason;
         _settings = isVttl ? FrenoySettings.VttlSettings(_currentSeason) : FrenoySettings.SportaSettings(_currentSeason);
 

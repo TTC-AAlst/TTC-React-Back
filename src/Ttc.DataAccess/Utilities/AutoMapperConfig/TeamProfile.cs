@@ -19,7 +19,7 @@ internal class TeamProfile : Profile
                 opts => opts.MapFrom(src => Constants.OwnClubId))
             .ForMember(
                 dest => dest.Competition,
-                opts => opts.MapFrom(src => Constants.NormalizeCompetition(src.Competition)))
+                opts => opts.MapFrom(src => src.Competition))
             .ForMember(
                 dest => dest.DivisionName,
                 opts => opts.MapFrom(src => src.ReeksNummer + src.ReeksCode))

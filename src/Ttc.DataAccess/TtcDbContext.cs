@@ -70,6 +70,10 @@ internal class TtcDbContext : DbContext, ITtcDbContext
             .WithMany(c => c.Contacten)
             .HasForeignKey(x => x.ClubId)
             .IsRequired();
+
+        modelBuilder.Entity<TeamEntity>()
+            .Property(o => o.Competition)
+            .HasConversion<string>();
     }
 }
 

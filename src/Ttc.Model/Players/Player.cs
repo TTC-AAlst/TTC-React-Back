@@ -34,7 +34,5 @@ public class Player : ITtcConfidential
         Contact = null;
     }
 
-    public PlayerCompetition? GetCompetition(Competition competition) => competition == Competition.Vttl ? Vttl : Sporta;
-
     public override string ToString() => $"Id={Id}, Alias={Alias}, Active={Active}";
 }

@@ -72,7 +72,7 @@ public class MatchService
         {
             // TODO BUG: This means that when called from Team Week Overview, no opponent is set and there is no sync...
             // TODO PERFORMANCE: This executes too many times, make it part of initial competition load
-            var frenoy = new FrenoyMatchesApi(_context, Constants.NormalizeCompetition(team.Competition));
+            var frenoy = new FrenoyMatchesApi(_context, team.Competition);
             await frenoy.SyncOpponentMatches(team, opponent);
 
             matchEntities = await GetMatchEntities();
@@ -228,7 +228,7 @@ public class MatchService
                 PlayerId = player.Id,
                 Name = player.NaamKort ?? "",
                 Status = newStatus,
-                Ranking = match.Competition == Competition.Vttl ? player.KlassementVttl : player.KlassementSporta,
+                Ranking = match.Competition is Competition.Vttl or Competition.Jeugd ? player.KlassementVttl : player.KlassementSporta,
                 Home = match.IsHomeMatch ?? false,
                 Position = i
             };
@@ -290,7 +290,7 @@ public class MatchService
     public async Task FrenoyTeamSync(int teamId)
     {
         var team = await _context.Teams.SingleAsync(x => x.Id == teamId);
-        var frenoySync = new FrenoyMatchesApi(_context, Constants.NormalizeCompetition(team.Competition));
+        var frenoySync = new FrenoyMatchesApi(_context, team.Competition);
         await frenoySync.SyncTeamMatches(team);
     }
 
@@ -335,7 +335,7 @@ public class MatchService
         var teams = await _context.Teams
             .Include(x => x.Opponents).ThenInclude(x => x.Club)
             .Where(x => x.Year == currentSeason)
-            .Where(x => x.Competition == Competition.Sporta.ToString())
+            .Where(x => x.Competition == Competition.Sporta)
             .ToArrayAsync();
 
         var frenoy = new FrenoyPlayersApi(_context, Competition.Sporta);

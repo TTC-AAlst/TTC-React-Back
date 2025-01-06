@@ -500,12 +500,28 @@ public class FrenoyMatchesApi : FrenoyApiBase
     #endregion
 
     #region Create Teams
-    private static readonly Regex VttlDivisionRegex = new Regex(@"Afdeling (\d+)(\w+)");
-    private static readonly Regex SportaDivisionRegex = new Regex(@"(\d)(\w)?");
+    private static readonly Regex VttlDivisionRegex = new(@"Afdeling (\d+)(\w*)");
+    private static readonly Regex SportaDivisionRegex = new(@"(\d)(\w)?");
+    private const string MatchTypeJeugd = "6";
+    private const string MatchTypeMen = "2";
     private TeamEntity CreateTeam(TeamEntryType frenoyTeam)
     {
         var team = new TeamEntity();
-        team.Competition = _settings.Competition.ToString();
+        if (frenoyTeam.MatchType == MatchTypeJeugd)
+        {
+            if (_settings.Competition != Competition.Vttl)
+                throw new Exception($"Jeugd is only possible for Vttl. Was={_settings.Competition}");
+
+            team.Competition = Competition.Jeugd;
+        }
+        else
+        {
+            if (frenoyTeam.MatchType != MatchTypeMen)
+                throw new Exception($"Expected MatchType to be {MatchTypeMen}. Was={frenoyTeam.MatchType}");
+
+            team.Competition = _settings.Competition;
+        }
+        
         team.ReeksType = _settings.DivisionType;
         team.Year = _settings.Year;
         team.LinkId = $"{frenoyTeam.DivisionId}_{frenoyTeam.Team}";

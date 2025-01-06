@@ -59,5 +59,9 @@ public class PlayerCompetition
 public enum Competition
 {
     Vttl,
-    Sporta
+    Sporta,
+    /// <summary>
+    /// Vttl Jeugd
+    /// </summary>
+    Jeugd
 }

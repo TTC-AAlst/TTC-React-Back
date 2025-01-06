@@ -9,7 +9,7 @@ public class TeamEntity
     [Key]
     public int Id { get; set; }
     [MaxLength(10)]
-    public string Competition { get; set; }
+    public Competition Competition { get; set; }
     /// <summary>
     /// ColumnName "Reeks" in the db
     /// </summary>
@@ -26,11 +26,6 @@ public class TeamEntity
     [MaxLength(10)]
     public string FrenoyTeamId { get; set; }
     public int FrenoyDivisionId { get; set; }
-
-    public Competition GetCompetition()
-    {
-        return Constants.NormalizeCompetition(Competition);
-    }
 
     public ICollection<TeamPlayerEntity> Players { get; set; }
     public ICollection<TeamOpponentEntity> Opponents { get; set; }
