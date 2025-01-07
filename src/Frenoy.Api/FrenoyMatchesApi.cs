@@ -285,9 +285,25 @@ public class FrenoyMatchesApi : FrenoyApiBase
                 await RemoveExistingMatchPlayersAndGames(matchEntity);
             }
 
-            if (frenoyMatch.Score != null && frenoyMatch.MatchDetails != null && frenoyMatch.MatchDetails.DetailsCreated)
+            if (frenoyMatch is { Score: not null, MatchDetails.DetailsCreated: true })
             {
-                matchEntity.IsSyncedWithFrenoy = true;
+                int? totalScore = matchEntity.AwayScore + matchEntity.HomeScore;
+                if (totalScore.HasValue)
+                {
+                    if (matchEntity.Competition == Competition.Sporta)
+                    {
+                        if (totalScore == 10)
+                            matchEntity.IsSyncedWithFrenoy = true;
+                    }
+                    else
+                    {
+                        bool IsMatchComplete(string frenoyPrefix, int expectedScore) =>
+                            matchEntity.FrenoyMatchId?.StartsWith(frenoyPrefix) == true && totalScore == expectedScore;
+
+                        if (IsMatchComplete("POVLH", 16) || IsMatchComplete("POVLJ", 5))
+                            matchEntity.IsSyncedWithFrenoy = true;
+                    }
+                }
             }
         }
     }
