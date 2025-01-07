@@ -427,9 +427,9 @@ public class FrenoyMatchesApi : FrenoyApiBase
     #endregion
 
     #region Cache
-    private static readonly TimeSpan FrenoyPesterExpiration = TimeSpan.FromHours(1);
+    private static readonly TimeSpan FrenoyPesterExpiration = TimeSpan.FromMinutes(15);
     private static readonly Dictionary<int, DateTime> FrenoyNoPesterCache = new();
-    private static readonly object FrenoyNoPesterLock = new object();
+    private static readonly object FrenoyNoPesterLock = new();
     private static bool ShouldAttemptMatchSync(int matchId)
     {
         lock (FrenoyNoPesterLock)
@@ -440,7 +440,7 @@ public class FrenoyMatchesApi : FrenoyApiBase
                 return true;
             }
 
-            bool shouldSync = value > DateTime.Now + FrenoyPesterExpiration;
+            bool shouldSync = value + FrenoyPesterExpiration < DateTime.Now;
             if (shouldSync)
             {
                 FrenoyNoPesterCache.Remove(matchId);
@@ -450,7 +450,7 @@ public class FrenoyMatchesApi : FrenoyApiBase
     }
 
     private static readonly Dictionary<string, DateTime> FrenoyOpponentCache = new();
-    private static readonly object FrenoyOpponentLock = new object();
+    private static readonly object FrenoyOpponentLock = new();
     private bool ShouldAttemptOpponentMatchSync(OpposingTeam team, int teamId, int? season = null)
     {
         season ??= _db.CurrentFrenoySeason;
@@ -464,7 +464,7 @@ public class FrenoyMatchesApi : FrenoyApiBase
                 return true;
             }
 
-            bool shouldSync = value > DateTime.Now + FrenoyPesterExpiration;
+            bool shouldSync = value + FrenoyPesterExpiration < DateTime.Now;
             if (shouldSync)
             {
                 FrenoyOpponentCache.Remove(hash);
