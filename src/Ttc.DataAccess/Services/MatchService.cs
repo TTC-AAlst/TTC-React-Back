@@ -223,7 +223,6 @@ public class MatchService
             var player = await _context.Players.FindAsync(playerIds[i]);
             var newMatchPlayer = new MatchPlayerEntity
             {
-                Id = i * -1,
                 MatchId = matchId,
                 PlayerId = player.Id,
                 Name = player.NaamKort ?? "",
