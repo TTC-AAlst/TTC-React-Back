@@ -4,6 +4,7 @@ using Serilog;
 using Serilog.Context;
 using Serilog.Events;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.FileProviders;
 using Ttc.DataAccess;
 using Ttc.Model.Core;
 using Ttc.WebApi.Emailing;
@@ -75,6 +76,13 @@ try
 
     app.UseCors();
     // app.UseHttpsRedirection();
+
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(ttcSettings.PublicImageFolder),
+        RequestPath = "/img"
+    });
+
     app.UseAuthentication();
     app.UseAuthorization();
     app.Use(async (context, next) =>

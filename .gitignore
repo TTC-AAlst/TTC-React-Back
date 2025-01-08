@@ -214,3 +214,4 @@ ModelManifest.xml
 # TTC stuff
 PublishProfiles
 src/Ttc.WebApi/logs/
+upload/
