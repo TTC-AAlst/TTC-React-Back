@@ -2,7 +2,7 @@
 
 ```sh
 cp .example.env .env
-cp Ttc.WebApi/appsettings.json Ttc.WebApi/appsettings.Release.json
+cp src/Ttc.WebApi/appsettings.json src/Ttc.WebApi/appsettings.Release.json
 ```
 
 ## Database
