@@ -3,7 +3,6 @@ using Ttc.DataEntities;
 using Microsoft.EntityFrameworkCore;
 using Ttc.DataEntities.Core;
 using Ttc.Model.Clubs;
-using Ttc.Model.Players;
 
 namespace Ttc.DataAccess.Services;
 
@@ -21,15 +20,15 @@ public class ClubService
     public async Task<IEnumerable<Club>> GetActiveClubs()
     {
         var activeClubs = await _context.Clubs
-            .Include(x => x.Lokalen)
-            .Include(x => x.Contacten)
-            .Where(x => x.Actief == 1)
+            .Include(x => x.Locations)
+            .Include(x => x.Managers)
+            .Where(x => x.Active)
             .ToListAsync();
 
         var result = _mapper.Map<IList<ClubEntity>, IList<Club>>(activeClubs);
 
-        var managers = activeClubs.Single(x => x.Id == Constants.OwnClubId).Contacten;
-        var managerIds = managers.Select(x => x.SpelerId).ToArray();
+        var managers = activeClubs.Single(x => x.Id == Constants.OwnClubId).Managers;
+        var managerIds = managers.Select(x => x.PlayerId).ToArray();
 
 
         var ourClub = result.Single(x => x.Id == Constants.OwnClubId);
@@ -38,13 +37,13 @@ public class ClubService
         var managerPlayers = await _context.Players.Where(x => managerIds.Contains(x.Id)).ToArrayAsync();
         foreach (var managerPlayer in managerPlayers)
         {
-            var managerInfo = managers.Single(x => x.SpelerId == managerPlayer.Id);
+            var managerInfo = managers.Single(x => x.PlayerId == managerPlayer.Id);
             ourClub.Managers.Add(new ClubManager
             {
-                Description = managerInfo.Omschrijving,
-                PlayerId = managerInfo.SpelerId,
+                Description = managerInfo.Description,
+                PlayerId = managerInfo.PlayerId,
                 Name = managerPlayer.Name,
-                SortOrder = managerInfo.Sortering
+                SortOrder = managerInfo.SortOrder
             });
         }
 
@@ -54,25 +53,25 @@ public class ClubService
     #region Club Board
     public async Task SaveBoardMember(int playerId, string boardFunction, int sort)
     {
-        var board = await _context.ClubContacten.SingleOrDefaultAsync(x => x.SpelerId == playerId);
+        var board = await _context.ClubContacten.SingleOrDefaultAsync(x => x.PlayerId == playerId);
         if (board == null)
         {
-            board = new ClubContact()
+            board = new ClubManagerEntity()
             {
                 ClubId = Constants.OwnClubId,
-                SpelerId = playerId
+                PlayerId = playerId
             };
             _context.ClubContacten.Add(board);
         }
 
-        board.Omschrijving = boardFunction;
-        board.Sortering = sort;
+        board.Description = boardFunction;
+        board.SortOrder = sort;
         await _context.SaveChangesAsync();
     }
 
     public async Task DeleteBoardMember(int playerId)
     {
-        var board = await _context.ClubContacten.SingleAsync(x => x.SpelerId == playerId);
+        var board = await _context.ClubContacten.SingleAsync(x => x.PlayerId == playerId);
         _context.ClubContacten.Remove(board);
         await _context.SaveChangesAsync();
     }
@@ -93,8 +92,8 @@ public class ClubService
 
     private static void MapClub(Club club, ClubEntity existingClub)
     {
-        existingClub.Naam = club.Name;
-        existingClub.Douche = club.Shower ? 1 : 0;
+        existingClub.Name = club.Name;
+        existingClub.Shower = club.Shower;
         existingClub.Website = club.Website;
         // existingClub.Lokalen = club.MainLocation
     }

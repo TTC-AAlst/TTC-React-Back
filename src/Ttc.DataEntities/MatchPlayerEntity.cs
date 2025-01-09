@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ttc.DataEntities;
 
-[Table("matchplayer")]
+[Table("MatchPlayer")]
 public class MatchPlayerEntity
 {
     [Key]
@@ -31,11 +31,10 @@ public class MatchPlayerEntity
 
     public int Position { get; set; }
 
-    // TODO: Name & UniqueIndex are required (and non 0) or the automapper crashes (some attribute?)
     [MaxLength(50)]
-    public string Name { get; set; }
+    public string Name { get; set; } = "";
     [MaxLength(5)]
-    public string Ranking { get; set; }
+    public string Ranking { get; set; } = "";
     public int UniqueIndex { get; set; }
 
     public override string ToString() => $"MatchId={MatchId}, Name={Name}, Won={Won}, Home={Home}, Status={Status}";

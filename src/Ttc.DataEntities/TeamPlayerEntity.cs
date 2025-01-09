@@ -4,7 +4,7 @@ using Ttc.Model.Teams;
 
 namespace Ttc.DataEntities;
 
-[Table("teamplayer")]
+[Table("TeamPlayer")]
 public class TeamPlayerEntity
 {
     [Key]

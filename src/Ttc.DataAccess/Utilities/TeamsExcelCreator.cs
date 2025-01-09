@@ -145,7 +145,7 @@ internal class TeamsExcelCreator
             foreach (var teamPlayer in team.Players)
             {
                 var player = players.First(x => x.Id == teamPlayer.PlayerId);
-                teamModel.Players.Add(new TeamPlayerExcelModel(player.NaamKort, teamPlayer.PlayerType));
+                teamModel.Players.Add(new TeamPlayerExcelModel(player.Alias, teamPlayer.PlayerType));
             }
 
             foreach (var match in matches.Where(x => x.FrenoyDivisionId == team.FrenoyDivisionId).OrderBy(x => x.Date))
@@ -248,7 +248,7 @@ internal class TeamMatchExcelModel
             return "Aalst " + teamCode;
         }
         var club = clubs.Single(x => x.Id == clubId);
-        return club.Naam + " " + teamCode;
+        return club.Name + " " + teamCode;
     }
 
     public override string ToString() => $"{Match.FrenoyMatchId}";

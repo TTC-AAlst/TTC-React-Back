@@ -22,7 +22,7 @@ internal class TeamProfile : Profile
                 opts => opts.MapFrom(src => src.Competition))
             .ForMember(
                 dest => dest.DivisionName,
-                opts => opts.MapFrom(src => src.ReeksNummer + src.ReeksCode))
+                opts => opts.MapFrom(src => src.DivisionNumber + src.DivisionCode))
             .ForMember(
                 dest => dest.Frenoy,
                 opts => opts.MapFrom(src => new FrenoyTeamLinks

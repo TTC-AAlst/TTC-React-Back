@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Ttc.DataAccess.Services;
 using Ttc.DataAccess.Utilities.AutoMapperConfig;
 using Ttc.DataEntities.Core;
-using Ttc.Model.Core;
 
 namespace Ttc.DataAccess;
 
@@ -13,9 +13,9 @@ namespace Ttc.DataAccess;
 /// </summary>
 public static class GlobalBackendConfiguration
 {
-    public static void Configure(IServiceCollection services, TtcSettings ttcSettings)
+    public static void Configure(IServiceCollection services, IConfigurationRoot configuration)
     {
-        ConfigureDbContext(services, ttcSettings);
+        ConfigureDbContext(services, configuration);
         ConfigureAutoMapper(services);
         ConfigureServices(services);
     }
@@ -34,21 +34,41 @@ public static class GlobalBackendConfiguration
         services.AddAutoMapper(typeof(TeamProfile));
     }
 
-    private static void ConfigureDbContext(IServiceCollection services, TtcSettings ttcSettings)
+    private static void ConfigureDbContext(IServiceCollection services, IConfigurationRoot configuration)
+    {
+        var connectionString = configuration.GetConnectionString("Ttc");
+        services.AddDbContext<ITtcDbContext, TtcDbContext>(
+            dbContextOptions => ConfigureDbContextBuilder(dbContextOptions, connectionString));
+    }
+
+    internal static void ConfigureDbContextBuilder(DbContextOptionsBuilder builder, string? connectionString = null)
     {
         // Replace with your server version and type.
         // Use 'MariaDbServerVersion' for MariaDB.
         // Alternatively, use 'ServerVersion.AutoDetect(connectionString)'.
         var serverVersion = new MySqlServerVersion(new Version(5, 5, 60));
 
-        services.AddDbContext<ITtcDbContext, TtcDbContext>(
-            dbContextOptions => dbContextOptions
-                .UseMySql(ttcSettings.ConnectionString, serverVersion)
-                // The following three options help with debugging, but should
-                // be changed or removed for production.
-                .LogTo(Console.WriteLine, LogLevel.Warning)
-                //.EnableSensitiveDataLogging()
-                //.EnableDetailedErrors()
-        );
+        if (connectionString == null)
+        {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../Ttc.WebApi"))
+                .AddJsonFile("appsettings.json")
+                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development"}.json", optional: true)
+                .Build();
+            connectionString = configuration.GetConnectionString("Ttc") ?? "";
+        }
+
+        string? mysqlPassword = Environment.GetEnvironmentVariable("MYSQL_ROOT_PASSWORD");
+        if (!string.IsNullOrWhiteSpace(mysqlPassword))
+        {
+            connectionString = connectionString.Replace("{MYSQL_ROOT_PASSWORD}", mysqlPassword);
+        }
+
+        builder.UseMySql(connectionString, serverVersion)
+            // The following three options help with debugging, but should
+            // be changed or removed for production.
+            .LogTo(Console.WriteLine, LogLevel.Warning);
+            //.EnableSensitiveDataLogging()
+            //.EnableDetailedErrors()
     }
 }

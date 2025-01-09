@@ -12,51 +12,52 @@ internal class ClubProfile : Profile
         CreateMap<ClubEntity, Club>()
             .ForMember(
                 dest => dest.Name,
-                opts => opts.MapFrom(src => src.Naam))
+                opts => opts.MapFrom(src => src.Name))
             .ForMember(
                 dest => dest.Active,
-                opts => opts.MapFrom(src => src.Actief))
+                opts => opts.MapFrom(src => src.Active))
             .ForMember(
                 dest => dest.Shower,
-                opts => opts.MapFrom(src => src.Douche == 1))
+                opts => opts.MapFrom(src => src.Shower))
             .ForMember(
                 dest => dest.MainLocation,
-                opts => opts.MapFrom(src => CreateMainClubLocation(src.Lokalen)))
+                opts => opts.MapFrom(src => CreateMainClubLocation(src.Locations)))
             .ForMember(
                 dest => dest.AlternativeLocations,
-                opts => opts.MapFrom(src => CreateSecundaryClubLocations(src.Lokalen)));
+                opts => opts.MapFrom(src => CreateSecondaryClubLocations(src.Locations)))
+            .ForMember(dest => dest.Managers, opts => opts.Ignore());
     }
 
-    private static ICollection<ClubLocation> CreateSecundaryClubLocations(ICollection<ClubLokaal> lokalen)
+    private static ICollection<Model.Clubs.ClubLocation> CreateSecondaryClubLocations(ICollection<ClubLocationEntity> allLocations)
     {
-        var locations = lokalen.Where(x => !x.Hoofd.HasValue || x.Hoofd != 1).ToArray();
+        var locations = allLocations.Where(x => !x.MainLocation).ToArray();
         if (!locations.Any())
         {
-            return new Collection<ClubLocation>();
+            return new Collection<Model.Clubs.ClubLocation>();
         }
         return locations.Select(CreateClubLocation).ToArray();
     }
 
-    private static ClubLocation CreateMainClubLocation(ICollection<ClubLokaal> lokalen)
+    private static Model.Clubs.ClubLocation CreateMainClubLocation(ICollection<ClubLocationEntity> locations)
     {
-        var mainLocation = lokalen.FirstOrDefault(x => x.Hoofd.HasValue && x.Hoofd == 1);
+        var mainLocation = locations.FirstOrDefault(x => x.MainLocation);
         if (mainLocation == null)
         {
-            return new ClubLocation();
+            return new Model.Clubs.ClubLocation();
         }
         return CreateClubLocation(mainLocation);
     }
 
-    private static ClubLocation CreateClubLocation(ClubLokaal location)
+    private static Model.Clubs.ClubLocation CreateClubLocation(ClubLocationEntity location)
     {
-        return new ClubLocation
+        return new Model.Clubs.ClubLocation
         {
             Id = location.Id,
-            Description = location.Lokaal,
-            Address = location.Adres,
-            PostalCode = location.Postcode.ToString(),
-            City = location.Gemeente,
-            Mobile = location.Telefoon
+            Description = location.Description,
+            Address = location.Address,
+            PostalCode = location.PostalCode.ToString(),
+            City = location.City,
+            Mobile = location.Mobile
         };
     }
 }

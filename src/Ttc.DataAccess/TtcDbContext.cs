@@ -11,8 +11,8 @@ internal class TtcDbContext : DbContext, ITtcDbContext
     public DbSet<PlayerPasswordResetEntity> PlayerPasswordResets { get; set; }
 
     public DbSet<ClubEntity> Clubs { get; set; }
-    public DbSet<ClubLokaal> ClubLokalen { get; set; }
-    public DbSet<ClubContact> ClubContacten { get; set; }
+    public DbSet<ClubLocationEntity> ClubLokalen { get; set; }
+    public DbSet<ClubManagerEntity> ClubContacten { get; set; }
 
     public DbSet<TeamEntity> Teams { get; set; }
     public DbSet<TeamOpponentEntity> TeamOpponents { get; set; }
@@ -32,7 +32,7 @@ internal class TtcDbContext : DbContext, ITtcDbContext
     {
         get
         {
-            var year = Parameters.Single(x => x.Sleutel == "year").Value;
+            var year = Parameters.Single(x => x.Key == "year").Value;
             return int.Parse(year);
         }
     }
@@ -55,15 +55,15 @@ internal class TtcDbContext : DbContext, ITtcDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ClubLokaal>()
+        modelBuilder.Entity<ClubLocationEntity>()
             .HasOne(c => c.Club)
-            .WithMany(l => l.Lokalen)
+            .WithMany(l => l.Locations)
             .HasForeignKey(x => x.ClubId)
             .IsRequired();
 
-        modelBuilder.Entity<ClubContact>()
+        modelBuilder.Entity<ClubManagerEntity>()
             .HasOne(c => c.Club)
-            .WithMany(c => c.Contacten)
+            .WithMany(c => c.Managers)
             .HasForeignKey(x => x.ClubId)
             .IsRequired();
 
@@ -80,8 +80,8 @@ internal class TtcDbContextFactory : IDesignTimeDbContextFactory<TtcDbContext>
 {
     public TtcDbContext CreateDbContext(string[] args)
     {
-        var options = new DbContextOptions<TtcDbContext>();
-        
-        return new TtcDbContext(options);
+        var builder = new DbContextOptionsBuilder<TtcDbContext>();
+        GlobalBackendConfiguration.ConfigureDbContextBuilder(builder);
+        return new TtcDbContext(builder.Options);
     }
 }

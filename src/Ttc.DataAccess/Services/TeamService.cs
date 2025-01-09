@@ -169,7 +169,7 @@ public class TeamService
             .Where(x => x.FrenoySeason == currentFrenoySeason)
             .ToListAsync();
 
-        var players = await _context.Players.Where(x => x.Gestopt == null).ToArrayAsync();
+        var players = await _context.Players.Where(x => x.QuitYear == null).ToArrayAsync();
 
         var clubs = await _context.Clubs.ToArrayAsync();
 

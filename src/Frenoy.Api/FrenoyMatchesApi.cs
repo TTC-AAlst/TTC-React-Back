@@ -431,9 +431,9 @@ public class FrenoyMatchesApi : FrenoyApiBase
             if (dbPlayer != null)
             {
                 matchPlayerEntity.PlayerId = dbPlayer.Id;
-                if (!string.IsNullOrWhiteSpace(dbPlayer.NaamKort))
+                if (!string.IsNullOrWhiteSpace(dbPlayer.Alias))
                 {
-                    matchPlayerEntity.Name = dbPlayer.NaamKort;
+                    matchPlayerEntity.Name = dbPlayer.Alias;
                 }
             }
 
@@ -539,21 +539,21 @@ public class FrenoyMatchesApi : FrenoyApiBase
             team.Competition = _settings.Competition;
         }
         
-        team.ReeksType = _settings.DivisionType;
+        team.DivisionType = _settings.DivisionType;
         team.Year = _settings.Year;
         team.LinkId = $"{frenoyTeam.DivisionId}_{frenoyTeam.Team}";
 
         if (_isVttl)
         {
             var teamRegexMatch = VttlDivisionRegex.Match(frenoyTeam.DivisionName);
-            team.ReeksNummer = teamRegexMatch.Groups[1].Value;
-            team.ReeksCode = teamRegexMatch.Groups[2].Value;
+            team.DivisionNumber = teamRegexMatch.Groups[1].Value;
+            team.DivisionCode = teamRegexMatch.Groups[2].Value;
         }
         else
         {
             var teamRegexMatch = SportaDivisionRegex.Match(frenoyTeam.DivisionName.Trim());
-            team.ReeksNummer = teamRegexMatch.Groups[1].Value;
-            team.ReeksCode = teamRegexMatch.Groups[2].Value;
+            team.DivisionNumber = teamRegexMatch.Groups[1].Value;
+            team.DivisionCode = teamRegexMatch.Groups[2].Value;
         }
 
         team.FrenoyDivisionId = int.Parse(frenoyTeam.DivisionId);

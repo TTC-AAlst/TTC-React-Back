@@ -20,7 +20,7 @@ public class FrenoyPlayersApi : FrenoyApiBase
         {
             if (alsoSetGestopt)
             {
-                dbPlayer.Gestopt = _currentSeason - 1;
+                dbPlayer.QuitYear = _currentSeason - 1;
             }
             dbPlayer.ClubIdSporta = null;
             dbPlayer.ClubIdVttl = null;
@@ -79,12 +79,12 @@ public class FrenoyPlayersApi : FrenoyApiBase
 
     private static void SetVttl(PlayerEntity player, MemberEntryType frenoyPlayer)
     {
-        player.Gestopt = null;
+        player.QuitYear = null;
 
         player.IndexVttl = int.Parse(frenoyPlayer.RankingIndex);
         player.VolgnummerVttl = int.Parse(frenoyPlayer.Position);
         player.ClubIdVttl = Constants.OwnClubId;
-        player.KlassementVttl = frenoyPlayer.Ranking;
+        player.RankingVttl = frenoyPlayer.Ranking;
         player.ComputerNummerVttl = int.Parse(frenoyPlayer.UniqueIndex);
     }
 
@@ -116,18 +116,18 @@ public class FrenoyPlayersApi : FrenoyApiBase
         var newPlayer = new PlayerEntity();
         newPlayer.FirstName = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(frenoyPlayer.FirstName.ToLowerInvariant());
         newPlayer.LastName = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(frenoyPlayer.LastName.ToLowerInvariant());
-        newPlayer.NaamKort = newPlayer.Name;
-        newPlayer.Toegang = PlayerToegang.Player;
+        newPlayer.Alias = newPlayer.Name;
+        newPlayer.Security = PlayerToegang.Player;
         newPlayer.Email = frenoyPlayer.Email;
         if (frenoyPlayer.Phone != null)
         {
-            newPlayer.Gsm = frenoyPlayer.Phone.Mobile;
+            newPlayer.Mobile = frenoyPlayer.Phone.Mobile;
         }
 
         if (frenoyPlayer.Address != null)
         {
-            newPlayer.Adres = frenoyPlayer.Address.Line1;
-            newPlayer.Gemeente = frenoyPlayer.Address.ZipCode + " " + frenoyPlayer.Address.Town;
+            newPlayer.Address = frenoyPlayer.Address.Line1;
+            newPlayer.City = frenoyPlayer.Address.ZipCode + " " + frenoyPlayer.Address.Town;
         }
 
         return newPlayer;
@@ -135,12 +135,12 @@ public class FrenoyPlayersApi : FrenoyApiBase
 
     private static void SetSporta(PlayerEntity player, MemberEntryType frenoyPlayer)
     {
-        player.Gestopt = null;
+        player.QuitYear = null;
 
         player.IndexSporta = int.Parse(frenoyPlayer.RankingIndex);
         player.VolgnummerSporta = int.Parse(frenoyPlayer.Position);
         player.ClubIdSporta = Constants.OwnClubId;
-        player.KlassementSporta = frenoyPlayer.Ranking;
+        player.RankingSporta = frenoyPlayer.Ranking;
         player.LidNummerSporta = int.Parse(frenoyPlayer.UniqueIndex);
         //player.LinkKaartSporta
     }

@@ -215,3 +215,5 @@ ModelManifest.xml
 PublishProfiles
 src/Ttc.WebApi/logs/
 upload/
+.env
+appsettings.Release.json

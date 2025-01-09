@@ -3,13 +3,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ttc.DataEntities;
 
-[Table("parameter")]
+[Table("Parameter")]
 public class ParameterEntity
 {
     [Key]
-    public string Sleutel { get; set; }
-    public string Value { get; set; }
-    public string? Omschrijving { get; set; }
+    [StringLength(20)]
+    public string Key { get; set; } = "";
+    [StringLength(255)]
+    public string Value { get; set; } = "";
+    [StringLength(255)]
+    public string? Description { get; set; }
 
-    public override string ToString() => $"{Sleutel}={Value}, Desc={Omschrijving}";
+    public override string ToString() => $"{Key}={Value}, Desc={Description}";
 }

@@ -44,8 +44,8 @@ public class PlayerService
             return null;
         }
 
-        existingSpeler.Stijl = playerStyle.Name;
-        existingSpeler.BesteSlag = playerStyle.BestStroke;
+        existingSpeler.Style = playerStyle.Name;
+        existingSpeler.BestStroke = playerStyle.BestStroke;
         await _context.SaveChangesAsync();
         var newMatch = await GetPlayer(playerStyle.PlayerId);
         return newMatch;
@@ -81,29 +81,29 @@ public class PlayerService
 
     private static void MapPlayer(Player player, PlayerEntity existingSpeler)
     {
-        existingSpeler.Gsm = player.Contact.Mobile;
+        existingSpeler.Mobile = player.Contact.Mobile;
         existingSpeler.Email = player.Contact.Email;
-        existingSpeler.Adres = player.Contact.Address;
-        existingSpeler.Gemeente = player.Contact.City;
+        existingSpeler.Address = player.Contact.Address;
+        existingSpeler.City = player.Contact.City;
 
-        existingSpeler.Stijl = player.Style.Name;
-        existingSpeler.BesteSlag = player.Style.BestStroke;
+        existingSpeler.Style = player.Style.Name;
+        existingSpeler.BestStroke = player.Style.BestStroke;
 
-        existingSpeler.Gestopt = player.QuitYear;
-        existingSpeler.Toegang = (PlayerToegang)Enum.Parse(typeof(PlayerToegang), player.Security);
+        existingSpeler.QuitYear = player.QuitYear;
+        existingSpeler.Security = (PlayerToegang)Enum.Parse(typeof(PlayerToegang), player.Security);
         existingSpeler.HasKey = player.HasKey;
 
         existingSpeler.FirstName = player.FirstName;
         existingSpeler.LastName = player.LastName;
-        existingSpeler.NaamKort = player.Alias;
+        existingSpeler.Alias = player.Alias;
 
-        existingSpeler.NextKlassementVttl = player.Vttl?.NextRanking;
-        existingSpeler.NextKlassementSporta = player.Sporta?.NextRanking;
+        existingSpeler.NextRankingVttl = player.Vttl?.NextRanking;
+        existingSpeler.NextRankingSporta = player.Sporta?.NextRanking;
     }
 
     public async Task<byte[]> GetExcelExport()
     {
-        var activePlayers = await _context.Players.Where(x => x.Gestopt == null).ToArrayAsync();
+        var activePlayers = await _context.Players.Where(x => x.QuitYear == null).ToArrayAsync();
         var exceller = new PlayersExcelCreator(activePlayers);
         return exceller.Create();
     }
@@ -120,12 +120,12 @@ public class PlayerService
             .Select(x => x.Id)
             .ToListAsync();
 
-        var player = await _context.Players.SingleAsync(ply => ply.Id == playerId);
+        var player = await _context.Players.SingleAsync(ply => ply.Id == playerId && ply.QuitYear == null);
         return new User
         {
             PlayerId = playerId,
-            Alias = player.NaamKort ?? "",
-            Security = GetPlayerSecurity(player.Toegang),
+            Alias = player.Alias ?? "",
+            Security = GetPlayerSecurity(player.Security),
             Teams = teams
         };
     }
@@ -167,11 +167,11 @@ public class PlayerService
     {
         if (user.PlayerId == SystemPlayerIdFromFrontend)
         {
-            user.PlayerId = (await _context.Players.SingleAsync(ply => ply.NaamKort == "SYSTEM")).Id;
+            user.PlayerId = (await _context.Players.SingleAsync(ply => ply.Alias == "SYSTEM")).Id;
         }
 
         var playerEntity = await _context.Players.FromSqlRaw(
-            $"SELECT * FROM {PlayerEntity.TableName} WHERE id={{0}} AND paswoord=MD5({{1}})",
+            $"SELECT * FROM {PlayerEntity.TableName} WHERE id={{0}} AND Password=MD5({{1}}) AND QuitYear IS NULL",
             new MySqlParameter("@p1", user.PlayerId),
             new MySqlParameter("@p2", user.Password)
         ).FirstOrDefaultAsync();
@@ -187,7 +187,7 @@ public class PlayerService
     public async Task<User?> ChangePassword(PasswordCredentials userNewCredentials)
     {
         var player = await _context.Players.FromSqlRaw(
-            $"SELECT * FROM {PlayerEntity.TableName} WHERE id={{0}} AND paswoord=MD5({{1}})",
+            $"SELECT * FROM {PlayerEntity.TableName} WHERE id={{0}} AND Password=MD5({{1}})",
             userNewCredentials.PlayerId,
             userNewCredentials.OldPassword).FirstOrDefaultAsync();
 
@@ -197,7 +197,7 @@ public class PlayerService
         }
 
         await _context.Database.ExecuteSqlRawAsync(
-            $"UPDATE {PlayerEntity.TableName} SET paswoord=MD5({{1}}) WHERE id={{0}}",
+            $"UPDATE {PlayerEntity.TableName} SET Password=MD5({{1}}) WHERE id={{0}}",
             userNewCredentials.PlayerId,
             userNewCredentials.NewPassword);
 
@@ -209,7 +209,7 @@ public class PlayerService
         PlayerEntity? player;
         if (request.PlayerId == SystemPlayerIdFromFrontend)
         {
-            player = await _context.Players.SingleAsync(ply => ply.NaamKort == "SYSTEM");
+            player = await _context.Players.SingleAsync(ply => ply.Alias == "SYSTEM");
         }
         else
         {
@@ -219,7 +219,7 @@ public class PlayerService
         if (player != null)
         {
             await _context.Database.ExecuteSqlRawAsync(
-                $"UPDATE {PlayerEntity.TableName} SET paswoord=MD5({{1}}) WHERE id={{0}}",
+                $"UPDATE {PlayerEntity.TableName} SET Password=MD5({{1}}) WHERE id={{0}}",
                 player.Id,
                 request.NewPassword);
 
@@ -254,7 +254,7 @@ public class PlayerService
         if (resetInfo != null)
         {
             await _context.Database.ExecuteSqlRawAsync(
-                $"UPDATE {PlayerEntity.TableName} SET paswoord=MD5({{1}}) WHERE id={{0}}",
+                $"UPDATE {PlayerEntity.TableName} SET Password=MD5({{1}}) WHERE id={{0}}",
                 playerId,
                 password);
         }

@@ -68,8 +68,8 @@ internal class PlayersExcelCreator
             worksheet.Cells[i, 2].Value = player.IndexSporta;
             worksheet.Cells[i, 3].Value = player.LidNummerSporta;
             worksheet.Cells[i, 4].Value = player.Name;
-            worksheet.Cells[i, 5].Value = player.KlassementSporta;
-            worksheet.Cells[i, 6].Value = KlassementValueConverter.Sporta(player.KlassementSporta);
+            worksheet.Cells[i, 5].Value = player.RankingSporta;
+            worksheet.Cells[i, 6].Value = KlassementValueConverter.Sporta(player.RankingSporta);
 
             i++;
         }
@@ -94,7 +94,7 @@ internal class PlayersExcelCreator
             worksheet.Cells[i, 2].Value = player.IndexVttl;
             worksheet.Cells[i, 3].Value = player.ComputerNummerVttl;
             worksheet.Cells[i, 4].Value = player.Name;
-            worksheet.Cells[i, 5].Value = player.KlassementVttl;
+            worksheet.Cells[i, 5].Value = player.RankingVttl;
 
             i++;
         }
@@ -107,17 +107,17 @@ internal class PlayersExcelCreator
         foreach (var player in _players.OrderBy(x => x.Name))
         {
             worksheet.Cells[i, 1].Value = player.Name;
-            worksheet.Cells[i, 2].Value = player.Adres;
-            worksheet.Cells[i, 3].Value = player.Gemeente;
+            worksheet.Cells[i, 2].Value = player.Address;
+            worksheet.Cells[i, 3].Value = player.City;
 
             var telephoneCell = worksheet.Cells[i, 4];
-            if (int.TryParse(player.Gsm, out var telephone))
+            if (int.TryParse(player.Mobile, out var telephone))
             {
                 telephoneCell.Value = $"{telephone:####/## ## ##}";
             }
             else
             {
-                telephoneCell.Value = player.Gsm;
+                telephoneCell.Value = player.Mobile;
             }
 
             if (!string.IsNullOrWhiteSpace(player.Email))

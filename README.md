@@ -1,58 +1,32 @@
 # TTC-React-Back
 
-TODO stuff:
-- Implement caching again...
-- Broadcasting with SignalR?
-- TabbedContainer: Accordion isn't implemented
-- Check all commits done after starting the switch to TypeScript
-- Check the old Ttc.UnitTests project -- anything interesting there?
-
-- UploadController :: UploadTempFile
-- ConfigController :: GetLogging
-- Deploy tabtapi-test somewhere (and update link in AdminDev)
-- Add Middleware to catch exceptions
-- Add middleware to log request timings
-
-
-Testing...
-- Emailing (pwd reset)
-- Uploading pictures
-- SignalR
-
-
-Performance:
-- Only if IsAdmin load the !Active players!
-- Cache everything... (need loggedIn & nog logged in caches)
-	- Invalidate cache with all changes!
-- Review existing table indexes! (gets seem to be like really slow)
+```sh
+cp .example.env .env
+cp Ttc.WebApi/appsettings.json Ttc.WebApi/appsettings.Release.json
+```
 
 ## Database
 
+Use `docker compose up -d --build` or:
+
 ```sh
-docker run --name ttc-mysql -p 33060:3306 -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:5.5.60
-
-create database ttc_aalst
--- and load sql script from ./db
+docker run --name ttc-mysql -p 7202:3306 -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:5.5.60
 ```
-
 
 
 ## EF Migrations
 
-ATTN: We're not using migrations right now!
-Might be a good idea to just switch to Postgres and start using this again...
-
-
+Migrations will run at startup of application.
 
 ```ps1
-cd Ttc.DataAccess
+cd src/Ttc.DataAccess
+dotnet ef database update
 
 # Install
 dotnet tool install --global dotnet-ef
 
 # Create
 dotnet ef migrations add InitialCreate
-dotnet ef database update
 
 # Delete
 dotnet ef migrations remove

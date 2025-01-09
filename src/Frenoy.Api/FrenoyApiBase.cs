@@ -68,7 +68,7 @@ public class FrenoyApiBase
     }
     #endregion
 
-    private static readonly Regex ClubHasTeamCodeRegex = new Regex(@"(\w)( \(af\))?$");
+    private static readonly Regex ClubHasTeamCodeRegex = new(@"(\w)( \(af\))?$");
     protected static string? ExtractTeamCodeFromFrenoyName(string team)
     {
         // team == Sint-Niklase Tafeltennisclub D
@@ -120,27 +120,27 @@ public class FrenoyApiBase
         {
             CodeVttl = _isVttl ? frenoyClubCode : null,
             CodeSporta = !_isVttl ? frenoyClubCode : null,
-            Actief = 1,
-            Naam = frenoyClub.GetClubsResponse.ClubEntries.First().LongName,
-            Douche = 0
+            Active = true,
+            Name = frenoyClub.GetClubsResponse.ClubEntries.First().LongName,
+            Shower = false
         };
 
         _db.Clubs.Add(club);
         await CommitChanges();
 
-        foreach (var frenoyLokaal in frenoyClub.GetClubsResponse.ClubEntries.First().VenueEntries)
+        foreach (var frenoyLocation in frenoyClub.GetClubsResponse.ClubEntries.First().VenueEntries)
         {
-            var lokaal = new ClubLokaal
+            var location = new ClubLocationEntity
             {
                 ClubId = club.Id,
-                Telefoon = frenoyLokaal.Phone,
-                Lokaal = frenoyLokaal.Name,
-                Adres = frenoyLokaal.Street,
-                Postcode = int.Parse(frenoyLokaal.Town.Substring(0, frenoyLokaal.Town.IndexOf(" "))),
-                Gemeente = frenoyLokaal.Town.Substring(frenoyLokaal.Town.IndexOf(" ") + 1),
-                Hoofd = 1
+                Mobile = frenoyLocation.Phone,
+                Description = frenoyLocation.Name,
+                Address = frenoyLocation.Street,
+                PostalCode = int.Parse(frenoyLocation.Town.Substring(0, frenoyLocation.Town.IndexOf(" "))),
+                City = frenoyLocation.Town.Substring(frenoyLocation.Town.IndexOf(" ") + 1),
+                MainLocation = true
             };
-            _db.ClubLokalen.Add(lokaal);
+            _db.ClubLokalen.Add(location);
         }
 
         return club;

@@ -3,12 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ttc.DataEntities;
 
-[Table("matchcomment")]
+[Table("MatchComment")]
 public class MatchCommentEntity
 {
     [Key]
     public int Id { get; set; }
     public DateTime PostedOn { get; set; }
+    [Column(TypeName = "TEXT")]
+    [StringLength(65000)]
     public string? Text { get; set; }
     public bool Hidden { get; set; }
     [MaxLength(100)]

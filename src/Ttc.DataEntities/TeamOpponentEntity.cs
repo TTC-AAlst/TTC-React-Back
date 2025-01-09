@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ttc.DataEntities;
 
-[Table("teamopponent")]
+[Table("TeamOpponent")]
 public class TeamOpponentEntity
 {
     [Key]
@@ -21,7 +21,7 @@ public class TeamOpponentEntity
     /// Team A, B, C, ...
     /// </summary>
     [MaxLength(2)]
-    public string TeamCode { get; set; }
+    public string TeamCode { get; set; } = "";
 
     public override string ToString() => $"Id={Id}, Reeks=_{Team}_, ClubId={ClubId}, TeamCode={TeamCode}";
 }

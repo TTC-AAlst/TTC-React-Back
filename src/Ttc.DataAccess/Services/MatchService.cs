@@ -225,9 +225,9 @@ public class MatchService
             {
                 MatchId = matchId,
                 PlayerId = player.Id,
-                Name = player.NaamKort ?? "",
+                Name = player.Alias ?? "",
                 Status = newStatus,
-                Ranking = match.Competition is Competition.Vttl or Competition.Jeugd ? player.KlassementVttl : player.KlassementSporta,
+                Ranking = match.Competition is Competition.Vttl or Competition.Jeugd ? player.RankingVttl : player.RankingSporta,
                 Home = match.IsHomeMatch ?? false,
                 Position = i
             };
@@ -321,7 +321,7 @@ public class MatchService
     {
         int currentSeason = _context.CurrentSeason;
         var activePlayers = await _context.Players
-            .Where(x => x.Gestopt == null)
+            .Where(x => x.QuitYear == null)
             .Where(x => x.ClubIdSporta.HasValue)
             .ToArrayAsync();
 

@@ -21,7 +21,7 @@ Reset je paswoord hier:<br>
     public async Task Email(string email, Guid guid)
     {
         string subject = "Paswoord reset TTC Aalst";
-        string fullUrlLink = "http://www.ttc-aalst.be/login/nieuw-paswoord/" + guid;
+        string fullUrlLink = "https://ttc-aalst.be/login/nieuw-paswoord/" + guid;
         string content = string.Format(NewPasswordRequestTemplate, fullUrlLink);
         await _emailService.SendEmail(email, subject, content, _config);
     }

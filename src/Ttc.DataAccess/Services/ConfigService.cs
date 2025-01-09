@@ -23,20 +23,20 @@ public class ConfigService
             "endOfSeason"
         };
 
-        var parameters = await _context.Parameters.Where(x => keys.Contains(x.Sleutel)).ToArrayAsync();
-        return parameters.ToDictionary(x => x.Sleutel, x => x.Value);
+        var parameters = await _context.Parameters.Where(x => keys.Contains(x.Key)).ToArrayAsync();
+        return parameters.ToDictionary(x => x.Key, x => x.Value);
     }
 
     public async Task<EmailConfig> GetEmailConfig()
     {
-        var sendGridApiKey = (await _context.Parameters.SingleAsync(x => x.Sleutel == "SendGridApiKey")).Value;
-        var fromEmail = (await _context.Parameters.SingleAsync(x => x.Sleutel == "FromEmail")).Value;
+        var sendGridApiKey = (await _context.Parameters.SingleAsync(x => x.Key == "SendGridApiKey")).Value;
+        var fromEmail = (await _context.Parameters.SingleAsync(x => x.Key == "FromEmail")).Value;
         return new EmailConfig(fromEmail, sendGridApiKey);
     }
 
     public async Task Save(string key, string value)
     {
-        var param = await _context.Parameters.SingleAsync(x => x.Sleutel == key);
+        var param = await _context.Parameters.SingleAsync(x => x.Key == key);
         if (key == "year")
         {
             int newYear = int.Parse(value);

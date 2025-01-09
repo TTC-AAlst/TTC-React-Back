@@ -65,7 +65,7 @@ internal class SportaMatchExcelCreator
             CreateTemplateVisitorPlayers(package);
 
             var scoresheet = package.Workbook.Worksheets["Wedstrijdblad"];
-            var location = _context.Parameters.First(p => p.Sleutel == "location");
+            var location = _context.Parameters.First(p => p.Key == "location");
             scoresheet.Cells["B5"].Value = location.Value;
 
             // Fill in match details
@@ -74,7 +74,7 @@ internal class SportaMatchExcelCreator
             scoresheet.Cells["U4"].Value = _match.FrenoyMatchId;
 
             var ourTeam = _match.HomeTeam ?? _match.AwayTeam;
-            scoresheet.Cells["W5"].Value = string.IsNullOrWhiteSpace(ourTeam.ReeksNummer) ? "Ere" : ourTeam.ReeksNummer + ourTeam.ReeksCode;
+            scoresheet.Cells["W5"].Value = string.IsNullOrWhiteSpace(ourTeam.DivisionNumber) ? "Ere" : ourTeam.DivisionNumber + ourTeam.DivisionCode;
             scoresheet.Cells["A9"].Value = $"Aalst {ourTeam.TeamCode}";
 
             var theirTeam = GetTheirTeam();
@@ -113,15 +113,15 @@ internal class SportaMatchExcelCreator
         }
     }
 
-    private (string ClubName, string TeamCode) GetTheirTeam()
+    private (string ClubName, string? TeamCode) GetTheirTeam()
     {
         var theirClubId = _match.HomeTeamId.HasValue ? _match.AwayClubId : _match.HomeClubId;
         var club = _context.Clubs.Single(x => x.Id == theirClubId);
         if (_match.HomeTeamId.HasValue)
         {
-            return (club.Naam, _match.AwayTeamCode);
+            return (club.Name, _match.AwayTeamCode);
         }
-        return (club.Naam, _match.HomeTeamCode);
+        return (club.Name, _match.HomeTeamCode);
     }
 
     private string GetTheirTeamDesc()
@@ -146,8 +146,8 @@ internal class SportaMatchExcelCreator
         {
             sheet.Cells["A" + rowIndex].Value = opponent.Name;
             sheet.Cells["B" + rowIndex].Value = opponent.LidNummerSporta;
-            sheet.Cells["C" + rowIndex].Value = opponent.KlassementSporta;
-            sheet.Cells["D" + rowIndex].Value = KlassementValueConverter.Sporta(opponent.KlassementSporta);
+            sheet.Cells["C" + rowIndex].Value = opponent.RankingSporta;
+            sheet.Cells["D" + rowIndex].Value = KlassementValueConverter.Sporta(opponent.RankingSporta);
             rowIndex++;
         }
 
@@ -164,8 +164,8 @@ internal class SportaMatchExcelCreator
             .Select(x => new
             {
                 Ploegen = $"Aalst {x.TeamCode}",
-                Afdeling = string.IsNullOrWhiteSpace(x.ReeksNummer) ? "Ere" : x.ReeksNummer,
-                Reeks = x.ReeksCode,
+                Afdeling = string.IsNullOrWhiteSpace(x.DivisionNumber) ? "Ere" : x.DivisionNumber,
+                Reeks = x.DivisionCode,
             })
             .ToArray();
 
@@ -182,7 +182,7 @@ internal class SportaMatchExcelCreator
 
             ploegenSheet.Cells[i, 1].Value = $"Bezoekers {team.TeamCode}-ploeg";
             var opponents = team.Opponents
-                .Select(x => x.Club.Naam + " " + x.TeamCode)
+                .Select(x => x.Club.Name + " " + x.TeamCode)
                 .OrderBy(x => x)
                 .ToArray();
 
@@ -204,8 +204,8 @@ internal class SportaMatchExcelCreator
             .Select(x => new
             {
                 Naam = x.Name,
-                Klassement = KlassementValueConverter.Sporta(x.KlassementSporta),
-                Waarde = x.KlassementSporta,
+                Klassement = KlassementValueConverter.Sporta(x.RankingSporta),
+                Waarde = x.RankingSporta,
                 Lidkaart = x.LidNummerSporta
             })
             .ToArray();

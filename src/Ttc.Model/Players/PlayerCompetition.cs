@@ -39,7 +39,7 @@ public class PlayerCompetition
         
     }
 
-    public PlayerCompetition(Competition competition, int clubId, int uniqueIndex, string frenoyLink, string ranking, int position, int rankingIndex, int rankingValue, string prevRanking)
+    public PlayerCompetition(Competition competition, int clubId, int uniqueIndex, string frenoyLink, string ranking, int position, int rankingIndex, int rankingValue, string nextRanking)
     {
         Competition = competition;
         ClubId = clubId;
@@ -49,7 +49,7 @@ public class PlayerCompetition
         UniqueIndex = uniqueIndex;
         RankingIndex = rankingIndex;
         RankingValue = rankingValue;
-        NextRanking = prevRanking;
+        NextRanking = nextRanking;
     }
     #endregion
 

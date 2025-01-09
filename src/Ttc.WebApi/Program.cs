@@ -10,6 +10,8 @@ using Ttc.Model.Core;
 using Ttc.WebApi.Emailing;
 using Ttc.WebApi.Utilities;
 using Ttc.WebApi.Utilities.Auth;
+using Microsoft.EntityFrameworkCore;
+using Ttc.DataEntities.Core;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -48,8 +50,8 @@ try
     });
     builder.Services.AddEndpointsApiExplorer();
     AddSwagger.Configure(builder.Services);
-    var ttcSettings = LoadSettings.Configure(builder.Services);
-    GlobalBackendConfiguration.Configure(builder.Services, ttcSettings);
+    var (ttcSettings, configuration) = LoadSettings.Configure(builder.Services);
+    GlobalBackendConfiguration.Configure(builder.Services, configuration);
     AddAuthentication.Configure(builder.Services, ttcSettings);
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
     builder.Services.AddProblemDetails();
@@ -94,6 +96,13 @@ try
     app.MapControllers();
     app.UseExceptionHandler();
     app.Lifetime.ApplicationStopped.Register(Log.CloseAndFlush);
+
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<ITtcDbContext>();
+        dbContext.Database.Migrate();
+    }
+
     app.Run();
 }
 catch (Exception ex)

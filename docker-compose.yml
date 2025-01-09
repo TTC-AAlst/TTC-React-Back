@@ -2,13 +2,11 @@ version: '3.8'
 
 services:
   db:
-    build:
-      context: ./db
-      dockerfile: Dockerfile
+    image: mysql:5.5.60
     container_name: ttc-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: my-secret-pw
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ttc_aalst
       MYSQL_USER:
       MYSQL_PASSWORD:
@@ -17,7 +15,6 @@ services:
     networks:
       - ttcnet
     volumes:
-      - ./db:/docker-entrypoint-initdb.d
       - mysql-data:/var/lib/mysql
 
   webapi:
@@ -32,6 +29,7 @@ services:
       - ttcnet
     environment:
       - ASPNETCORE_ENVIRONMENT=Release
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     volumes:
       - ./upload:/upload
     depends_on:

@@ -26,12 +26,12 @@ public class FrenoyClubApi : FrenoyApiBase
         if (_isVttl)
         {
             getClubCode = dbClub => dbClub.CodeVttl;
-            clubs = _db.Clubs.Include(x => x.Lokalen).Where(club => !string.IsNullOrEmpty(club.CodeVttl)).ToArray();
+            clubs = _db.Clubs.Include(x => x.Locations).Where(club => !string.IsNullOrEmpty(club.CodeVttl)).ToArray();
         }
         else
         {
             getClubCode = dbClub => dbClub.CodeSporta;
-            clubs = _db.Clubs.Include(x => x.Lokalen).Where(club => !string.IsNullOrEmpty(club.CodeSporta)).ToArray();
+            clubs = _db.Clubs.Include(x => x.Locations).Where(club => !string.IsNullOrEmpty(club.CodeSporta)).ToArray();
         }
         await SyncClubLokalen(clubs, getClubCode);
     }
@@ -53,15 +53,15 @@ public class FrenoyClubApi : FrenoyApiBase
             var frenoyClub = frenoyClubs.GetClubsResponse.ClubEntries.FirstOrDefault();
             if (frenoyClub == null)
             {
-                Debug.Print("Got some wrong CodeSporta/Vttl in legacy db: " + dbClub.Naam);
+                Debug.Print("Got some wrong CodeSporta/Vttl in legacy db: " + dbClub.Name);
             }
             else if (frenoyClub.VenueEntries == null)
             {
-                Debug.Print("Missing frenoy data?: " + dbClub.Naam);
+                Debug.Print("Missing frenoy data?: " + dbClub.Name);
             }
-            else if (frenoyClub.VenueEntries.Length < dbClub.Lokalen.Count)
+            else if (frenoyClub.VenueEntries.Length < dbClub.Locations.Count)
             {
-                Debug.Print("we got better data...: " + dbClub.Naam);
+                Debug.Print("we got better data...: " + dbClub.Name);
             }
             else
             {
@@ -71,15 +71,15 @@ public class FrenoyClubApi : FrenoyApiBase
                 {
                     //Debug.Assert(string.IsNullOrWhiteSpace(frenoyLokaal.Comment), "comments opslaan in db?");
                     Debug.Assert(frenoyLokaal.ClubVenue == "1");
-                    var lokaal = new ClubLokaal
+                    var lokaal = new ClubLocationEntity
                     {
-                        Lokaal = frenoyLokaal.Name,
-                        Adres = frenoyLokaal.Street,
+                        Description = frenoyLokaal.Name,
+                        Address = frenoyLokaal.Street,
                         ClubId = dbClub.Id,
-                        Gemeente = frenoyLokaal.Town.Substring(frenoyLokaal.Town.IndexOf(" ") + 1),
-                        Telefoon = frenoyLokaal.Phone,
-                        Postcode = int.Parse(frenoyLokaal.Town.Substring(0, frenoyLokaal.Town.IndexOf(" "))),
-                        Hoofd = frenoyLokaal.ClubVenue == "1" ? 1 : 0
+                        City = frenoyLokaal.Town.Substring(frenoyLokaal.Town.IndexOf(" ") + 1),
+                        Mobile = frenoyLokaal.Phone,
+                        PostalCode = int.Parse(frenoyLokaal.Town.Substring(0, frenoyLokaal.Town.IndexOf(" "))),
+                        MainLocation = frenoyLokaal.ClubVenue == "1"
                     };
                     _db.ClubLokalen.Add(lokaal);
                 }

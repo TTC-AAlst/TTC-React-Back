@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 using Ttc.Model.Players;
 
 namespace Ttc.DataEntities;
 
-[Table("matches")]
-[Index(nameof(Date))]
+[Table("Match")]
 public class MatchEntity
 {
     [Key]
@@ -26,18 +24,16 @@ public class MatchEntity
     [MaxLength(200)]
     public string? Block { get; set; }
 
-    //[Index]
     public int FrenoyDivisionId { get; set; }
     /// <summary>
     /// 2015-2016 = 16
     /// </summary>
-    public int FrenoySeason { get; set; } // TODO: need extra filtering on season in frontend
+    public int FrenoySeason { get; set; }
     public Competition Competition { get; set; }
 
     public int? HomeTeamId { get; set; }
     [ForeignKey("HomeTeamId")]
     public TeamEntity? HomeTeam { get; set; }
-    //[Index]
     public int HomeClubId { get; set; }
     [MaxLength(2)]
     public string? HomeTeamCode { get; set; }
@@ -45,7 +41,6 @@ public class MatchEntity
     public int? AwayTeamId { get; set; }
     [ForeignKey("AwayTeamId")]
     public TeamEntity? AwayTeam { get; set; }
-    //[Index]
     public int AwayClubId { get; set; }
 
     [MaxLength(2)]
@@ -54,8 +49,11 @@ public class MatchEntity
     public int ReportPlayerId { get; set; }
     public ICollection<MatchGameEntity> Games { get; set; }
     public ICollection<MatchPlayerEntity> Players { get; set; }
+    [StringLength(250)]
     public string? FormationComment { get; set; }
     public ICollection<MatchCommentEntity> Comments { get; set; }
+    [Column(TypeName = "TEXT")]
+    [StringLength(65000)]
     public string? Description { get; set; }
     public int? HomeScore { get; set; }
     public int? AwayScore { get; set; }
