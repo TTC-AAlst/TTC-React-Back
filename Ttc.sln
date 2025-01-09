@@ -26,8 +26,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frenoy.Api", "src\Frenoy.Ap
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "db", "db", "{8C14F294-2B6E-4081-9C78-A92729206D5A}"
 	ProjectSection(SolutionItems) = preProject
-		db\000 - backup - ttc - heidi.sql = db\000 - backup - ttc - heidi.sql
-		db\001 - initial adjustments.sql = db\001 - initial adjustments.sql
+		db\000-initial.sql = db\000-initial.sql
+		db\Dockerfile = db\Dockerfile
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ttc.UnitTests", "src\Ttc.UnitTests\Ttc.UnitTests.csproj", "{5FA97B84-068E-462B-B883-C9D24B98EFD6}"

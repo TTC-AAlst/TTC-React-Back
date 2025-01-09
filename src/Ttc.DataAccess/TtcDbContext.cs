@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Ttc.DataAccess.Legacy;
 using Ttc.DataEntities;
 using Ttc.DataEntities.Core;
 
@@ -39,9 +38,6 @@ internal class TtcDbContext : DbContext, ITtcDbContext
     }
 
     public int CurrentFrenoySeason => CurrentSeason - 2000 + 1;
-
-    public DbSet<BackupReport> BackupReports { get; set; }
-    public DbSet<BackupTeamPlayer> BackupTeamPlayers { get; set; }
 
     public TtcDbContext(DbContextOptions<TtcDbContext> options) : base(options)
     {
