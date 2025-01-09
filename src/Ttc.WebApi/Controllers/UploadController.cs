@@ -1,17 +1,6 @@
-﻿using System;
-using System.Diagnostics;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Web;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ttc.DataAccess.Services;
 using Ttc.Model.Core;
-using Ttc.WebApi.Utilities;
 
 namespace Ttc.WebApi.Controllers;
 
@@ -28,7 +17,7 @@ public class UploadController
 
     [HttpPost]
     [Route("Image")]
-    public void UploadImage([FromBody] UploadImageDto data)
+    public async Task UploadImage([FromBody] UploadImageDto data)
     {
         var file = GetServerPlayerImageFile(data.Type, data.DataId);
         if (file.Exists)
@@ -40,55 +29,44 @@ public class UploadController
 
         string base64String = data.Image.Substring(22);
         byte[] bytes = Convert.FromBase64String(base64String);
-        using (var ms = new MemoryStream(bytes))
-        {
-            var image = Image.FromStream(ms);
-            image.Save(file.FullName);
-        }
+        await File.WriteAllBytesAsync(file.FullName, bytes);
     }
 
     [HttpPost]
-    public async Task<HttpResponseMessage> UploadTempFile()
+    public async Task<IResult> UploadTempFile(IFormFile file, [FromForm] string uploadType, [FromForm] int uploadTypeId)
     {
-        //if (!Request.Content.IsMimeMultipartContent())
-        //{
-        //    throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
-        //}
+        string fullPath = GetServerImagePath(ImageFolder.Temp);
 
-        //string fullPath = GetServerImagePath(ImageFolder.Temp);
-        //var provider = new MultipartFormDataStreamProvider(fullPath);
+        try
+        {
+            var originalFileExtension = Path.GetExtension(file.FileName);
+            var tempFilePath = Path.Combine(fullPath, uploadType + "_" + uploadTypeId + "_" + Path.GetRandomFileName());
+            var tempFilePathWithExtension = Path.ChangeExtension(tempFilePath, originalFileExtension);
 
-        //try
-        //{
-        //    await Request.Content.ReadAsMultipartAsync(provider);
+            // Save the file to the temporary folder
+            await using (var stream = new FileStream(tempFilePathWithExtension, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
 
-        //    var file = provider.FileData.First();
+            if (uploadType.Equals("match", StringComparison.OrdinalIgnoreCase))
+            {
+                var matchFolderPath = GetServerImagePath(ImageFolder.Match);
+                Directory.CreateDirectory(matchFolderPath);
 
-        //    var localFileName = file.Headers.ContentDisposition.Name.Substring(1);
-        //    localFileName = localFileName.Substring(0, localFileName.Length - 1);
-        //    var originalFile = new FileInfo(localFileName);
-        //    string localFileNameWithExt = Path.ChangeExtension(file.LocalFileName, originalFile.Extension);
-        //    File.Move(file.LocalFileName, localFileNameWithExt);
+                var matchFilePath = Path.Combine(matchFolderPath, Path.GetFileName(tempFilePathWithExtension));
+                File.Move(tempFilePathWithExtension, matchFilePath);
 
-        //    string fieldType = provider.FormData.GetValues("uploadType").First();
-        //    if (fieldType == "match")
-        //    {
-        //        var matchPath = GetServerImagePath(ImageFolder.Match);
-        //        var fn = new FileInfo(localFileNameWithExt);
-        //        string matchName = matchPath + "\\" + fn.Name;
-        //        File.Move(localFileNameWithExt, matchName);
-        //        return Request.CreateResponse(HttpStatusCode.OK, new { fileName = "/img/matches/" + fn.Name });
-        //    }
+                return Results.Ok(new { fileName = $"/img/matches/{Path.GetFileName(matchFilePath)}" });
+            }
 
-        //    string publicFileName = "/img/temp/" + localFileNameWithExt.Replace(fullPath, "").Replace("\\", "");
-
-        //    return Request.CreateResponse(HttpStatusCode.OK, new { fileName = publicFileName });
-        //}
-        //catch (System.Exception e)
-        //{
-        //    return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
-        //}
-        return null;
+            string publicFileName = $"/img/temp/{Path.GetFileName(tempFilePathWithExtension)}";
+            return Results.Ok(new { fileName = publicFileName });
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem(detail: ex.Message, statusCode: StatusCodes.Status500InternalServerError);
+        }
     }
 
     #region Private FileSystem stuff
