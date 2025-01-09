@@ -18,7 +18,7 @@ public class MatchPlayer
     /// True == TTC Aalst player
     /// </summary>
     public bool Home { get; set; }
-    public int PlayerId { get; set; }
+    public int? PlayerId { get; set; }
     public string Alias { get; set; }
     #endregion
 

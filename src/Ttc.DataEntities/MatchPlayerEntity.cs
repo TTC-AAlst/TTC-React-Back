@@ -14,8 +14,8 @@ public class MatchPlayerEntity
     public int MatchId { get; set; }
 
     [ForeignKey("PlayerId")]
-    public PlayerEntity Player { get; set; }
-    public int PlayerId { get; set; }
+    public PlayerEntity? Player { get; set; }
+    public int? PlayerId { get; set; }
 
     [MaxLength(10)]
     public string Status { get; set; }
