@@ -3,7 +3,7 @@ version: '3.8'
 services:
   db:
     image: mysql:5.5.60
-    container_name: ttc-mysql
+    container_name: ttc-mysql-migrations
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -21,7 +21,7 @@ services:
     build:
       context: ./
       dockerfile: ./src/Ttc.WebApi/Dockerfile
-    container_name: ttc-backend
+    container_name: ttc-backend-migrations
     restart: always
     ports:
       - "7200:8080"
