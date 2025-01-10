@@ -65,6 +65,7 @@ try
         Log.Information("Starting Development Server with Swagger");
         app.UseSwagger();
         app.UseSwaggerUI();
+        app.UseDeveloperExceptionPage();
     }
     else
     {
