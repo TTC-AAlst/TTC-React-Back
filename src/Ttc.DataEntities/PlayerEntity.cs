@@ -94,6 +94,11 @@ public class PlayerEntity
     /// </summary>
     public int? QuitYear { get; set; }
     public bool Active => QuitYear == null;
+    /// <summary>
+    /// Update this whenever a new player image is uploaded
+    /// so that the cache gets invalidated
+    /// </summary>
+    public int ImageVersion { get; set; }
 
     public bool IsFromOwnClub() => ClubIdSporta == Constants.OwnClubId || ClubIdVttl == Constants.OwnClubId;
 

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Ttc.DataEntities.Core;
 using Ttc.Model.Core;
 
 namespace Ttc.WebApi.Controllers;
@@ -9,10 +11,12 @@ namespace Ttc.WebApi.Controllers;
 public class UploadController
 {
     private readonly TtcSettings _settings;
+    private readonly ITtcDbContext _context;
 
-    public UploadController(TtcSettings settings)
+    public UploadController(TtcSettings settings, ITtcDbContext context)
     {
         _settings = settings;
+        _context = context;
     }
 
     [HttpPost]
@@ -25,6 +29,16 @@ public class UploadController
             var backupFile = GetServerImagePath(ImageFolder.Backup) + "\\";
             backupFile += data.Type.Replace("-", "_") + "_" + data.DataId + "_" + Path.GetRandomFileName() + ".png";
             File.Move(file.FullName, backupFile);
+        }
+
+        if (data.Type is "player-photo" or "player-avatar")
+        {
+            var player = await _context.Players.SingleOrDefaultAsync(x => x.Id == data.DataId);
+            if (player != null)
+            {
+                player.ImageVersion++;
+                await _context.SaveChangesAsync();
+            }
         }
 
         string base64String = data.Image.Substring(22);

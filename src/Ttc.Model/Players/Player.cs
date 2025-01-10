@@ -25,6 +25,8 @@ public class Player : ITtcConfidential
 
     public PlayerCompetition? Vttl { get; set; }
     public PlayerCompetition? Sporta { get; set; }
+
+    public int ImageVersion { get; set; }
     #endregion
 
     public void Hide()
