@@ -44,6 +44,7 @@ public class UploadController
         string base64String = data.Image.Substring(22);
         byte[] bytes = Convert.FromBase64String(base64String);
         await File.WriteAllBytesAsync(file.FullName, bytes);
+        file.LastWriteTime = DateTime.Now;
     }
 
     [HttpPost]
