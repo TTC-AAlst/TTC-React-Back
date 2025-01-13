@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ttc.DataAccess.Services;
 using Ttc.Model.Core;
@@ -38,10 +37,11 @@ public class ConfigController
     [HttpPost]
     [Route("Log")]
     [AllowAnonymous]
-    public void Log([FromBody] dynamic context)
+    public void Log([FromBody] ComponentError error)
     {
-        var str = context.args.ToString();
-        _logger.Error(str);
+        string errMsg = error.Message + Environment.NewLine + error.Stack;
+        errMsg += Environment.NewLine + Environment.NewLine + "Component Stack:" + Environment.NewLine + error.ComponentStack;
+        _logger.Error(errMsg);
     }
 
     [HttpGet]
@@ -69,3 +69,11 @@ public class ConfigParam
     public override string ToString() => $"{Key} => {Value}";
 }
 
+public class ComponentError
+{
+    public string Message { get; set; } = "";
+    public string Stack { get; set; } = "";
+    public string ComponentStack { get; set; } = "";
+
+    public override string ToString() => Message;
+}
