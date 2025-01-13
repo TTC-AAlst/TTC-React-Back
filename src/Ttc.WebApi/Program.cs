@@ -15,6 +15,18 @@ using Ttc.DataEntities.Core;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+
+    // These two don't seem to be turning anything off?
+    //.MinimumLevel.Override("Microsoft.AspNetCore.Mvc", LogEventLevel.Warning)
+    //.MinimumLevel.Override("Microsoft.AspNetCore.Routing", LogEventLevel.Warning)
+
+    // Turn off HTTP GET/POST logs:
+    //.MinimumLevel.Override("Microsoft.AspNetCore.Hosting", LogEventLevel.Warning)
+
+    // Turn everything off:
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+
     .Enrich.FromLogContext()
     .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}")
     .WriteTo.File(
@@ -23,7 +35,6 @@ Log.Logger = new LoggerConfiguration()
         outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}",
         shared: true
     )
-    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
     .CreateLogger();
 
 Log.Information("Starting up...");
@@ -93,7 +104,11 @@ try
         LogContext.PushProperty("UserName", context.User.Identity?.Name ?? "Anonymous");
         await next();
     });
-    app.UseSerilogRequestLogging();
+    //app.UseSerilogRequestLogging(options =>
+    //{
+    //    options.GetLevel = (httpContext, elapsed, exception) =>
+    //        LogEventLevel.Warning;
+    //});
     app.MapControllers();
     app.UseExceptionHandler();
     app.Lifetime.ApplicationStopped.Register(Log.CloseAndFlush);
