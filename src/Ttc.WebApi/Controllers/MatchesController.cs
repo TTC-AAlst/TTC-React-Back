@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Ttc.DataAccess.Services;
 using Ttc.Model.Matches;
+using Ttc.Model.Players;
 using Ttc.Model.Teams;
 using Ttc.WebApi.Emailing;
 using Ttc.WebApi.Utilities.Auth;
@@ -171,8 +172,17 @@ public class MatchesController
     {
         var emailConfig = await _configService.GetEmailConfig();
         var players = await _playerService.GetOwnClub();
-        var activePlayers = players.Where(player => player.Active);
-        await _emailService.SendEmail(activePlayers, email.Title, email.Email, emailConfig);
+
+        IEnumerable<Player> sendTo;
+        if (email.JustMe)
+        {
+            sendTo = players.Where(player => player.Id == _user.PlayerId!.Value);
+        }
+        else
+        {
+            sendTo = players.Where(player => player.Active);
+        }
+        await _emailService.SendEmail(sendTo, email.Title, email.Email, emailConfig);
     }
 }
 
