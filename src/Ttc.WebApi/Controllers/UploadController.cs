@@ -26,8 +26,8 @@ public class UploadController
         var file = GetServerPlayerImageFile(data.Type, data.DataId);
         if (file.Exists)
         {
-            var backupFile = GetServerImagePath(ImageFolder.Backup) + "\\";
-            backupFile += data.Type.Replace("-", "_") + "_" + data.DataId + "_" + Path.GetRandomFileName() + ".png";
+            string backupFile = GetServerImagePath(ImageFolder.Backup);
+            backupFile = Path.Combine(backupFile, data.Type.Replace("-", "_") + "_" + data.DataId + "_" + Path.GetRandomFileName() + ".png");
             File.Move(file.FullName, backupFile);
         }
 
@@ -151,9 +151,9 @@ public class UploadImageDto
     /// <summary>
     /// Base64 encoded
     /// </summary>
-    public string Image { get; set; }
+    public string Image { get; set; } = "";
     public int DataId { get; set; }
-    public string Type { get; set; }
+    public string Type { get; set; } = "";
 
     public override string ToString() => $"Image: {Image}, Id: {DataId}";
 }
