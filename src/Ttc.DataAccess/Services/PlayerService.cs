@@ -38,7 +38,7 @@ public class PlayerService
 
     public async Task<Player> UpdateStyle(PlayerStyle playerStyle)
     {
-        var existingSpeler = await _context.Players.FirstOrDefaultAsync(x => x.Id == playerStyle.PlayerId);
+        var existingSpeler = await _context.Players.SingleOrDefaultAsync(x => x.Id == playerStyle.PlayerId);
         if (existingSpeler == null)
         {
             return null;
