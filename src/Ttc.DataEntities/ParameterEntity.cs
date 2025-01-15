@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Ttc.DataEntities.Core;
 
 namespace Ttc.DataEntities;
 
 [Table("Parameter")]
-public class ParameterEntity
+public class ParameterEntity : IAudit
 {
     [Key]
     [StringLength(20)]
@@ -13,6 +14,7 @@ public class ParameterEntity
     public string Value { get; set; } = "";
     [StringLength(255)]
     public string? Description { get; set; }
+    public Audit Audit { get; } = new();
 
     public override string ToString() => $"{Key}={Value}, Desc={Description}";
 }

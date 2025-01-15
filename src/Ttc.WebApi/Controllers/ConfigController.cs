@@ -26,9 +26,10 @@ public class ConfigController
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<Dictionary<string, string>> Get()
+    public async Task<Dictionary<string, string>?> Get([FromQuery]DateTime? lastChecked)
     {
-        return await _service.Get();
+        var config = await _service.Get(lastChecked);
+        return config;
     }
 
     [HttpPost]

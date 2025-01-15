@@ -58,6 +58,8 @@ try
     builder.Services.AddSingleton<TtcLogger>();
     builder.Services.AddScoped<EmailService>();
     builder.Services.AddScoped<UserProvider>();
+    builder.Services.AddScoped<IUserNameProvider, WebUserNameProvider>();
+    builder.Services.AddMemoryCache();
     builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
     builder.Services.AddControllers().AddJsonOptions(options =>
     {

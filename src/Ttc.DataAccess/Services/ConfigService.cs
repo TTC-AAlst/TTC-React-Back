@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Globalization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Ttc.DataAccess.Utilities;
 using Ttc.DataEntities.Core;
 
@@ -7,24 +9,41 @@ namespace Ttc.DataAccess.Services;
 public class ConfigService
 {
     private readonly ITtcDbContext _context;
+    private readonly CacheHelper _cache;
 
-    public ConfigService(ITtcDbContext context)
+    private static readonly string[] PublicParameters = new[]
+    {
+        "email", "googleMapsUrl", "location", "trainingDays", "competitionDays",
+        "adultMembership", "youthMembership", "additionalMembership", "recreationalMembers",
+        "frenoyClubIdVttl", "frenoyClubIdSporta", "compBalls", "clubBankNr", "clubOrgNr", "year",
+        "endOfSeason"
+    };
+
+    public ConfigService(ITtcDbContext context, IMemoryCache cache)
     {
         _context = context;
+        _cache = new CacheHelper(cache);
     }
 
-    public async Task<Dictionary<string, string>> Get()
+    public async Task<Dictionary<string, string>?> Get(DateTime? lastChecked)
     {
-        var keys = new[]
-        {
-            "email", "googleMapsUrl", "location", "trainingDays", "competitionDays",
-            "adultMembership", "youthMembership", "additionalMembership", "recreationalMembers",
-            "frenoyClubIdVttl", "frenoyClubIdSporta", "compBalls", "clubBankNr", "clubOrgNr", "year",
-            "endOfSeason"
-        };
+        var dict = await _cache.GetOrSet("config", Get, TimeSpan.FromHours(1))!;
 
-        var parameters = await _context.Parameters.Where(x => keys.Contains(x.Key)).ToArrayAsync();
-        return parameters.ToDictionary(x => x.Key, x => x.Value);
+        DateTime lastCachedChange = DateTime.ParseExact(dict[nameof(Audit.ModifiedOn)], "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
+        if (lastChecked.HasValue && lastChecked.Value >= lastCachedChange)
+        {
+            return null;
+        }
+        return dict;
+    }
+
+    private async Task<Dictionary<string, string>> Get()
+    {
+        var parameters = await _context.Parameters.Where(x => PublicParameters.Contains(x.Key)).ToArrayAsync();
+        var dict = parameters.ToDictionary(x => x.Key, x => x.Value);
+        var lastChange = parameters.Max(x => x.Audit.ModifiedOn ?? DateTime.MinValue);
+        dict.Add(nameof(Audit.ModifiedOn), lastChange.ToString("yyyy-MM-ddTHH:mm:ss"));
+        return dict;
     }
 
     public async Task<EmailConfig> GetEmailConfig()
@@ -48,5 +67,6 @@ public class ConfigService
             param.Value = value;
         }
         await _context.SaveChangesAsync();
+        _cache.Remove("config");
     }
 }
