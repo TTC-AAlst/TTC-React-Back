@@ -42,12 +42,16 @@ Log.Information("Starting up...");
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+    var (ttcSettings, configuration) = LoadSettings.Configure(builder.Services);
     builder.Services.AddCors(options =>
     {
-        options.AddDefaultPolicy(b => {
-            b.AllowAnyOrigin();
-            b.AllowAnyMethod();
-            b.AllowAnyHeader();
+        options.AddPolicy("CorsPolicy", corsBuilder =>
+        {
+            corsBuilder
+                .WithOrigins(ttcSettings.Origins)
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
         });
     });
     builder.Services.AddSerilog(Log.Logger);
@@ -61,11 +65,12 @@ try
     });
     builder.Services.AddEndpointsApiExplorer();
     AddSwagger.Configure(builder.Services);
-    var (ttcSettings, configuration) = LoadSettings.Configure(builder.Services);
     GlobalBackendConfiguration.Configure(builder.Services, configuration);
     AddAuthentication.Configure(builder.Services, ttcSettings);
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
     builder.Services.AddProblemDetails();
+    builder.Services.AddSignalR();
+    builder.Services.AddSingleton<TtcHub>();
 
     builder.Services.AddServiceModelServices().AddServiceModelMetadata();
     builder.Services.AddSingleton<IServiceBehavior, UseRequestHeadersForMetadataAddressBehavior>();
@@ -88,8 +93,7 @@ try
     var serviceMetadataBehavior = app.Services.GetRequiredService<CoreWCF.Description.ServiceMetadataBehavior>();
     serviceMetadataBehavior.HttpGetEnabled = true;
 
-    app.UseCors();
-    // app.UseHttpsRedirection();
+    app.UseCors("CorsPolicy");
 
     app.UseStaticFiles(new StaticFileOptions
     {
@@ -111,6 +115,7 @@ try
     //});
     app.MapControllers();
     app.UseExceptionHandler();
+    app.MapHub<TtcHub>("/hubs/ttc");
     app.Lifetime.ApplicationStopped.Register(Log.CloseAndFlush);
 
     using (var scope = app.Services.CreateScope())

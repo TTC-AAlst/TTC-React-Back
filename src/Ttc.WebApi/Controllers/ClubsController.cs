@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ttc.DataAccess.Services;
+using Ttc.DataEntities;
 using Ttc.Model.Clubs;
+using Ttc.WebApi.Utilities;
 
 namespace Ttc.WebApi.Controllers;
 
@@ -11,10 +13,12 @@ public class ClubsController
 {
     #region Constructor
     private readonly ClubService _service;
+    private readonly TtcHub _hub;
 
-    public ClubsController(ClubService service)
+    public ClubsController(ClubService service, TtcHub hub)
     {
         _service = service;
+        _hub = hub;
     }
     #endregion
 
@@ -27,6 +31,7 @@ public class ClubsController
     public async Task<Club> UpdateClub([FromBody] Club club)
     {
         var result = await _service.UpdateClub(club);
+        await _hub.BroadcastReload(Entities.Club, result.Id);
         return result;
     }
 
@@ -36,6 +41,7 @@ public class ClubsController
     public async Task SaveBoardMember([FromBody] BoardMember m)
     {
         await _service.SaveBoardMember(m.PlayerId, m.BoardFunction, m.Sort);
+        await _hub.BroadcastReload(Entities.Player, Constants.OwnClubId);
     }
 
     [HttpPost]
@@ -43,6 +49,7 @@ public class ClubsController
     public async Task DeleteBoardMember(int playerId)
     {
         await _service.DeleteBoardMember(playerId);
+        await _hub.BroadcastReload(Entities.Player, Constants.OwnClubId);
     }
 
     public class BoardMember

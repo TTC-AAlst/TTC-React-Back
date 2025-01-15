@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Ttc.DataAccess.Services;
 using Ttc.Model.Players;
+using Ttc.WebApi.Utilities;
 using Ttc.WebApi.Utilities.Auth;
 
 namespace Ttc.WebApi.Controllers;
@@ -13,11 +14,13 @@ public class PlayersController
     #region Constructor
     private readonly PlayerService _service;
     private readonly UserProvider _user;
+    private readonly TtcHub _hub;
 
-    public PlayersController(PlayerService service, UserProvider user)
+    public PlayersController(PlayerService service, UserProvider user, TtcHub hub)
     {
         _service = service;
         _user = user;
+        _hub = hub;
     }
     #endregion
 
@@ -44,6 +47,7 @@ public class PlayersController
     public async Task<Player> UpdateStyle([FromBody] PlayerStyle playerStyle)
     {
         var result = await _service.UpdateStyle(playerStyle);
+        await _hub.BroadcastReload(Entities.Player, result.Id);
         return result;
     }
 
@@ -52,6 +56,7 @@ public class PlayersController
     public async Task<Player> UpdatePlayer([FromBody] Player player)
     {
         var result = await _service.UpdatePlayer(player);
+        await _hub.BroadcastReload(Entities.Player, result.Id);
         return result;
     }
 

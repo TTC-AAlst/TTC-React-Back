@@ -2,7 +2,8 @@
 
 public class TtcSettings
 {
-    public string JwtSecret { get; set; }
-    public string Issuer { get; set; }
-    public string PublicImageFolder { get; set; }
+    public string JwtSecret { get; set; } = "";
+    public string Issuer { get; set; } = "";
+    public string PublicImageFolder { get; set; } = "";
+    public string Origins { get; set; } = "";
 }

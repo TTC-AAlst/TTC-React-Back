@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Ttc.DataAccess.Services;
 using Ttc.Model.Teams;
+using Ttc.WebApi.Utilities;
 
 namespace Ttc.WebApi.Controllers;
 
@@ -11,10 +12,12 @@ public class TeamsController
 {
     #region Constructor
     private readonly TeamService _service;
+    private readonly TtcHub _hub;
 
-    public TeamsController(TeamService service)
+    public TeamsController(TeamService service, TtcHub hub)
     {
         _service = service;
+        _hub = hub;
     }
     #endregion
 
@@ -36,6 +39,7 @@ public class TeamsController
     public async Task<Team> ToggleTeamPlayer([FromBody] TeamToggleRequest req)
     {
         var result = await _service.ToggleTeamPlayer(req);
+        await _hub.BroadcastReload(Entities.Team, req.TeamId);
         return result;
     }
 

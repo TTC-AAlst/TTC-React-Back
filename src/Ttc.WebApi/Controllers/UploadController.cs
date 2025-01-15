@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Ttc.DataEntities.Core;
 using Ttc.Model.Core;
+using Ttc.WebApi.Utilities;
 
 namespace Ttc.WebApi.Controllers;
 
@@ -12,11 +13,13 @@ public class UploadController
 {
     private readonly TtcSettings _settings;
     private readonly ITtcDbContext _context;
+    private readonly TtcHub _hub;
 
-    public UploadController(TtcSettings settings, ITtcDbContext context)
+    public UploadController(TtcSettings settings, ITtcDbContext context, TtcHub hub)
     {
         _settings = settings;
         _context = context;
+        _hub = hub;
     }
 
     [HttpPost]
@@ -31,6 +34,11 @@ public class UploadController
             File.Move(file.FullName, backupFile);
         }
 
+        string base64String = data.Image.Substring(22);
+        byte[] bytes = Convert.FromBase64String(base64String);
+        await File.WriteAllBytesAsync(file.FullName, bytes);
+        file.LastWriteTime = DateTime.Now;
+
         if (data.Type is "player-photo" or "player-avatar")
         {
             var player = await _context.Players.SingleOrDefaultAsync(x => x.Id == data.DataId);
@@ -38,13 +46,9 @@ public class UploadController
             {
                 player.ImageVersion++;
                 await _context.SaveChangesAsync();
+                await _hub.BroadcastReload(Entities.Player, player.Id);
             }
         }
-
-        string base64String = data.Image.Substring(22);
-        byte[] bytes = Convert.FromBase64String(base64String);
-        await File.WriteAllBytesAsync(file.FullName, bytes);
-        file.LastWriteTime = DateTime.Now;
     }
 
     [HttpPost]

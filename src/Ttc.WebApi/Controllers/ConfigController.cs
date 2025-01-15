@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Ttc.DataAccess.Services;
 using Ttc.Model.Core;
+using Ttc.WebApi.Utilities;
 
 namespace Ttc.WebApi.Controllers;
 
@@ -12,11 +14,13 @@ public class ConfigController
     #region Constructor
     private readonly ConfigService _service;
     private readonly TtcLogger _logger;
+    private readonly TtcHub _hub;
 
-    public ConfigController(ConfigService service, TtcLogger logger)
+    public ConfigController(ConfigService service, TtcLogger logger, TtcHub hub)
     {
         _service = service;
         _logger = logger;
+        _hub = hub;
     }
     #endregion
 
@@ -24,7 +28,6 @@ public class ConfigController
     [AllowAnonymous]
     public async Task<Dictionary<string, string>> Get()
     {
-        _logger.Information("Getting config");
         return await _service.Get();
     }
 
@@ -32,6 +35,7 @@ public class ConfigController
     public async Task Post([FromBody] ConfigParam param)
     {
         await _service.Save(param.Key, param.Value);
+        await _hub.BroadcastReload(Entities.Config, 0);
     }
 
     [HttpPost]

@@ -5,6 +5,7 @@ using Ttc.Model.Matches;
 using Ttc.Model.Players;
 using Ttc.Model.Teams;
 using Ttc.WebApi.Emailing;
+using Ttc.WebApi.Utilities;
 using Ttc.WebApi.Utilities.Auth;
 
 namespace Ttc.WebApi.Controllers;
@@ -19,19 +20,22 @@ public class MatchesController
     private readonly ConfigService _configService;
     private readonly EmailService _emailService;
     private readonly UserProvider _user;
+    private readonly TtcHub _hub;
 
     public MatchesController(
         MatchService service,
         PlayerService playerService,
         ConfigService configService,
         EmailService emailService,
-        UserProvider user)
+        UserProvider user,
+        TtcHub hub)
     {
         _service = service;
         _playerService = playerService;
         _configService = configService;
         _emailService = emailService;
         _user = user;
+        _hub = hub;
     }
     #endregion
 
@@ -76,6 +80,7 @@ public class MatchesController
     public async Task<Match> FrenoyMatchSync([FromBody] IdDto matchId, [FromQuery] bool forceSync)
     {
         var result = await _service.FrenoyMatchSync(matchId.Id, forceSync);
+        await _hub.BroadcastReload(Entities.Match, matchId.Id);
         _user.CleanSensitiveData(result);
         return result;
     }
@@ -85,6 +90,8 @@ public class MatchesController
     public async Task FrenoyTeamSync([FromBody] IdDto teamId)
     {
         await _service.FrenoyTeamSync(teamId.Id);
+        // No broadcast: this is typically only used when a match will be
+        // played on a different date due circumstances
     }
 
     [HttpPost]
@@ -93,6 +100,7 @@ public class MatchesController
     public async Task<OtherMatch> FrenoyOtherMatchSync([FromBody] IdDto matchId)
     {
         var result = await _service.FrenoyOtherMatchSync(matchId.Id);
+        await _hub.BroadcastReload(Entities.Match, matchId.Id);
         return result;
     }
 
@@ -101,6 +109,7 @@ public class MatchesController
     public async Task<Match> TogglePlayer([FromBody] MatchPlayer player)
     {
         var result = await _service.ToggleMatchPlayer(player);
+        await _hub.BroadcastReload(Entities.Match, player.MatchId);
         return result;
     }
 
@@ -109,6 +118,7 @@ public class MatchesController
     public async Task<Match> SetMyFormation([FromBody] MatchPlayer player)
     {
         var result = await _service.SetMyFormation(player);
+        await _hub.BroadcastReload(Entities.Match, player.MatchId);
         return result;
     }
 
@@ -117,6 +127,7 @@ public class MatchesController
     public async Task<Match> EditMatchPlayers([FromBody] MatchPlayersDto dto)
     {
         var result = await _service.EditMatchPlayers(dto.MatchId, dto.PlayerIds, dto.NewStatus, dto.BlockAlso, dto.Comment);
+        await _hub.BroadcastReload(Entities.Match, dto.MatchId);
         return result;
     }
 
@@ -125,6 +136,7 @@ public class MatchesController
     public async Task<Match> Report([FromBody] MatchReport report)
     {
         var result = await _service.UpdateReport(report);
+        await _hub.BroadcastReload(Entities.Match, report.MatchId);
         return result;
     }
 
@@ -133,6 +145,7 @@ public class MatchesController
     public async Task<Match> Comment([FromBody] MatchComment comment)
     {
         var result = await _service.AddComment(comment);
+        await _hub.BroadcastReload(Entities.Match, comment.MatchId);
         return result;
     }
 
@@ -141,6 +154,7 @@ public class MatchesController
     public async Task<Match> DeleteComment([FromBody] IdDto comment)
     {
         var result = await _service.DeleteComment(comment.Id);
+        await _hub.BroadcastReload(Entities.Match, result.Id);
         return result;
     }
 
@@ -154,6 +168,7 @@ public class MatchesController
         else if (score.Out > 15) score.Out = 16;
 
         var result = await _service.UpdateScore(score.MatchId, new MatchScore(score.Home, score.Out));
+        await _hub.BroadcastReload(Entities.Match, result.Id);
         return result;
     }
     #endregion
