@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Ttc.DataEntities;
 
 [Flags]
-public enum PlayerToegang
+public enum PlayerAccess
 {
     Player = 1,
     /// <summary>
@@ -41,7 +41,7 @@ public class PlayerEntity
 
     [StringLength(20)]
     public string? Alias { get; set; }
-    public PlayerToegang Security { get; set; }
+    public PlayerAccess Security { get; set; }
     [StringLength(50)]
     public string? Style { get; set; }
     [StringLength(200)]

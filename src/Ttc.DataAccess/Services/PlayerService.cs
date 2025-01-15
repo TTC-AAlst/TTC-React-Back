@@ -36,37 +36,37 @@ public class PlayerService
         return newPlayer;
     }
 
-    public async Task<Player> UpdateStyle(PlayerStyle playerStyle)
+    public async Task<Player?> UpdateStyle(PlayerStyle playerStyle)
     {
-        var existingSpeler = await _context.Players.SingleOrDefaultAsync(x => x.Id == playerStyle.PlayerId);
-        if (existingSpeler == null)
+        var existingPlayer= await _context.Players.SingleOrDefaultAsync(x => x.Id == playerStyle.PlayerId);
+        if (existingPlayer == null)
         {
             return null;
         }
 
-        existingSpeler.Style = playerStyle.Name;
-        existingSpeler.BestStroke = playerStyle.BestStroke;
+        existingPlayer.Style = playerStyle.Name;
+        existingPlayer.BestStroke = playerStyle.BestStroke;
         await _context.SaveChangesAsync();
-        var newMatch = await GetPlayer(playerStyle.PlayerId);
-        return newMatch;
+        var updatedPlayer = await GetPlayer(playerStyle.PlayerId);
+        return updatedPlayer;
     }
 
     public async Task<Player> UpdatePlayer(Player player)
     {
-        var existingSpeler = await _context.Players.FirstOrDefaultAsync(x => x.Id == player.Id);
-        if (existingSpeler == null)
+        var existingPlayer= await _context.Players.FirstOrDefaultAsync(x => x.Id == player.Id);
+        if (existingPlayer == null)
         {
-            existingSpeler = new PlayerEntity();
-            MapPlayer(player, existingSpeler);
-            _context.Players.Add(existingSpeler);
+            existingPlayer = new PlayerEntity();
+            MapPlayer(player, existingPlayer);
+            await _context.Players.AddAsync(existingPlayer);
         }
         else
         {
-            MapPlayer(player, existingSpeler);
+            MapPlayer(player, existingPlayer);
         }
 
         await _context.SaveChangesAsync();
-        player.Id = existingSpeler.Id;
+        player.Id = existingPlayer.Id;
         var newPlayer = await GetPlayer(player.Id);
         return newPlayer;
     }
@@ -79,33 +79,33 @@ public class PlayerService
         await _context.SaveChangesAsync();
     }
 
-    private static void MapPlayer(Player player, PlayerEntity existingSpeler)
+    private static void MapPlayer(Player player, PlayerEntity existingPlayer)
     {
-        existingSpeler.Mobile = player.Contact.Mobile;
-        existingSpeler.Email = player.Contact.Email;
-        existingSpeler.Address = player.Contact.Address;
-        existingSpeler.City = player.Contact.City;
+        existingPlayer.Mobile = player.Contact.Mobile;
+        existingPlayer.Email = player.Contact.Email;
+        existingPlayer.Address = player.Contact.Address;
+        existingPlayer.City = player.Contact.City;
 
-        existingSpeler.Style = player.Style.Name;
-        existingSpeler.BestStroke = player.Style.BestStroke;
+        existingPlayer.Style = player.Style.Name;
+        existingPlayer.BestStroke = player.Style.BestStroke;
 
-        existingSpeler.QuitYear = player.QuitYear;
-        existingSpeler.Security = (PlayerToegang)Enum.Parse(typeof(PlayerToegang), player.Security);
-        existingSpeler.HasKey = player.HasKey;
+        existingPlayer.QuitYear = player.QuitYear;
+        existingPlayer.Security = (PlayerAccess)Enum.Parse(typeof(PlayerAccess), player.Security);
+        existingPlayer.HasKey = player.HasKey;
 
-        existingSpeler.FirstName = player.FirstName;
-        existingSpeler.LastName = player.LastName;
-        existingSpeler.Alias = player.Alias;
+        existingPlayer.FirstName = player.FirstName;
+        existingPlayer.LastName = player.LastName;
+        existingPlayer.Alias = player.Alias;
 
-        existingSpeler.NextRankingVttl = player.Vttl?.NextRanking;
-        existingSpeler.NextRankingSporta = player.Sporta?.NextRanking;
+        existingPlayer.NextRankingVttl = player.Vttl?.NextRanking;
+        existingPlayer.NextRankingSporta = player.Sporta?.NextRanking;
     }
 
     public async Task<byte[]> GetExcelExport()
     {
         var activePlayers = await _context.Players.Where(x => x.QuitYear == null).ToArrayAsync();
-        var exceller = new PlayersExcelCreator(activePlayers);
-        return exceller.Create();
+        var excelCreator = new PlayersExcelCreator(activePlayers);
+        return excelCreator.Create();
     }
     #endregion
 
@@ -130,22 +130,22 @@ public class PlayerService
         };
     }
 
-    private static ICollection<string> GetPlayerSecurity(PlayerToegang toegang)
+    private static string[] GetPlayerSecurity(PlayerAccess access)
     {
-        switch (toegang)
+        switch (access)
         {
-            case PlayerToegang.System:
+            case PlayerAccess.System:
                 return new[] { "CAN_MANAGETEAM", "CAN_EDITALLREPORTS", "IS_ADMIN", "IS_SYSTEM" };
 
-            case PlayerToegang.Dev:
+            case PlayerAccess.Dev:
                 return new[] { "CAN_MANAGETEAM", "CAN_EDITALLREPORTS", "IS_ADMIN", "IS_DEV" };
 
-            case PlayerToegang.Board:
+            case PlayerAccess.Board:
                 return new[] { "CAN_MANAGETEAM", "CAN_EDITALLREPORTS", "IS_ADMIN" };
 
             // No PlayerToegang.Captain: This happens automatically when assigned Captain to a Team
 
-            case PlayerToegang.Player:
+            case PlayerAccess.Player:
             default:
                 return [];
         }
