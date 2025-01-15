@@ -99,7 +99,7 @@ public class FrenoyMatchesApi : FrenoyApiBase
         await SyncTeamMatches(team.Id, team.FrenoyDivisionId, matches.GetMatchesResponse);
     }
 
-    public async Task SyncMatchDetails(MatchEntity matchEntity)
+    public async Task<bool> SyncMatchDetails(MatchEntity matchEntity)
     {
         if (_forceSync || ShouldAttemptMatchSync(matchEntity.Id))
         {
@@ -122,7 +122,9 @@ public class FrenoyMatchesApi : FrenoyApiBase
             await MapMatch(matchEntity, ourTeamId, matchEntity.FrenoyDivisionId, frenoyMatch, matchEntity.FrenoySeason);
             await SyncMatchResults(matchEntity, frenoyMatch);
             await CommitChanges();
+            return true;
         }
+        return false;
     }
 
     // TODO: This is probably some code that fetches opponent team last year performance

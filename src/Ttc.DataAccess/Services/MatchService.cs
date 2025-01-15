@@ -271,19 +271,25 @@ public class MatchService
     #endregion
 
     #region Frenoy Sync
-    public async Task<OtherMatch> FrenoyOtherMatchSync(int matchId)
+    public async Task<OtherMatch?> FrenoyOtherMatchSync(int matchId)
     {
-        await FrenoyMatchSyncCore(matchId, false);
-        var match = _context.Matches
-            .WithIncludes()
-            .Single(x => x.Id == matchId);
-        return _mapper.Map<MatchEntity, OtherMatch>(match);
+        if (await FrenoyMatchSyncCore(matchId, false))
+        {
+            var match = _context.Matches
+                .WithIncludes()
+                .Single(x => x.Id == matchId);
+            return _mapper.Map<MatchEntity, OtherMatch>(match);
+        }
+        return null;
     }
 
-    public async Task<Match> FrenoyMatchSync(int matchId, bool forceSync)
+    public async Task<Match?> FrenoyMatchSync(int matchId, bool forceSync)
     {
-        await FrenoyMatchSyncCore(matchId, forceSync);
-        return await GetMatch(matchId);
+        if (await FrenoyMatchSyncCore(matchId, forceSync))
+        {
+            return await GetMatch(matchId);
+        }
+        return null;
     }
 
     public async Task FrenoyTeamSync(int teamId)
@@ -293,7 +299,7 @@ public class MatchService
         await frenoySync.SyncTeamMatches(team);
     }
 
-    private async Task FrenoyMatchSyncCore(int matchId, bool forceSync)
+    private async Task<bool> FrenoyMatchSyncCore(int matchId, bool forceSync)
     {
         var match = await _context.Matches
             .WithIncludes()
@@ -304,8 +310,9 @@ public class MatchService
         if (forceSync || (match.Date < DateTime.Now && !match.IsSyncedWithFrenoy))
         {
             var frenoySync = new FrenoyMatchesApi(_context, match.Competition, forceSync);
-            await frenoySync.SyncMatchDetails(match);
+            return await frenoySync.SyncMatchDetails(match);
         }
+        return false;
     }
     #endregion
     #endregion
