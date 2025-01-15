@@ -70,7 +70,6 @@ try
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
     builder.Services.AddProblemDetails();
     builder.Services.AddSignalR();
-    builder.Services.AddSingleton<TtcHub>();
 
     builder.Services.AddServiceModelServices().AddServiceModelMetadata();
     builder.Services.AddSingleton<IServiceBehavior, UseRequestHeadersForMetadataAddressBehavior>();

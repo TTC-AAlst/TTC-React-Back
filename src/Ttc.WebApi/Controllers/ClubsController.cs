@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Ttc.DataAccess.Services;
 using Ttc.DataEntities;
 using Ttc.Model.Clubs;
@@ -13,9 +14,9 @@ public class ClubsController
 {
     #region Constructor
     private readonly ClubService _service;
-    private readonly TtcHub _hub;
+    private readonly IHubContext<TtcHub, ITtcHub> _hub;
 
-    public ClubsController(ClubService service, TtcHub hub)
+    public ClubsController(ClubService service, IHubContext<TtcHub, ITtcHub> hub)
     {
         _service = service;
         _hub = hub;
@@ -31,7 +32,7 @@ public class ClubsController
     public async Task<Club> UpdateClub([FromBody] Club club)
     {
         var result = await _service.UpdateClub(club);
-        await _hub.BroadcastReload(Entities.Club, result.Id);
+        await _hub.Clients.All.BroadcastReload(Entities.Club, result.Id);
         return result;
     }
 
@@ -41,7 +42,7 @@ public class ClubsController
     public async Task SaveBoardMember([FromBody] BoardMember m)
     {
         await _service.SaveBoardMember(m.PlayerId, m.BoardFunction, m.Sort);
-        await _hub.BroadcastReload(Entities.Player, Constants.OwnClubId);
+        await _hub.Clients.All.BroadcastReload(Entities.Player, Constants.OwnClubId);
     }
 
     [HttpPost]
@@ -49,7 +50,7 @@ public class ClubsController
     public async Task DeleteBoardMember(int playerId)
     {
         await _service.DeleteBoardMember(playerId);
-        await _hub.BroadcastReload(Entities.Player, Constants.OwnClubId);
+        await _hub.Clients.All.BroadcastReload(Entities.Player, Constants.OwnClubId);
     }
 
     public class BoardMember

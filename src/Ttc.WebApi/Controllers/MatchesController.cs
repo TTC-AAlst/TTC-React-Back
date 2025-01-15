@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Ttc.DataAccess.Services;
 using Ttc.Model.Matches;
 using Ttc.Model.Players;
@@ -20,7 +21,7 @@ public class MatchesController
     private readonly ConfigService _configService;
     private readonly EmailService _emailService;
     private readonly UserProvider _user;
-    private readonly TtcHub _hub;
+    private readonly IHubContext<TtcHub, ITtcHub> _hub;
 
     public MatchesController(
         MatchService service,
@@ -28,7 +29,7 @@ public class MatchesController
         ConfigService configService,
         EmailService emailService,
         UserProvider user,
-        TtcHub hub)
+        IHubContext<TtcHub, ITtcHub> hub)
     {
         _service = service;
         _playerService = playerService;
@@ -74,15 +75,20 @@ public class MatchesController
 
 
     #region Puts
+
     [HttpPost]
     [Route("FrenoyMatchSync")]
     [AllowAnonymous]
-    public async Task<Match> FrenoyMatchSync([FromBody] IdDto matchId, [FromQuery] bool forceSync)
+    public async Task<Match?> FrenoyMatchSync([FromBody] IdDto matchId, [FromQuery] bool forceSync)
     {
         var result = await _service.FrenoyMatchSync(matchId.Id, forceSync);
-        await _hub.BroadcastReload(Entities.Match, matchId.Id);
-        _user.CleanSensitiveData(result);
-        return result;
+        if (result != null)
+        {
+            await _hub.Clients.All.BroadcastReload(Entities.Match, matchId.Id);
+            _user.CleanSensitiveData(result);
+            return result;
+        }
+        return null;
     }
 
     [HttpPost]
@@ -97,11 +103,15 @@ public class MatchesController
     [HttpPost]
     [Route("FrenoyOtherMatchSync")]
     [AllowAnonymous]
-    public async Task<OtherMatch> FrenoyOtherMatchSync([FromBody] IdDto matchId)
+    public async Task<OtherMatch?> FrenoyOtherMatchSync([FromBody] IdDto matchId)
     {
         var result = await _service.FrenoyOtherMatchSync(matchId.Id);
-        await _hub.BroadcastReload(Entities.Match, matchId.Id);
-        return result;
+        if (result != null)
+        {
+            await _hub.Clients.All.BroadcastReload(Entities.Match, matchId.Id);
+            return result;
+        }
+        return null;
     }
 
     [HttpPost]
@@ -109,7 +119,7 @@ public class MatchesController
     public async Task<Match> TogglePlayer([FromBody] MatchPlayer player)
     {
         var result = await _service.ToggleMatchPlayer(player);
-        await _hub.BroadcastReload(Entities.Match, player.MatchId);
+        await _hub.Clients.All.BroadcastReload(Entities.Match, player.MatchId);
         return result;
     }
 
@@ -118,7 +128,7 @@ public class MatchesController
     public async Task<Match> SetMyFormation([FromBody] MatchPlayer player)
     {
         var result = await _service.SetMyFormation(player);
-        await _hub.BroadcastReload(Entities.Match, player.MatchId);
+        await _hub.Clients.All.BroadcastReload(Entities.Match, player.MatchId);
         return result;
     }
 
@@ -127,7 +137,7 @@ public class MatchesController
     public async Task<Match> EditMatchPlayers([FromBody] MatchPlayersDto dto)
     {
         var result = await _service.EditMatchPlayers(dto.MatchId, dto.PlayerIds, dto.NewStatus, dto.BlockAlso, dto.Comment);
-        await _hub.BroadcastReload(Entities.Match, dto.MatchId);
+        await _hub.Clients.All.BroadcastReload(Entities.Match, dto.MatchId);
         return result;
     }
 
@@ -136,7 +146,7 @@ public class MatchesController
     public async Task<Match> Report([FromBody] MatchReport report)
     {
         var result = await _service.UpdateReport(report);
-        await _hub.BroadcastReload(Entities.Match, report.MatchId);
+        await _hub.Clients.All.BroadcastReload(Entities.Match, report.MatchId);
         return result;
     }
 
@@ -145,7 +155,7 @@ public class MatchesController
     public async Task<Match> Comment([FromBody] MatchComment comment)
     {
         var result = await _service.AddComment(comment);
-        await _hub.BroadcastReload(Entities.Match, comment.MatchId);
+        await _hub.Clients.All.BroadcastReload(Entities.Match, comment.MatchId);
         return result;
     }
 
@@ -154,7 +164,7 @@ public class MatchesController
     public async Task<Match> DeleteComment([FromBody] IdDto comment)
     {
         var result = await _service.DeleteComment(comment.Id);
-        await _hub.BroadcastReload(Entities.Match, result.Id);
+        await _hub.Clients.All.BroadcastReload(Entities.Match, result.Id);
         return result;
     }
 
@@ -168,7 +178,7 @@ public class MatchesController
         else if (score.Out > 15) score.Out = 16;
 
         var result = await _service.UpdateScore(score.MatchId, new MatchScore(score.Home, score.Out));
-        await _hub.BroadcastReload(Entities.Match, result.Id);
+        await _hub.Clients.All.BroadcastReload(Entities.Match, result.Id);
         return result;
     }
     #endregion

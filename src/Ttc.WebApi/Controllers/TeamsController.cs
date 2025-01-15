@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Ttc.DataAccess.Services;
 using Ttc.Model.Teams;
 using Ttc.WebApi.Utilities;
@@ -12,9 +13,9 @@ public class TeamsController
 {
     #region Constructor
     private readonly TeamService _service;
-    private readonly TtcHub _hub;
+    private readonly IHubContext<TtcHub, ITtcHub> _hub;
 
-    public TeamsController(TeamService service, TtcHub hub)
+    public TeamsController(TeamService service, IHubContext<TtcHub, ITtcHub> hub)
     {
         _service = service;
         _hub = hub;
@@ -39,7 +40,7 @@ public class TeamsController
     public async Task<Team> ToggleTeamPlayer([FromBody] TeamToggleRequest req)
     {
         var result = await _service.ToggleTeamPlayer(req);
-        await _hub.BroadcastReload(Entities.Team, req.TeamId);
+        await _hub.Clients.All.BroadcastReload(Entities.Team, req.TeamId);
         return result;
     }
 

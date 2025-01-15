@@ -14,9 +14,9 @@ public class ConfigController
     #region Constructor
     private readonly ConfigService _service;
     private readonly TtcLogger _logger;
-    private readonly TtcHub _hub;
+    private readonly IHubContext<TtcHub, ITtcHub> _hub;
 
-    public ConfigController(ConfigService service, TtcLogger logger, TtcHub hub)
+    public ConfigController(ConfigService service, TtcLogger logger, IHubContext<TtcHub, ITtcHub> hub)
     {
         _service = service;
         _logger = logger;
@@ -35,7 +35,7 @@ public class ConfigController
     public async Task Post([FromBody] ConfigParam param)
     {
         await _service.Save(param.Key, param.Value);
-        await _hub.BroadcastReload(Entities.Config, 0);
+        await _hub.Clients.All.BroadcastReload(Entities.Config, 0);
     }
 
     [HttpPost]

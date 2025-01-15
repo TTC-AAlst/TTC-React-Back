@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Ttc.DataEntities.Core;
 using Ttc.Model.Core;
@@ -13,9 +14,9 @@ public class UploadController
 {
     private readonly TtcSettings _settings;
     private readonly ITtcDbContext _context;
-    private readonly TtcHub _hub;
+    private readonly IHubContext<TtcHub, ITtcHub> _hub;
 
-    public UploadController(TtcSettings settings, ITtcDbContext context, TtcHub hub)
+    public UploadController(TtcSettings settings, ITtcDbContext context, IHubContext<TtcHub, ITtcHub> hub)
     {
         _settings = settings;
         _context = context;
@@ -46,7 +47,7 @@ public class UploadController
             {
                 player.ImageVersion++;
                 await _context.SaveChangesAsync();
-                await _hub.BroadcastReload(Entities.Player, player.Id);
+                await _hub.Clients.All.BroadcastReload(Entities.Player, player.Id);
             }
         }
     }

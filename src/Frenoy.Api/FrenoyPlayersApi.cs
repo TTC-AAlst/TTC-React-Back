@@ -117,7 +117,7 @@ public class FrenoyPlayersApi : FrenoyApiBase
         newPlayer.FirstName = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(frenoyPlayer.FirstName.ToLowerInvariant());
         newPlayer.LastName = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(frenoyPlayer.LastName.ToLowerInvariant());
         newPlayer.Alias = newPlayer.Name;
-        newPlayer.Security = PlayerToegang.Player;
+        newPlayer.Security = PlayerAccess.Player;
         newPlayer.Email = frenoyPlayer.Email;
         if (frenoyPlayer.Phone != null)
         {

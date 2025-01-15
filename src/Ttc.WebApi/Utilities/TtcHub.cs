@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Ttc.Model.Core;
 
 namespace Ttc.WebApi.Utilities;
 
@@ -12,28 +11,24 @@ public enum Entities
     Config,
 }
 
-public class TtcHub : Hub
+public interface ITtcHub
 {
-    private readonly TtcLogger _logger;
+    Task BroadcastReload(Entities entityType, int id);
+}
 
-    public TtcHub(TtcLogger logger)
-    {
-        _logger = logger;
-    }
-
-    public async Task BroadcastReload(Entities entityType, int id)
-    {
-        _logger.Information($"BroadcastReload {entityType} for {id} with ClientsNull={(Clients == null).ToString()} and Context={Context?.ConnectionId}");
-
-        if (Clients != null && Context != null)
-        {
-            await Clients.AllExcept(Context.ConnectionId).SendAsync("BroadcastReload", entityType.ToString(), id);
-        }
-        else
-        {
-            _logger.Information("Not broadcasting :(");
-        }
-    }
+public class TtcHub : Hub<ITtcHub>
+{
+    //public async Task BroadcastReload(Entities entityType, int id)
+    //{
+    //    if (Clients != null && Context != null)
+    //    {
+    //        await Clients.All.SendAsync("BroadcastReload", entityType.ToString(), id);
+    //    }
+    //    else
+    //    {
+    //        _logger.Error($"Not broadcasting {entityType} for {id} :(");
+    //    }
+    //}
 
     //public async Task SendMessage(string user, string message)
     //{
