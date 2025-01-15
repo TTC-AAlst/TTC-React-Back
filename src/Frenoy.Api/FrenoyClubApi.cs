@@ -40,7 +40,7 @@ public class FrenoyClubApi : FrenoyApiBase
     {
         foreach (var dbClub in clubs)
         {
-            var oldLokalen = await _db.ClubLokalen.Where(x => x.ClubId == dbClub.Id).ToArrayAsync();
+            var oldLokalen = await _db.ClubLocations.Where(x => x.ClubId == dbClub.Id).ToArrayAsync();
 
             var frenoyClubs = await _frenoy.GetClubsAsync(new GetClubsRequest
             {
@@ -65,7 +65,7 @@ public class FrenoyClubApi : FrenoyApiBase
             }
             else
             {
-                _db.ClubLokalen.RemoveRange(oldLokalen);
+                _db.ClubLocations.RemoveRange(oldLokalen);
 
                 foreach (var frenoyLokaal in frenoyClub.VenueEntries)
                 {
@@ -81,7 +81,7 @@ public class FrenoyClubApi : FrenoyApiBase
                         PostalCode = int.Parse(frenoyLokaal.Town.Substring(0, frenoyLokaal.Town.IndexOf(" "))),
                         MainLocation = frenoyLokaal.ClubVenue == "1"
                     };
-                    _db.ClubLokalen.Add(lokaal);
+                    _db.ClubLocations.Add(lokaal);
                 }
             }
         }

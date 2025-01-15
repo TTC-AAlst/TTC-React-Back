@@ -140,7 +140,7 @@ public class FrenoyApiBase
                 City = frenoyLocation.Town.Substring(frenoyLocation.Town.IndexOf(" ") + 1),
                 MainLocation = true
             };
-            _db.ClubLokalen.Add(location);
+            _db.ClubLocations.Add(location);
         }
 
         return club;

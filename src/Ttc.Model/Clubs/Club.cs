@@ -1,5 +1,17 @@
 ﻿namespace Ttc.Model.Clubs;
 
+public class ClubCache
+{
+    public IEnumerable<Club> Clubs { get; set; }
+    public DateTime LastChange { get; set; }
+
+    public ClubCache(IEnumerable<Club> clubs, DateTime lastChange)
+    {
+        Clubs = clubs;
+        LastChange = lastChange;
+    }
+}
+
 public class Club
 {
     #region Properties

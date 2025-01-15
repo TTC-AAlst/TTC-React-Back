@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Ttc.DataEntities.Core;
 using Ttc.Model.Clubs;
 
 namespace Ttc.DataEntities;
@@ -8,7 +9,7 @@ namespace Ttc.DataEntities;
 /// Entity suffix: Otherwise conflict with <see cref="Club"/>
 /// </summary>
 [Table("Club")]
-public class ClubEntity
+public class ClubEntity : IAudit
 {
     [Key]
     public int Id { get; set; }
@@ -26,6 +27,8 @@ public class ClubEntity
     public ICollection<ClubLocationEntity> Locations { get; set; } = [];
 
     public ICollection<ClubManagerEntity> Managers { get; set; } = [];
+
+    public Audit Audit { get; } = new();
 
     public override string ToString() => $"Id={Id}, Name={Name}, Vttl={CodeVttl}, Sporta={CodeSporta}, Active={Active}";
 }

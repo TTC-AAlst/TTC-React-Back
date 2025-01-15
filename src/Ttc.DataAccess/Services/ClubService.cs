@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Ttc.DataEntities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Ttc.DataAccess.Utilities;
 using Ttc.DataEntities.Core;
 using Ttc.Model.Clubs;
 
@@ -10,50 +12,55 @@ public class ClubService
 {
     private readonly ITtcDbContext _context;
     private readonly IMapper _mapper;
+    private readonly CacheHelper _cache;
 
-    public ClubService(ITtcDbContext context, IMapper mapper)
+    public ClubService(ITtcDbContext context, IMapper mapper, IMemoryCache cache)
     {
         _context = context;
         _mapper = mapper;
+        _cache = new CacheHelper(cache);
     }
 
-    public async Task<IEnumerable<Club>> GetActiveClubs()
+    public async Task<ClubCache?> GetActiveClubs(DateTime? lastChecked)
+    {
+        var clubs = await _cache.GetOrSet("clubs", GetActiveClubs, TimeSpan.FromHours(1));
+        if (lastChecked.HasValue && lastChecked.Value >= clubs.LastChange)
+        {
+            return null;
+        }
+        return clubs;
+    }
+
+    private async Task<ClubCache> GetActiveClubs()
     {
         var activeClubs = await _context.Clubs
             .Include(x => x.Locations)
-            .Include(x => x.Managers)
             .Where(x => x.Active)
             .ToListAsync();
 
+        var lastChange = activeClubs.Max(x => x.Audit.ModifiedOn) ?? DateTime.MinValue;
         var result = _mapper.Map<IList<ClubEntity>, IList<Club>>(activeClubs);
-
-        var managers = activeClubs.Single(x => x.Id == Constants.OwnClubId).Managers;
-        var managerIds = managers.Select(x => x.PlayerId).ToArray();
 
 
         var ourClub = result.Single(x => x.Id == Constants.OwnClubId);
-        ourClub.Managers = new List<ClubManager>();
-
-        var managerPlayers = await _context.Players.Where(x => managerIds.Contains(x.Id)).ToArrayAsync();
-        foreach (var managerPlayer in managerPlayers)
-        {
-            var managerInfo = managers.Single(x => x.PlayerId == managerPlayer.Id);
-            ourClub.Managers.Add(new ClubManager
+        var managers = await _context.ClubManagers.ToArrayAsync();
+        ourClub.Managers = managers
+            .Where(x => x.ClubId == Constants.OwnClubId)
+            .Select(x => new ClubManager()
             {
-                Description = managerInfo.Description,
-                PlayerId = managerInfo.PlayerId,
-                Name = managerPlayer.Name,
-                SortOrder = managerInfo.SortOrder
-            });
-        }
+                PlayerId = x.PlayerId,
+                Description = x.Description,
+                SortOrder = x.SortOrder,
+            })
+            .ToArray();
 
-        return result;
+        return new ClubCache(result, lastChange);
     }
 
     #region Club Board
     public async Task SaveBoardMember(int playerId, string boardFunction, int sort)
     {
-        var board = await _context.ClubContacten.SingleOrDefaultAsync(x => x.PlayerId == playerId);
+        var board = await _context.ClubManagers.SingleOrDefaultAsync(x => x.PlayerId == playerId);
         if (board == null)
         {
             board = new ClubManagerEntity()
@@ -61,19 +68,23 @@ public class ClubService
                 ClubId = Constants.OwnClubId,
                 PlayerId = playerId
             };
-            _context.ClubContacten.Add(board);
+            await _context.ClubManagers.AddAsync(board);
         }
 
         board.Description = boardFunction;
         board.SortOrder = sort;
+        await ChangeClub(board.ClubId);
         await _context.SaveChangesAsync();
+        _cache.Remove("clubs");
     }
 
     public async Task DeleteBoardMember(int playerId)
     {
-        var board = await _context.ClubContacten.SingleAsync(x => x.PlayerId == playerId);
-        _context.ClubContacten.Remove(board);
+        var board = await _context.ClubManagers.SingleAsync(x => x.PlayerId == playerId);
+        _context.ClubManagers.Remove(board);
+        await ChangeClub(board.ClubId);
         await _context.SaveChangesAsync();
+        _cache.Remove("clubs");
     }
     #endregion
 
@@ -86,8 +97,19 @@ public class ClubService
         }
 
         MapClub(club, existingClub);
+        await ChangeClub(club.Id);
         await _context.SaveChangesAsync();
+        _cache.Remove("clubs");
         return club;
+    }
+
+    private async Task ChangeClub(int clubId)
+    {
+        var club = await _context.Clubs.FindAsync(clubId);
+        if (club != null)
+        {
+            club.Audit.ModifiedOn = DateTime.Now;
+        }
     }
 
     private static void MapClub(Club club, ClubEntity existingClub)

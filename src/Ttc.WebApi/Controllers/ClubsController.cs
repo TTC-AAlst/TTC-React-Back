@@ -25,7 +25,10 @@ public class ClubsController
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IEnumerable<Club>> Get() => await _service.GetActiveClubs();
+    public async Task<ClubCache?> Get([FromQuery] DateTime? lastChecked)
+    {
+        return await _service.GetActiveClubs(lastChecked);
+    }
 
     [HttpPost]
     [Route("UpdateClub")]
@@ -42,7 +45,7 @@ public class ClubsController
     public async Task SaveBoardMember([FromBody] BoardMember m)
     {
         await _service.SaveBoardMember(m.PlayerId, m.BoardFunction, m.Sort);
-        await _hub.Clients.All.BroadcastReload(Entities.Player, Constants.OwnClubId);
+        await _hub.Clients.All.BroadcastReload(Entities.Club, Constants.OwnClubId);
     }
 
     [HttpPost]
@@ -50,7 +53,7 @@ public class ClubsController
     public async Task DeleteBoardMember(int playerId)
     {
         await _service.DeleteBoardMember(playerId);
-        await _hub.Clients.All.BroadcastReload(Entities.Player, Constants.OwnClubId);
+        await _hub.Clients.All.BroadcastReload(Entities.Club, Constants.OwnClubId);
     }
 
     public class BoardMember

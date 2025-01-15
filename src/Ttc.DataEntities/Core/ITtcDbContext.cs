@@ -10,8 +10,8 @@ public interface ITtcDbContext
     DbSet<PlayerPasswordResetEntity> PlayerPasswordResets { get; set; }
 
     DbSet<ClubEntity> Clubs { get; set; }
-    DbSet<ClubLocationEntity> ClubLokalen { get; set; }
-    DbSet<ClubManagerEntity> ClubContacten { get; set; }
+    DbSet<ClubLocationEntity> ClubLocations { get; set; }
+    DbSet<ClubManagerEntity> ClubManagers { get; set; }
 
     DbSet<TeamEntity> Teams { get; set; }
     DbSet<TeamOpponentEntity> TeamOpponents { get; set; }

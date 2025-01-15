@@ -14,8 +14,8 @@ internal class TtcDbContext : DbContext, ITtcDbContext
     public DbSet<PlayerPasswordResetEntity> PlayerPasswordResets { get; set; }
 
     public DbSet<ClubEntity> Clubs { get; set; }
-    public DbSet<ClubLocationEntity> ClubLokalen { get; set; }
-    public DbSet<ClubManagerEntity> ClubContacten { get; set; }
+    public DbSet<ClubLocationEntity> ClubLocations { get; set; }
+    public DbSet<ClubManagerEntity> ClubManagers { get; set; }
 
     public DbSet<TeamEntity> Teams { get; set; }
     public DbSet<TeamOpponentEntity> TeamOpponents { get; set; }
