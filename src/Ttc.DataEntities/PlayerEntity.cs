@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+using Ttc.DataEntities.Core;
 
 namespace Ttc.DataEntities;
 
@@ -22,7 +24,8 @@ public enum PlayerAccess
 }
 
 [Table(TableName)]
-public class PlayerEntity
+[Index(nameof(QuitYear))]
+public class PlayerEntity : IAudit
 {
     public const string TableName = "Player";
 
@@ -100,7 +103,7 @@ public class PlayerEntity
     /// </summary>
     public int ImageVersion { get; set; }
 
-    public bool IsFromOwnClub() => ClubIdSporta == Constants.OwnClubId || ClubIdVttl == Constants.OwnClubId;
+    public Audit Audit { get; } = new();
 
     public override string ToString() => $"Id={Id}, Alias={Alias} ({ClubIdVttl}, {ClubIdSporta}), Vttl={RankingVttl}, Sporta={RankingSporta}, Active={Active}";
 }

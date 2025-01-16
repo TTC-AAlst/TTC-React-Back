@@ -21,7 +21,7 @@ public class ClubService
         _cache = new CacheHelper(cache);
     }
 
-    public async Task<ClubCache?> GetActiveClubs(DateTime? lastChecked)
+    public async Task<CacheResponse<Club>?> GetActiveClubs(DateTime? lastChecked)
     {
         var clubs = await _cache.GetOrSet("clubs", GetActiveClubs, TimeSpan.FromHours(1));
         if (lastChecked.HasValue && lastChecked.Value >= clubs.LastChange)
@@ -31,7 +31,7 @@ public class ClubService
         return clubs;
     }
 
-    private async Task<ClubCache> GetActiveClubs()
+    private async Task<CacheResponse<Club>> GetActiveClubs()
     {
         var activeClubs = await _context.Clubs
             .Include(x => x.Locations)
@@ -54,7 +54,7 @@ public class ClubService
             })
             .ToArray();
 
-        return new ClubCache(result, lastChange);
+        return new CacheResponse<Club>(result, lastChange);
     }
 
     #region Club Board

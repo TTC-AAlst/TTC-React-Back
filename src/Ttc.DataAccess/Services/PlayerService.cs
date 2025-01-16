@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 using Ttc.DataAccess.Utilities;
 using Ttc.DataEntities.Core;
+using Microsoft.Extensions.Caching.Memory;
+using Ttc.Model.Clubs;
 
 namespace Ttc.DataAccess.Services;
 
@@ -14,17 +16,44 @@ public class PlayerService
 {
     private readonly ITtcDbContext _context;
     private readonly IMapper _mapper;
+    private readonly CacheHelper _cache;
 
-    public PlayerService(ITtcDbContext context, IMapper mapper)
+    public PlayerService(ITtcDbContext context, IMapper mapper, IMemoryCache cache)
     {
         _context = context;
         _mapper = mapper;
+        _cache = new CacheHelper(cache);
     }
 
     #region Player
-    public async Task<ICollection<Player>> GetOwnClub()
+
+    public async Task<CacheResponse<Player>?> GetOwnClub(DateTime? lastChecked)
     {
-        var players = await _context.Players.ToArrayAsync();
+        var players = await _cache.GetOrSet("players", GetOwnClub, TimeSpan.FromHours(1));
+        if (lastChecked.HasValue && lastChecked.Value >= players.LastChange)
+        {
+            return null;
+        }
+        return players;
+    }
+
+    private async Task<CacheResponse<Player>> GetOwnClub()
+    {
+        var players = await _context.Players
+            .Where(x => x.QuitYear == null)
+            .ToArrayAsync();
+
+        var lastChange = players.Max(x => x.Audit.ModifiedOn) ?? DateTime.MinValue;
+        var result = _mapper.Map<IList<PlayerEntity>, IList<Player>>(players);
+        return new CacheResponse<Player>(result, lastChange);
+    }
+
+    public async Task<IEnumerable<Player>> GetQuitters()
+    {
+        var players = await _context.Players
+            .Where(x => x.QuitYear != null)
+            .ToArrayAsync();
+
         var result = _mapper.Map<IList<PlayerEntity>, IList<Player>>(players);
         return result;
     }
@@ -47,6 +76,7 @@ public class PlayerService
         existingPlayer.Style = playerStyle.Name;
         existingPlayer.BestStroke = playerStyle.BestStroke;
         await _context.SaveChangesAsync();
+        _cache.Remove("players");
         var updatedPlayer = await GetPlayer(playerStyle.PlayerId);
         return updatedPlayer;
     }
@@ -66,6 +96,7 @@ public class PlayerService
         }
 
         await _context.SaveChangesAsync();
+        _cache.Remove("players");
         player.Id = existingPlayer.Id;
         var newPlayer = await GetPlayer(player.Id);
         return newPlayer;
@@ -77,6 +108,7 @@ public class PlayerService
         if (player == null) return;
         _context.Players.Remove(player);
         await _context.SaveChangesAsync();
+        _cache.Remove("players");
     }
 
     private static void MapPlayer(Player player, PlayerEntity existingPlayer)

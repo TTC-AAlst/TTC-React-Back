@@ -196,16 +196,16 @@ public class MatchesController
     public async Task WeekCompetitionEmail([FromBody] WeekCompetitionEmailModel email)
     {
         var emailConfig = await _configService.GetEmailConfig();
-        var players = await _playerService.GetOwnClub();
+        var players = await _playerService.GetOwnClub(null);
 
         IEnumerable<Player> sendTo;
         if (email.JustMe)
         {
-            sendTo = players.Where(player => player.Id == _user.PlayerId!.Value);
+            sendTo = players!.Data.Where(player => player.Id == _user.PlayerId!.Value);
         }
         else
         {
-            sendTo = players.Where(player => player.Active);
+            sendTo = players!.Data.Where(player => player.Active);
         }
         await _emailService.SendEmail(sendTo, email.Title, email.Email, emailConfig);
     }

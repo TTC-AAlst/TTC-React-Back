@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ttc.DataAccess;
 
@@ -11,9 +12,11 @@ using Ttc.DataAccess;
 namespace Ttc.DataAccess.Migrations
 {
     [DbContext(typeof(TtcDbContext))]
-    partial class TtcDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250115235944_PlayerQuitYearIndex")]
+    partial class PlayerQuitYearIndex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -741,44 +744,6 @@ namespace Ttc.DataAccess.Migrations
 
                             b1.WithOwner()
                                 .HasForeignKey("ParameterEntityKey");
-                        });
-
-                    b.Navigation("Audit")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Ttc.DataEntities.PlayerEntity", b =>
-                {
-                    b.OwnsOne("Ttc.DataEntities.Core.Audit", "Audit", b1 =>
-                        {
-                            b1.Property<int>("PlayerEntityId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("CreatedBy")
-                                .IsRequired()
-                                .HasMaxLength(50)
-                                .HasColumnType("varchar(50)")
-                                .HasColumnName("CreatedBy");
-
-                            b1.Property<DateTime>("CreatedOn")
-                                .HasColumnType("datetime")
-                                .HasColumnName("CreatedOn");
-
-                            b1.Property<string>("ModifiedBy")
-                                .HasMaxLength(50)
-                                .HasColumnType("varchar(50)")
-                                .HasColumnName("ModifiedBy");
-
-                            b1.Property<DateTime?>("ModifiedOn")
-                                .HasColumnType("datetime")
-                                .HasColumnName("ModifiedOn");
-
-                            b1.HasKey("PlayerEntityId");
-
-                            b1.ToTable("Player");
-
-                            b1.WithOwner()
-                                .HasForeignKey("PlayerEntityId");
                         });
 
                     b.Navigation("Audit")

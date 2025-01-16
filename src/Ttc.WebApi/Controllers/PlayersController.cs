@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Ttc.DataAccess.Services;
+using Ttc.Model.Clubs;
 using Ttc.Model.Players;
 using Ttc.WebApi.Utilities;
 using Ttc.WebApi.Utilities.Auth;
@@ -12,11 +13,11 @@ namespace Ttc.WebApi.Controllers;
 [Route("api/players")]
 public class PlayersController
 {
-    #region Constructor
     private readonly PlayerService _service;
     private readonly UserProvider _user;
     private readonly IHubContext<TtcHub, ITtcHub> _hub;
 
+    #region Constructor
     public PlayersController(PlayerService service, UserProvider user, IHubContext<TtcHub, ITtcHub> hub)
     {
         _service = service;
@@ -27,10 +28,21 @@ public class PlayersController
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IEnumerable<Player>> Get()
+    public async Task<CacheResponse<Player>?> Get([FromQuery] DateTime? lastChecked)
     {
-        var result = await _service.GetOwnClub();
-        _user.CleanSensitiveData(result);
+        var result = await _service.GetOwnClub(lastChecked);
+        if (result == null)
+        {
+            return null;
+        }
+        _user.CleanSensitiveData(result.Data);
+        return result;
+    }
+
+    [HttpGet("Quitters")]
+    public async Task<IEnumerable<Player>> GetQuitters()
+    {
+        var result = await _service.GetQuitters();
         return result;
     }
 
