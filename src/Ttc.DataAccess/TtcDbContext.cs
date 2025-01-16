@@ -7,6 +7,7 @@ namespace Ttc.DataAccess;
 
 internal class TtcDbContext : DbContext, ITtcDbContext
 {
+    private static int? _currentSeason;
     private readonly IUserNameProvider _userNameProvider;
 
     #region DbSets
@@ -37,9 +38,14 @@ internal class TtcDbContext : DbContext, ITtcDbContext
     {
         get
         {
+            if (_currentSeason.HasValue)
+                return _currentSeason.Value;
+
             var year = Parameters.Single(x => x.Key == "year").Value;
-            return int.Parse(year);
+            _currentSeason = int.Parse(year);
+            return _currentSeason.Value;
         }
+        set => _currentSeason = value;
     }
 
     public int CurrentFrenoySeason => CurrentSeason - 2000 + 1;

@@ -39,6 +39,8 @@ internal static class NewSeasonSeed
 
             var sporta = new FrenoyMatchesApi(context, Competition.Sporta);
             await sporta.SyncTeamsAndMatches();
+
+            context.CurrentSeason = year;
         }
     }
 }

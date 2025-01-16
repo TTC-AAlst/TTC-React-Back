@@ -24,7 +24,7 @@ public interface ITtcDbContext
 
     DbSet<ParameterEntity> Parameters { get; set; }
 
-    int CurrentSeason { get; }
+    int CurrentSeason { get; set; }
     int CurrentFrenoySeason { get; }
 
     Task<int> SaveChangesAsync(CancellationToken token = default);
