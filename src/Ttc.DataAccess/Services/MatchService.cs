@@ -2,7 +2,7 @@ using System.Diagnostics;
 using AutoMapper;
 using Frenoy.Api;
 using Microsoft.EntityFrameworkCore;
-using Ttc.DataAccess.Utilities;
+using Ttc.DataAccess.Utilities.Excel;
 using Ttc.DataEntities;
 using Ttc.DataEntities.Core;
 using Ttc.Model.Matches;

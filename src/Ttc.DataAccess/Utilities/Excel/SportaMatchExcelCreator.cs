@@ -8,7 +8,7 @@ using Ttc.DataEntities;
 using Ttc.DataEntities.Core;
 using Ttc.Model.Matches;
 
-namespace Ttc.DataAccess.Utilities;
+namespace Ttc.DataAccess.Utilities.Excel;
 
 public class SportaMatchFileInfo
 {

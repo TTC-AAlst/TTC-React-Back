@@ -7,7 +7,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using Ttc.DataEntities;
 
-namespace Ttc.DataAccess.Utilities;
+namespace Ttc.DataAccess.Utilities.Excel;
 
 internal class PlayersExcelCreator
 {

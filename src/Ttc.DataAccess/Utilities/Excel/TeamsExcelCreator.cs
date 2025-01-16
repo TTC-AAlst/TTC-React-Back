@@ -6,7 +6,7 @@ using Ttc.DataEntities;
 using Ttc.Model.Matches;
 using Ttc.Model.Teams;
 
-namespace Ttc.DataAccess.Utilities;
+namespace Ttc.DataAccess.Utilities.Excel;
 
 internal class TeamsExcelCreator
 {
@@ -107,7 +107,7 @@ internal class TeamsExcelCreator
         var headers = new List<string>() { ExcelExportResources.MatchFrenoyId, ExcelExportResources.MatchDay, ExcelExportResources.MatchDate, ExcelExportResources.MatchHour, ExcelExportResources.MatchHome, ExcelExportResources.MatchOut };
         int baseColumnIndex = headers.Count;
 
-        var players = team.Players.OrderBy(x => x.Reserve).ThenBy(x => x.Name).Select((player, index) => new { Name = player.Name, ColumnIndex = index + baseColumnIndex + 1 }).ToArray();
+        var players = team.Players.OrderBy(x => x.Reserve).ThenBy(x => x.Name).Select((player, index) => new { player.Name, ColumnIndex = index + baseColumnIndex + 1 }).ToArray();
         headers.AddRange(players.Select(x => x.Name));
         headers.Add(ExcelExportResources.MatchBlock);
         totalHeaderCount = headers.Count;

@@ -2,7 +2,7 @@
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 
-namespace Ttc.DataAccess.Utilities;
+namespace Ttc.DataAccess.Utilities.Excel;
 
 internal static class ExcelHelper
 {
