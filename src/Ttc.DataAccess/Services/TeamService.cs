@@ -44,6 +44,7 @@ public class TeamService
         var teams = await _context.Teams
             .Include(x => x.Players)
             .Include(x => x.Opponents)
+            .AsSingleQuery()
             .Where(x => x.Year == currentSeason)
             .ToArrayAsync();
 

@@ -31,6 +31,7 @@ public class MatchService
             //.Where(x => x.Id == 802)
             .Where(x => x.HomeClubId == Constants.OwnClubId || x.AwayClubId == Constants.OwnClubId)
             .Where(x => x.FrenoySeason == currentFrenoySeason)
+            .AsSplitQuery()
             .ToListAsync();
 
         var matchIds = matchEntities.Select(x => x.Id).ToArray();
@@ -52,6 +53,7 @@ public class MatchService
         {
             var matches = _context.Matches
                 .WithIncludes()
+                .AsSingleQuery()
                 .Where(match => match.FrenoyDivisionId == team.FrenoyDivisionId);
 
             if (opponent != null)
@@ -112,11 +114,12 @@ public class MatchService
     public async Task<Match> GetMatch(int matchId)
     {
         var match = await _context.Matches
-                .WithIncludes()
-                .SingleAsync(x => x.Id == matchId);
+            .WithIncludes()
+            .AsSingleQuery()
+            .SingleAsync(x => x.Id == matchId);
 
-        // TODO: UserProver.IsAuthenticated!
-        // TODO: Switch to Postgres and maybe we can just include?
+        // This used to crash with mysql when doing directly as an Include
+        // Is this still the case?
         var comments = await _context.MatchComments.Where(x => x.MatchId == matchId).ToArrayAsync();
         match.Comments = comments;
 

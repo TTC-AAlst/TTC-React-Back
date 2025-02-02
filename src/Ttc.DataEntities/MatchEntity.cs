@@ -1,10 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 using Ttc.Model.Players;
 
 namespace Ttc.DataEntities;
 
 [Table("Match")]
+[Index(nameof(FrenoyMatchId))]
+[Index(nameof(FrenoySeason), nameof(HomeClubId))]
+[Index(nameof(FrenoySeason), nameof(AwayClubId))]
 public class MatchEntity
 {
     [Key]
