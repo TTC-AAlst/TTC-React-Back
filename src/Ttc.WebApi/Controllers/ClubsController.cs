@@ -27,7 +27,8 @@ public class ClubsController
     [AllowAnonymous]
     public async Task<CacheResponse<Club>?> Get([FromQuery] DateTime? lastChecked)
     {
-        return await _service.GetActiveClubs(lastChecked);
+        var clubs = await _service.GetActiveClubs(lastChecked);
+        return clubs;
     }
 
     [HttpPost]

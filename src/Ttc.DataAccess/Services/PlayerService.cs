@@ -31,10 +31,10 @@ public class PlayerService
     public async Task<CacheResponse<Player>?> GetOwnClub(DateTime? lastChecked)
     {
         var players = await _cache.GetOrSet("players", GetOwnClub, TimeSpan.FromHours(1));
-        if (lastChecked.HasValue && lastChecked.Value >= players.LastChange)
-        {
-            return null;
-        }
+        //if (lastChecked.HasValue && lastChecked.Value >= players.LastChange)
+        //{
+        //    return null;
+        //}
         return players;
     }
 
@@ -61,9 +61,10 @@ public class PlayerService
 
     public async Task<Player> GetPlayer(int playerId)
     {
-        var player = await _context.Players.SingleAsync(x => x.Id == playerId);
-        var newPlayer = _mapper.Map<PlayerEntity, Player>(player);
-        return newPlayer;
+        var players = await GetOwnClub(null);
+        var player = players!.Data.Single(x => x.Id == playerId);
+        //var newPlayer = _mapper.Map<PlayerEntity, Player>(player);
+        return player;
     }
 
     public async Task<Player?> UpdateStyle(PlayerStyle playerStyle)

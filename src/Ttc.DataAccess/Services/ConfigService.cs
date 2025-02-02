@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Ttc.DataAccess.Utilities;
 using Ttc.DataEntities.Core;
@@ -28,12 +27,11 @@ public class ConfigService
     public async Task<Dictionary<string, string>?> Get(DateTime? lastChecked)
     {
         var dict = await _cache.GetOrSet("config", Get, TimeSpan.FromHours(5));
-
-        DateTime lastCachedChange = DateTime.ParseExact(dict[nameof(Audit.ModifiedOn)], "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
-        if (lastChecked.HasValue && lastChecked.Value >= lastCachedChange)
-        {
-            return null;
-        }
+        //DateTime lastCachedChange = DateTime.ParseExact(dict[nameof(Audit.ModifiedOn)], "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
+        //if (lastChecked.HasValue && lastChecked.Value >= lastCachedChange)
+        //{
+        //    return null;
+        //}
         return dict;
     }
 

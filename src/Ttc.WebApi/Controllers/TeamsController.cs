@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Ttc.DataAccess.Services;
+using Ttc.Model.Clubs;
+using Ttc.Model.Players;
 using Ttc.Model.Teams;
 using Ttc.WebApi.Utilities;
 
@@ -24,16 +26,26 @@ public class TeamsController
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IEnumerable<Team>> Get() => await _service.GetForCurrentYear();
+    public async Task<CacheResponse<Team>?> Get([FromQuery] DateTime? lastChecked)
+    {
+        var result = await _service.GetForCurrentYear(lastChecked);
+        return result;
+    }
 
     [HttpGet("{id:int}")]
     [AllowAnonymous]
-    public async Task<Team> Get(int id) => await _service.GetTeam(id, false);
+    public async Task<Team> Get(int id)
+    {
+        return await _service.GetTeam(id);
+    }
 
     [HttpGet]
     [AllowAnonymous]
-    [Route("Ranking")]
-    public async Task<Team> Ranking(int teamId) => await _service.GetTeam(teamId, true);
+    [Route("Ranking/{competition}/{divisionId:int}")]
+    public async Task<IEnumerable<DivisionRanking>> Ranking(Competition competition, int divisionId)
+    {
+        return await _service.GetTeamRanking(competition, divisionId);
+    }
 
     [HttpPost]
     [Route("ToggleTeamPlayer")]

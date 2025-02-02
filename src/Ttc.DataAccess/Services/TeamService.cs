@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using Frenoy.Api;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Ttc.Model.Teams;
 using Ttc.DataEntities;
 using Ttc.DataEntities.Core;
 using Ttc.Model.Players;
 using Ttc.DataAccess.Utilities.Excel;
+using Ttc.DataAccess.Utilities;
+using Ttc.Model.Clubs;
 
 namespace Ttc.DataAccess.Services;
 
@@ -13,15 +16,27 @@ public class TeamService
 {
     private readonly ITtcDbContext _context;
     private readonly IMapper _mapper;
-    private static readonly TimeSpan FrenoyTeamRankingExpiration = TimeSpan.FromHours(1);
+    private readonly CacheHelper _cache;
+    private static readonly TimeSpan FrenoyTeamRankingExpiration = TimeSpan.FromMinutes(30);
 
-    public TeamService(ITtcDbContext context, IMapper mapper)
+    public TeamService(ITtcDbContext context, IMapper mapper, IMemoryCache cache)
     {
         _context = context;
         _mapper = mapper;
+        _cache = new CacheHelper(cache);
     }
 
-    public async Task<IEnumerable<Team>> GetForCurrentYear()
+    public async Task<CacheResponse<Team>?> GetForCurrentYear(DateTime? lastChecked)
+    {
+        var teams = await _cache.GetOrSet("teams", GetForCurrentYear, TimeSpan.FromHours(1));
+        //if (lastChecked.HasValue && lastChecked.Value >= teams.LastChange)
+        //{
+        //    return null;
+        //}
+        return teams;
+    }
+
+    private async Task<CacheResponse<Team>> GetForCurrentYear()
     {
         int currentSeason = _context.CurrentSeason;
         var teams = await _context.Teams
@@ -30,34 +45,23 @@ public class TeamService
             .Where(x => x.Year == currentSeason)
             .ToArrayAsync();
 
+        var lastChange = teams.Max(x => x.Audit.ModifiedOn) ?? DateTime.MinValue;
         var result = _mapper.Map<IList<TeamEntity>, IList<Team>>(teams);
-        foreach (var team in result)
-        {
-            var key = new TeamRankingKey(team.Competition, team.Frenoy.DivisionId);
-            if (RankingCache.TryGetValue(key, out ICollection<DivisionRanking>? value))
-            {
-                team.Ranking = value;
-            }
-        }
-
-        InvalidateCache();
-
-        return result;
+        return new CacheResponse<Team>(result, lastChange);
     }
 
-    public async Task<Team> GetTeam(int teamId, bool syncFrenoy)
+    public async Task<Team> GetTeam(int teamId)
     {
-        var teamEntity = await _context.Teams
-            .Include(x => x.Players)
-            .Include(x => x.Opponents)
-            .SingleAsync(x => x.Id == teamId);
-
-        var team = _mapper.Map<TeamEntity, Team>(teamEntity);
-        if (syncFrenoy)
-        {
-            team.Ranking = await GetFrenoyRanking(team.Competition, team.Frenoy.DivisionId);
-        }
+        var teams = await GetForCurrentYear(null);
+        var team = teams!.Data.Single(x => x.Id == teamId);
         return team;
+    }
+
+    public async Task<IEnumerable<DivisionRanking>> GetTeamRanking(Competition competition, int divisionId)
+    {
+        InvalidateCache();
+        var ranking = await GetFrenoyRanking(competition, divisionId);
+        return ranking;
     }
 
     private async Task<ICollection<DivisionRanking>> GetFrenoyRanking(Competition competition, int divisionId)
@@ -84,16 +88,11 @@ public class TeamService
     private static readonly Dictionary<TeamRankingKey, ICollection<DivisionRanking>> RankingCache = new();
     private static readonly object CacheLock = new();
 
-    private struct TeamRankingKey
+    private class TeamRankingKey : IEquatable<TeamRankingKey>
     {
         private readonly DateTime _created;
         private readonly Competition _competition;
         private readonly int _divisionId;
-
-        public bool IsExpired()
-        {
-            return _created.Add(FrenoyTeamRankingExpiration) < DateTime.Now;
-        }
 
         public TeamRankingKey(Competition competition, int divisionId)
         {
@@ -102,20 +101,32 @@ public class TeamService
             _created = DateTime.Now;
         }
 
-        public override string ToString() => $"Competition: {_competition}, DivisionId: {_divisionId}";
+        public bool IsExpired()
+        {
+            return _created.Add(FrenoyTeamRankingExpiration) < DateTime.Now;
+        }
 
         public override bool Equals(object? obj)
         {
-            if (obj is not TeamRankingKey otherKey)
-                return false;
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((TeamRankingKey)obj);
+        }
 
-            return _competition == otherKey._competition && _divisionId == otherKey._divisionId;
+        public bool Equals(TeamRankingKey? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return _competition == other._competition && _divisionId == other._divisionId;
         }
 
         public override int GetHashCode()
         {
-            return (_competition + _divisionId.ToString()).GetHashCode();
+            return HashCode.Combine((int)_competition, _divisionId);
         }
+
+        public override string ToString() => $"Competition={_competition}, DivisionId={_divisionId}";
     }
 
     private static void InvalidateCache()
@@ -148,7 +159,8 @@ public class TeamService
             _context.Entry(exPlayer).State = EntityState.Deleted;
         }
         await _context.SaveChangesAsync();
-        return await GetTeam(req.TeamId, false);
+        _cache.Remove("teams");
+        return await GetTeam(req.TeamId);
     }
 
     public async Task<byte[]> GetExcelExport()
@@ -156,14 +168,11 @@ public class TeamService
         int currentSeason = _context.CurrentSeason;
         var teams = await _context.Teams
             .Include(x => x.Players)
-            //.Include(x => x.Opponents)
             .Where(x => x.Year == currentSeason)
             .ToArrayAsync();
 
         int currentFrenoySeason = _context.CurrentFrenoySeason;
         var matches = await _context.Matches
-            //.Include(x => x.HomeTeam)
-            //.Include(x => x.AwayTeam)
             .Include(x => x.Players)
             .Where(x => x.HomeClubId == Constants.OwnClubId || x.AwayClubId == Constants.OwnClubId)
             .Where(x => x.FrenoySeason == currentFrenoySeason)
@@ -173,8 +182,8 @@ public class TeamService
 
         var clubs = await _context.Clubs.ToArrayAsync();
 
-        var exceller = TeamsExcelCreator.CreateFormation(teams, matches, players, clubs);
-        return exceller.Create();
+        var excelCreator = TeamsExcelCreator.CreateFormation(teams, matches, players, clubs);
+        return excelCreator.Create();
     }
 }
 
@@ -186,4 +195,3 @@ public class TeamToggleRequest
 
     public override string ToString() => $"TeamId={TeamId}, PlayerId={PlayerId}, Role={Role}";
 }
-

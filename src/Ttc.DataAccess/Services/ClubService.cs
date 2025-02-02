@@ -24,10 +24,10 @@ public class ClubService
     public async Task<CacheResponse<Club>?> GetActiveClubs(DateTime? lastChecked)
     {
         var clubs = await _cache.GetOrSet("clubs", GetActiveClubs, TimeSpan.FromHours(5));
-        if (lastChecked.HasValue && lastChecked.Value >= clubs.LastChange)
-        {
-            return null;
-        }
+        //if (lastChecked.HasValue && lastChecked.Value >= clubs.LastChange)
+        //{
+        //    return null;
+        //}
         return clubs;
     }
 

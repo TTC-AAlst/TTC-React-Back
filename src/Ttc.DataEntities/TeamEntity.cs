@@ -1,13 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using Ttc.DataEntities.Core;
 using Ttc.Model.Players;
 
 namespace Ttc.DataEntities;
 
 [Table("Team")]
 [Index(nameof(Year))]
-public class TeamEntity
+public class TeamEntity : IAudit
 {
     [Key]
     public int Id { get; set; }
@@ -37,6 +38,8 @@ public class TeamEntity
     /// </summary>
     [MaxLength(2)]
     public string TeamCode { get; set; } = "";
+
+    public Audit Audit { get; } = new();
 
     public override string ToString() => $"Id={Id}, Competition={Competition} {Year}, Reeks={DivisionNumber}{DivisionCode}, FrenoyLink={LinkId}";
 }
