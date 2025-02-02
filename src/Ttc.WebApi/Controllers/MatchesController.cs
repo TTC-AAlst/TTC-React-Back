@@ -205,7 +205,7 @@ public class MatchesController
         }
         else
         {
-            sendTo = players!.Data.Where(player => player.Active);
+            sendTo = players!.Data.Where(player => player.Active).Where(x => !string.IsNullOrWhiteSpace(x.Contact?.Email));
         }
         await _emailService.SendEmail(sendTo, email.Title, email.Email, emailConfig);
     }
