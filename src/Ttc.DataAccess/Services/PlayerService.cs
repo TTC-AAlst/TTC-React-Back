@@ -63,7 +63,6 @@ public class PlayerService
     {
         var players = await GetOwnClub(null);
         var player = players!.Data.Single(x => x.Id == playerId);
-        //var newPlayer = _mapper.Map<PlayerEntity, Player>(player);
         return player;
     }
 
