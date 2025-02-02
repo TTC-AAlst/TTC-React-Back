@@ -98,12 +98,3 @@ private static void RandomizeMatchDatesForTestingPurposes(TtcDbContext context)
   }
 }
 ```
-
-
-## Emailing
-
-Go to Admin > Params to update the "SendGridApiKey" param.
-
-Uses a SendGrid API key:  
-Username: `pongit`.  
-Email: `wouter@pongit.be`  
