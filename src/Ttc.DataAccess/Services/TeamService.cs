@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Collections.Concurrent;
+using AutoMapper;
 using Frenoy.Api;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -17,6 +18,7 @@ public class TeamService
     private readonly ITtcDbContext _context;
     private readonly IMapper _mapper;
     private readonly CacheHelper _cache;
+    private static readonly ConcurrentDictionary<TeamRankingKey, ICollection<DivisionRanking>> RankingCache = new();
     private static readonly TimeSpan FrenoyTeamRankingExpiration = TimeSpan.FromMinutes(30);
 
     public TeamService(ITtcDbContext context, IMapper mapper, IMemoryCache cache)
@@ -74,20 +76,11 @@ public class TeamService
 
         var frenoy = new FrenoyTeamsApi(_context, competition);
         var ranking = await frenoy.GetTeamRankings(divisionId);
-        if (!RankingCache.ContainsKey(key))
-        {
-            lock (CacheLock)
-            {
-                RankingCache.TryAdd(key, ranking);
-            }
-        }
+        RankingCache.TryAdd(key, ranking);
         return ranking;
     }
 
     #region DivisionCache
-    private static readonly Dictionary<TeamRankingKey, ICollection<DivisionRanking>> RankingCache = new();
-    private static readonly object CacheLock = new();
-
     private class TeamRankingKey : IEquatable<TeamRankingKey>
     {
         private readonly DateTime _created;
@@ -131,11 +124,11 @@ public class TeamService
 
     private static void InvalidateCache()
     {
-        foreach (TeamRankingKey rankingKey in RankingCache.Keys.ToArray())
+        foreach (var pair in RankingCache.ToArray())
         {
-            if (rankingKey.IsExpired())
+            if (pair.Key.IsExpired())
             {
-                RankingCache.Remove(rankingKey);
+                RankingCache.TryRemove(pair);
             }
         }
     }
