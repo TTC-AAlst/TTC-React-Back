@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Ttc.DataAccess.Utilities {
+namespace Ttc.DataAccess.Utilities.Excel {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Ttc.DataAccess.Utilities {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Ttc.DataAccess.Utilities.ExcelExportResources", typeof(ExcelExportResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Ttc.DataAccess.Utilities.Excel.ExcelExportResources", typeof(ExcelExportResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
