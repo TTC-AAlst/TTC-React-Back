@@ -4,6 +4,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using Ttc.DataEntities;
 using Ttc.Model.Matches;
+using Ttc.Model.Players;
 using Ttc.Model.Teams;
 
 namespace Ttc.DataAccess.Utilities.Excel;
@@ -33,8 +34,7 @@ internal class TeamsExcelCreator
             foreach (var team in _model)
             {
                 var sheet = package.Workbook.Worksheets.Add(team.Team);
-                int totalColumnCount;
-                var playerToColumnMapping = SetHeader(team, sheet, out totalColumnCount);
+                var playerToColumnMapping = SetHeader(team, sheet, out int totalColumnCount);
 
                 int rowIndex = 2;
                 foreach (var match in team.Matches)
@@ -107,8 +107,13 @@ internal class TeamsExcelCreator
         var headers = new List<string>() { ExcelExportResources.MatchFrenoyId, ExcelExportResources.MatchDay, ExcelExportResources.MatchDate, ExcelExportResources.MatchHour, ExcelExportResources.MatchHome, ExcelExportResources.MatchOut };
         int baseColumnIndex = headers.Count;
 
-        var players = team.Players.OrderBy(x => x.Reserve).ThenBy(x => x.Name).Select((player, index) => new { player.Name, ColumnIndex = index + baseColumnIndex + 1 }).ToArray();
-        headers.AddRange(players.Select(x => x.Name));
+        var players = team.Players
+            .OrderBy(x => x.Reserve)
+            .ThenBy(x => x.Ranking)
+            .ThenBy(x => x.Name)
+            .Select((player, index) => new { player.Name, player.Ranking, ColumnIndex = index + baseColumnIndex + 1 })
+            .ToArray();
+        headers.AddRange(players.Select(x => $"{x.Name} ({x.Ranking})"));
         headers.Add(ExcelExportResources.MatchBlock);
         totalHeaderCount = headers.Count;
         var playerNameToColumnIndex = players.ToDictionary(x => x.Name, x => x.ColumnIndex);
@@ -145,7 +150,8 @@ internal class TeamsExcelCreator
             foreach (var teamPlayer in team.Players)
             {
                 var player = players.First(x => x.Id == teamPlayer.PlayerId);
-                teamModel.Players.Add(new TeamPlayerExcelModel(player.Alias, teamPlayer.PlayerType));
+                var ranking = team.Competition == Competition.Sporta ? player.RankingSporta : player.RankingVttl;
+                teamModel.Players.Add(new TeamPlayerExcelModel(player.Alias ?? player.FirstName ?? "???", teamPlayer.PlayerType, ranking ?? ""));
             }
 
             foreach (var match in matches.Where(x => x.FrenoyDivisionId == team.FrenoyDivisionId).OrderBy(x => x.Date))
@@ -208,12 +214,14 @@ internal class TeamPlayerExcelModel
     public string Name { get; set; }
     public bool Reserve { get; set; }
     public bool Captain { get; set; }
+    public string Ranking { get; set; }
 
-    public TeamPlayerExcelModel(string name, TeamPlayerType playerType)
+    public TeamPlayerExcelModel(string name, TeamPlayerType playerType, string ranking)
     {
         Name = name;
         Reserve = playerType == TeamPlayerType.Reserve;
         Captain = playerType == TeamPlayerType.Captain;
+        Ranking = ranking;
     }
 
     public override string ToString() => $"Name={Name}, Reserve={Reserve}";
