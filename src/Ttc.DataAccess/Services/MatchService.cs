@@ -133,6 +133,7 @@ public class MatchService
     {
         var match = await _context.Matches
             .WithIncludes()
+            .AsSingleQuery()
             .SingleAsync(x => x.Id == matchId);
 
         if (match.IsSyncedWithFrenoy)
@@ -280,6 +281,7 @@ public class MatchService
         {
             var match = _context.Matches
                 .WithIncludes()
+                .AsSingleQuery()
                 .Single(x => x.Id == matchId);
             return _mapper.Map<MatchEntity, OtherMatch>(match);
         }
@@ -308,6 +310,7 @@ public class MatchService
             .WithIncludes()
             .Include(x => x.HomeTeam)
             .Include(x => x.AwayTeam)
+            .AsSingleQuery()
             .SingleAsync(x => x.Id == matchId);
 
         if (forceSync || (match.Date < DateTime.Now && !match.IsSyncedWithFrenoy))
