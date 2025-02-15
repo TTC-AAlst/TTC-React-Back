@@ -207,7 +207,7 @@ public class PlayerService
             $"SELECT * FROM {PlayerEntity.TableName} WHERE id={{0}} AND Password=MD5({{1}}) AND QuitYear IS NULL",
             new MySqlParameter("@p1", user.PlayerId),
             new MySqlParameter("@p2", user.Password)
-        ).FirstOrDefaultAsync();
+        ).SingleOrDefaultAsync();
 
         if (playerEntity == null)
         {
@@ -222,7 +222,7 @@ public class PlayerService
         var player = await _context.Players.FromSqlRaw(
             $"SELECT * FROM {PlayerEntity.TableName} WHERE id={{0}} AND Password=MD5({{1}})",
             userNewCredentials.PlayerId,
-            userNewCredentials.OldPassword).FirstOrDefaultAsync();
+            userNewCredentials.OldPassword).SingleOrDefaultAsync();
 
         if (player == null)
         {
