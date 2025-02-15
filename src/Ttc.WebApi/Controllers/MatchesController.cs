@@ -108,7 +108,7 @@ public class MatchesController
         var result = await _service.FrenoyOtherMatchSync(matchId.Id);
         if (result != null)
         {
-            await _hub.Clients.All.BroadcastReload(Entities.Match, matchId.Id);
+            await _hub.Clients.All.BroadcastReload(Entities.ReadOnlyMatch, matchId.Id);
             return result;
         }
         return null;

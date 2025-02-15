@@ -5,10 +5,17 @@ namespace Ttc.WebApi.Utilities;
 public enum Entities
 {
     Player,
+    /// <summary>
+    /// Match from our club
+    /// </summary>
     Match,
     Team,
     Club,
     Config,
+    /// <summary>
+    /// Match where neither of the teams are from our club
+    /// </summary>
+    ReadOnlyMatch,
 }
 
 public interface ITtcHub
