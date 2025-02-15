@@ -126,6 +126,17 @@ public class MatchService
         var matchModel = _mapper.Map<MatchEntity, Match>(match);
         return matchModel;
     }
+
+    public async Task<OtherMatch> GetOpponentMatch(int matchId)
+    {
+        var match = await _context.Matches
+            .WithIncludes()
+            .AsSingleQuery()
+            .SingleAsync(x => x.Id == matchId);
+
+        var matchModel = _mapper.Map<MatchEntity, OtherMatch>(match);
+        return matchModel;
+    }
     #endregion
 
     #region Putters

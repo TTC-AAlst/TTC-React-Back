@@ -70,6 +70,15 @@ public class MatchesController
         _user.CleanSensitiveData(result);
         return result;
     }
+
+    [HttpGet("GetOpponentOne/{id:int}")]
+    [AllowAnonymous]
+    public async Task<OtherMatch> GetOpponentOne(int id)
+    {
+        var result = await _service.GetOpponentMatch(id);
+        _user.CleanSensitiveData(result);
+        return result;
+    }
     #endregion
 
 
