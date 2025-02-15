@@ -1,8 +1,13 @@
 # TTC-React-Back
 
+## Deploy
+
+
 ```sh
 cp .example.env .env
 cp src/Ttc.WebApi/appsettings.json src/Ttc.WebApi/appsettings.Release.json
+
+docker-compose up -d --build
 ```
 
 ## Database
