@@ -109,6 +109,7 @@ try
         LogContext.PushProperty("UserName", context.User.Identity?.Name ?? "Anonymous");
         await next();
     });
+    app.UseMiddleware<RequestLoggingFilter>();
     //app.UseSerilogRequestLogging(options =>
     //{
     //    options.GetLevel = (httpContext, elapsed, exception) =>
