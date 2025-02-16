@@ -143,7 +143,7 @@ public class PlayerService
     #endregion
 
     #region User
-    public async Task<User> GetUser(int playerId)
+    public async Task<User> GetUser(int playerId, bool isLogin)
     {
         int currentSeason = _context.CurrentSeason;
         var teams = await _context.Teams
@@ -154,6 +154,13 @@ public class PlayerService
             .ToListAsync();
 
         var player = await _context.Players.SingleAsync(ply => ply.Id == playerId && ply.QuitYear == null);
+
+        if (isLogin)
+        {
+            player.LastLogin = DateTime.Now;
+            await _context.SaveChangesAsync();
+        }
+
         return new User
         {
             PlayerId = playerId,
@@ -214,7 +221,7 @@ public class PlayerService
             return null;
         }
 
-        return await GetUser(user.PlayerId);
+        return await GetUser(user.PlayerId, true);
     }
 
     public async Task<User?> ChangePassword(PasswordCredentials userNewCredentials)
@@ -234,7 +241,7 @@ public class PlayerService
             userNewCredentials.PlayerId,
             userNewCredentials.NewPassword);
 
-        return await GetUser(userNewCredentials.PlayerId);
+        return await GetUser(userNewCredentials.PlayerId, false);
     }
 
     public async Task<string?> SetNewPassword(PasswordCredentials request)

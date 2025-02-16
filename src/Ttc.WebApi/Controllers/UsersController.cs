@@ -99,7 +99,7 @@ public class UsersController : ControllerBase
             return null;
         }
 
-        var userModel = await _service.GetUser(validated.PlayerId);
+        var userModel = await _service.GetUser(validated.PlayerId, true);
         userModel.Token = _user.GenerateJwtToken(userModel);
         return userModel;
     }

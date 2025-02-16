@@ -102,6 +102,7 @@ public class PlayerEntity : IAudit
     /// so that the cache gets invalidated
     /// </summary>
     public int ImageVersion { get; set; }
+    public DateTime LastLogin { get; set; }
 
     public Audit Audit { get; } = new();
 
