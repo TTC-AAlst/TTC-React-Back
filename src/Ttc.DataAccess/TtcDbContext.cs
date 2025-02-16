@@ -12,6 +12,7 @@ internal class TtcDbContext : DbContext, ITtcDbContext
 
     #region DbSets
     public DbSet<PlayerEntity> Players { get; set; }
+    public DbSet<PlayerLoginEntity> PlayerLogins { get; set; }
     public DbSet<PlayerPasswordResetEntity> PlayerPasswordResets { get; set; }
 
     public DbSet<ClubEntity> Clubs { get; set; }

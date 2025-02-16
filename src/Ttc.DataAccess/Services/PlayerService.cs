@@ -158,6 +158,14 @@ public class PlayerService
         if (isLogin)
         {
             player.LastLogin = DateTime.Now;
+
+            var login = new PlayerLoginEntity()
+            {
+                At = DateTime.Now,
+                PlayerId = player.Id,
+                Alias = player.Alias ?? player.Name,
+            };
+            await _context.PlayerLogins.AddAsync(login);
             await _context.SaveChangesAsync();
         }
 
