@@ -120,7 +120,14 @@ public class FrenoyMatchesApi : FrenoyApiBase
             int? ourTeamId = (matchEntity.HomeTeam ?? matchEntity.AwayTeam)?.Id;
 
             await MapMatch(matchEntity, ourTeamId, matchEntity.FrenoyDivisionId, frenoyMatch, matchEntity.FrenoySeason);
-            await SyncMatchResults(matchEntity, frenoyMatch);
+            if (matchEntity.ShouldBePlayed)
+            {
+                await SyncMatchResults(matchEntity, frenoyMatch);
+            }
+
+            if (!matchEntity.IsSyncedWithFrenoy && matchEntity.FrenoySeason < _db.CurrentFrenoySeason)
+                matchEntity.IsSyncedWithFrenoy = true;
+
             await CommitChanges();
             return true;
         }
@@ -234,6 +241,15 @@ public class FrenoyMatchesApi : FrenoyApiBase
         entity.FrenoyDivisionId = frenoyDivisionId;
         entity.Competition = _settings.Competition;
 
+        if (!entity.ShouldBePlayed)
+        {
+            if (frenoyMatch is { IsValidated: true, IsValidatedSpecified: true, IsLocked: true, IsLockedSpecified: true })
+                entity.IsSyncedWithFrenoy = true;
+
+            if (entity.FrenoySeason < _db.CurrentFrenoySeason)
+                entity.IsSyncedWithFrenoy = true;
+        }
+
         //TODO: The derby problem: both Home and AwayClubId are OwnClubId
         // do not pass teamId here but find out what the Team is based on HomeClubId and HomeTeamCode
         if (teamId.HasValue)
@@ -304,6 +320,22 @@ public class FrenoyMatchesApi : FrenoyApiBase
 
                         if (IsMatchComplete("POVLH", 16) || IsMatchComplete("POVLJ", 5))
                             matchEntity.IsSyncedWithFrenoy = true;
+                    }
+
+                    if (!matchEntity.IsSyncedWithFrenoy)
+                    {
+                        if (frenoyMatch.Date.AddDays(2) < DateTime.Now
+                            && frenoyMatch is { IsLocked: true, IsLockedSpecified: true, IsValidated: true, IsValidatedSpecified: true })
+                        {
+                            var players = frenoyMatch.MatchDetails.AwayPlayers.Players.Concat(frenoyMatch.MatchDetails.HomePlayers.Players);
+                            var hasForfeit = players.Any(x => x.IsForfeited && x.IsForfeitedSpecified);
+                            matchEntity.IsSyncedWithFrenoy = hasForfeit;
+                        }
+
+                        if (matchEntity.WalkOver)
+                        {
+                            matchEntity.IsSyncedWithFrenoy = true;
+                        }
                     }
                 }
             }
@@ -399,6 +431,12 @@ public class FrenoyMatchesApi : FrenoyApiBase
                 continue;
             }
 
+            if (frenoyVerslagSpeler.UniqueIndex == "0")
+            {
+                // Sometimes dummy records are added to a match
+                continue;
+            }
+
             MatchPlayerEntity matchPlayerEntity = new MatchPlayerEntity
             {
                 MatchId = match.Id,
@@ -445,7 +483,7 @@ public class FrenoyMatchesApi : FrenoyApiBase
     #endregion
 
     #region Cache
-    private static readonly TimeSpan FrenoyPesterExpiration = TimeSpan.FromMinutes(15);
+    private static readonly TimeSpan FrenoyPesterExpiration = TimeSpan.FromMinutes(10);
     private static readonly Dictionary<int, DateTime> FrenoyNoPesterCache = new();
     private static readonly object FrenoyNoPesterLock = new();
     private static bool ShouldAttemptMatchSync(int matchId)

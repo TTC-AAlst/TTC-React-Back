@@ -112,9 +112,9 @@ public class MatchesController
     [HttpPost]
     [Route("FrenoyOtherMatchSync")]
     [AllowAnonymous]
-    public async Task<OtherMatch?> FrenoyOtherMatchSync([FromBody] IdDto matchId)
+    public async Task<OtherMatch?> FrenoyOtherMatchSync([FromBody] IdDto matchId, [FromQuery] bool forceSync = false)
     {
-        var result = await _service.FrenoyOtherMatchSync(matchId.Id);
+        var result = await _service.FrenoyOtherMatchSync(matchId.Id, forceSync);
         if (result != null)
         {
             await _hub.Clients.All.BroadcastReload(Entities.ReadOnlyMatch, matchId.Id);

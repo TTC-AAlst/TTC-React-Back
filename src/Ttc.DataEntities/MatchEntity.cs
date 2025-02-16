@@ -79,7 +79,7 @@ public class MatchEntity
 
     public override string ToString()
     {
-        var str = $"Id={Id}, Date={Date:d} {Date:hh\\:mm}";
+        var str = $"Id={Id}, Date={Date:d} {Date:HH\\:mm}";
         return $"{str}, Club={AwayClubId}, Team={AwayTeamCode}";
     }
 }

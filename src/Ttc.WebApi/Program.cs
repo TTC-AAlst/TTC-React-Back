@@ -61,7 +61,7 @@ try
     builder.Services.AddScoped<IUserNameProvider, WebUserNameProvider>();
     builder.Services.AddMemoryCache();
     builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-    builder.Services.AddControllers().AddJsonOptions(options =>
+    builder.Services.AddControllers().AddControllersAsServices().AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
@@ -72,6 +72,7 @@ try
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
     builder.Services.AddProblemDetails();
     builder.Services.AddSignalR();
+    builder.Services.AddHostedService<FrenoySyncJob>();
 
     builder.Services.AddServiceModelServices().AddServiceModelMetadata();
     builder.Services.AddSingleton<IServiceBehavior, UseRequestHeadersForMetadataAddressBehavior>();

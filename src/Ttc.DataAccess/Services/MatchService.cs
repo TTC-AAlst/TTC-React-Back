@@ -286,9 +286,9 @@ public class MatchService
     #endregion
 
     #region Frenoy Sync
-    public async Task<OtherMatch?> FrenoyOtherMatchSync(int matchId)
+    public async Task<OtherMatch?> FrenoyOtherMatchSync(int matchId, bool forceSync = false)
     {
-        if (await FrenoyMatchSyncCore(matchId, false))
+        if (await FrenoyMatchSyncCore(matchId, forceSync))
         {
             var match = _context.Matches
                 .WithIncludes()
