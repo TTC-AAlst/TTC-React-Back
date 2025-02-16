@@ -29,7 +29,9 @@ public class RequestLoggingFilter
 
         string body = "";
         if (request.Method != HttpMethods.Get && request.Method != HttpMethods.Delete && request.ContentLength > 0 
-            && request.Path != "/api/User/sign-in" && request.Path != "/api/users/ValidateToken")
+            && request.Path != "/api/User/sign-in" && request.Path != "/api/users/ValidateToken"
+            && request.Path != "/api/User/ChangePassword" && request.Path != "/api/User/SetNewPasswordFromGuid"
+            && request.Path != "/api/User/AdminSetNewPassword")
         {
             request.Body.Position = 0;
             using var reader = new StreamReader(request.Body, leaveOpen: true);
