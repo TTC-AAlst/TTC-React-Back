@@ -9,7 +9,9 @@ internal class MatchProfile : Profile
 {
     public MatchProfile()
     {
-        CreateMap<Match, Match>();
+        // ATTN: Since we're not caching matches, we let AutoMapper
+        //       return the same instances when mapping the matches
+        // CreateMap<Match, Match>();
 
         CreateMap<MatchEntity, OtherMatch>()
             .ForMember(

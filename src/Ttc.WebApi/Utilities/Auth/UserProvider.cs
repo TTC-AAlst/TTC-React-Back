@@ -121,6 +121,10 @@ public class UserProvider : IUserProvider
         if (IsAuthenticated)
             return data;
 
+        // Due to AutoMapper configuration this will create copies
+        // for Players, but not for Matches. Since Players are being
+        // cached (and hiding data would mutate the cache) but
+        // Matches are not cached.
         var dataCopy = _mapper.Map<T[]>(data);
         foreach (var record in dataCopy)
         {
