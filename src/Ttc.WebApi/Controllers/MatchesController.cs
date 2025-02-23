@@ -46,8 +46,8 @@ public class MatchesController
     public async Task<IEnumerable<Match>> Get()
     {
         var result = await _service.GetMatches();
-        _user.CleanSensitiveData(result);
-        return result;
+        var cleanedResult = _user.CleanSensitiveData(result);
+        return cleanedResult;
     }
 
     [HttpGet("{id:int}")]
@@ -55,8 +55,8 @@ public class MatchesController
     public async Task<Match> Get(int id)
     {
         var result = await _service.GetMatch(id);
-        _user.CleanSensitiveData(result);
-        return result;
+        var cleanedResult = _user.CleanSensitiveData(result);
+        return cleanedResult;
     }
 
     [HttpGet]
@@ -67,7 +67,6 @@ public class MatchesController
         // This is also called from Team Week display where there is no opponent
         var opponent = clubId.HasValue ? OpposingTeam.Create(clubId, teamCode) : null;
         var result = await _service.GetOpponentMatches(teamId, opponent);
-        _user.CleanSensitiveData(result);
         return result;
     }
 
@@ -76,7 +75,6 @@ public class MatchesController
     public async Task<OtherMatch> GetOpponentOne(int id)
     {
         var result = await _service.GetOpponentMatch(id);
-        _user.CleanSensitiveData(result);
         return result;
     }
     #endregion
@@ -94,8 +92,8 @@ public class MatchesController
         if (result != null)
         {
             await _hub.Clients.All.BroadcastReload(Entities.Match, matchId.Id);
-            _user.CleanSensitiveData(result);
-            return result;
+            var cleanedResult = _user.CleanSensitiveData(result);
+            return cleanedResult;
         }
         return null;
     }

@@ -9,6 +9,8 @@ internal class MatchProfile : Profile
 {
     public MatchProfile()
     {
+        CreateMap<Match, Match>();
+
         CreateMap<MatchEntity, OtherMatch>()
             .ForMember(
                 dest => dest.Home,

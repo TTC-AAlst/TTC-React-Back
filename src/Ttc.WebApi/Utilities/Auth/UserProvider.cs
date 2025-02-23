@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System.Security.Claims;
 using System.Text;
+using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
 using Ttc.DataEntities.Core;
 using Ttc.Model;
@@ -14,6 +15,7 @@ public class UserProvider : IUserProvider
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly TtcSettings _settings;
+    private readonly IMapper _mapper;
 
     private ClaimsPrincipal? Principal => _httpContextAccessor.HttpContext?.User;
 
@@ -33,10 +35,11 @@ public class UserProvider : IUserProvider
         }
     }
 
-    public UserProvider(IHttpContextAccessor httpContextAccessor, TtcSettings settings)
+    public UserProvider(IHttpContextAccessor httpContextAccessor, TtcSettings settings, IMapper mapper)
     {
         _httpContextAccessor = httpContextAccessor;
         _settings = settings;
+        _mapper = mapper;
     }
 
     public string GenerateJwtToken(User user)
@@ -112,24 +115,28 @@ public class UserProvider : IUserProvider
         };
     }
 
-    public void CleanSensitiveData<T>(ICollection<T> data)
+    public ICollection<T> CleanSensitiveData<T>(ICollection<T> data)
         where T : ITtcConfidential
     {
         if (IsAuthenticated)
-            return;
+            return data;
 
-        foreach (var record in data)
+        var dataCopy = _mapper.Map<T[]>(data);
+        foreach (var record in dataCopy)
         {
             record.Hide();
         }
+        return dataCopy;
     }
 
-    public void CleanSensitiveData<T>(T data)
+    public T CleanSensitiveData<T>(T data)
         where T : ITtcConfidential
     {
         if (IsAuthenticated)
-            return;
+            return data;
 
-        data.Hide();
+        var dataCopy = _mapper.Map<T>(data);
+        dataCopy.Hide();
+        return dataCopy;
     }
 }

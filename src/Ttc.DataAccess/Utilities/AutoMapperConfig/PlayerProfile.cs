@@ -8,6 +8,8 @@ internal class PlayerProfile : Profile
 {
     public PlayerProfile()
     {
+        CreateMap<Player, Player>();
+
         CreateMap<PlayerEntity, Player>()
             .ForMember(
                 dest => dest.Alias,

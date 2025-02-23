@@ -35,8 +35,9 @@ public class PlayersController
         {
             return null;
         }
-        _user.CleanSensitiveData(result.Data);
-        return result;
+
+        var cleanedResult = _user.CleanSensitiveData(result.Data);
+        return new CacheResponse<Player>(cleanedResult, DateTime.MinValue);
     }
 
     [HttpGet("Quitters")]
@@ -51,8 +52,8 @@ public class PlayersController
     public async Task<Player> Get(int id)
     {
         var result = await _service.GetPlayer(id);
-        _user.CleanSensitiveData(result);
-        return result;
+        var cleanedResult = _user.CleanSensitiveData(result);
+        return cleanedResult;
     }
 
     [HttpPost]
