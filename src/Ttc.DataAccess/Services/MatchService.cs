@@ -260,6 +260,10 @@ public class MatchService
         var existingMatch = await _context.Matches.FirstAsync(x => x.Id == report.MatchId);
         existingMatch.ReportPlayerId = report.PlayerId;
         existingMatch.Description = report.Text;
+
+        var clubEvent = EventEntity.MatchReport(report);
+        await _context.Events.AddAsync(clubEvent);
+
         await _context.SaveChangesAsync();
         var newMatch = await GetMatch(report.MatchId);
         return newMatch;
@@ -270,6 +274,11 @@ public class MatchService
         var entity = _mapper.Map<MatchCommentEntity>(comment);
         entity.PostedOn = TtcDbContext.GetCurrentBelgianDateTime();
         _context.MatchComments.Add(entity);
+        await _context.SaveChangesAsync();
+
+        var clubEvent = EventEntity.MatchComment(entity);
+        await _context.Events.AddAsync(clubEvent);
+
         await _context.SaveChangesAsync();
         var newMatch = await GetMatch(comment.MatchId);
         return newMatch;

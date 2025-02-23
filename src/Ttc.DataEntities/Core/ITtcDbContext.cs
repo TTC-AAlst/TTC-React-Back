@@ -24,6 +24,7 @@ public interface ITtcDbContext
     DbSet<MatchCommentEntity> MatchComments { get; set; }
 
     DbSet<ParameterEntity> Parameters { get; set; }
+    DbSet<EventEntity> Events { get; set; }
 
     int CurrentSeason { get; set; }
     int CurrentFrenoySeason { get; }

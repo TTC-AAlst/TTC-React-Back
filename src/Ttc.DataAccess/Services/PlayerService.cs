@@ -17,12 +17,14 @@ public class PlayerService
 {
     private readonly ITtcDbContext _context;
     private readonly IMapper _mapper;
+    private readonly IUserProvider _user;
     private readonly CacheHelper _cache;
 
-    public PlayerService(ITtcDbContext context, IMapper mapper, IMemoryCache cache)
+    public PlayerService(ITtcDbContext context, IMapper mapper, IMemoryCache cache, IUserProvider user)
     {
         _context = context;
         _mapper = mapper;
+        _user = user;
         _cache = new CacheHelper(cache);
     }
 
@@ -76,7 +78,12 @@ public class PlayerService
 
         existingPlayer.Style = playerStyle.Name;
         existingPlayer.BestStroke = playerStyle.BestStroke;
+
+        var clubEvent = EventEntity.UpdatePlayerStyle(existingPlayer, _user.PlayerId);
+        await _context.Events.AddAsync(clubEvent);
+
         await _context.SaveChangesAsync();
+
         _cache.Remove("players");
         var updatedPlayer = await GetPlayer(playerStyle.PlayerId);
         return updatedPlayer;

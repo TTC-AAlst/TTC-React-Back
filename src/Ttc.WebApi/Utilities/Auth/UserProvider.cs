@@ -3,13 +3,14 @@ using Newtonsoft.Json;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Ttc.DataEntities.Core;
 using Ttc.Model;
 using Ttc.Model.Core;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace Ttc.WebApi.Utilities.Auth;
 
-public class UserProvider
+public class UserProvider : IUserProvider
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly TtcSettings _settings;
@@ -18,7 +19,7 @@ public class UserProvider
 
     public bool IsAuthenticated => Principal?.Identity?.IsAuthenticated ?? false;
 
-    public string? Alias => Principal?.Identity?.Name ?? "Anonymous";
+    public string Name => Principal?.Identity?.Name ?? "Anonymous";
 
     public int? PlayerId
     {

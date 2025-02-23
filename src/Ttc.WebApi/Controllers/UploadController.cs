@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Ttc.DataEntities;
 using Ttc.DataEntities.Core;
 using Ttc.Model.Core;
 using Ttc.WebApi.Utilities;

@@ -8,7 +8,7 @@ namespace Ttc.DataAccess;
 internal class TtcDbContext : DbContext, ITtcDbContext
 {
     private static int? _currentSeason;
-    private readonly IUserNameProvider _userNameProvider;
+    private readonly IUserProvider _userProvider;
 
     #region DbSets
     public DbSet<PlayerEntity> Players { get; set; }
@@ -28,6 +28,7 @@ internal class TtcDbContext : DbContext, ITtcDbContext
     public DbSet<MatchCommentEntity> MatchComments { get; set; }
 
     public DbSet<ParameterEntity> Parameters { get; set; }
+    public DbSet<EventEntity> Events { get; set; }
     #endregion
 
     #region Properties
@@ -52,9 +53,9 @@ internal class TtcDbContext : DbContext, ITtcDbContext
     public int CurrentFrenoySeason => CurrentSeason - 2000 + 1;
     #endregion
 
-    public TtcDbContext(DbContextOptions<TtcDbContext> options, IUserNameProvider userNameProvider) : base(options)
+    public TtcDbContext(DbContextOptions<TtcDbContext> options, IUserProvider userProvider) : base(options)
     {
-        _userNameProvider = userNameProvider;
+        _userProvider = userProvider;
     }
 
     /// <summary>
@@ -82,6 +83,12 @@ internal class TtcDbContext : DbContext, ITtcDbContext
 
         modelBuilder.Entity<TeamEntity>()
             .Property(o => o.Competition)
+            .HasConversion<string>();
+
+        modelBuilder
+            .Entity<EventEntity>()
+            .Property(e => e.Type)
+            .HasMaxLength(50)
             .HasConversion<string>();
 
 
@@ -127,12 +134,12 @@ internal class TtcDbContext : DbContext, ITtcDbContext
             if (entityEntry.State == EntityState.Added)
             {
                 audit.CreatedOn = DateTime.Now;
-                audit.CreatedBy = _userNameProvider.Name;
+                audit.CreatedBy = _userProvider.Name;
             }
             else
             {
                 audit.ModifiedOn = DateTime.Now;
-                audit.ModifiedBy = _userNameProvider.Name;
+                audit.ModifiedBy = _userProvider.Name;
             }
         }
     }
@@ -148,6 +155,6 @@ internal class TtcDbContextFactory : IDesignTimeDbContextFactory<TtcDbContext>
     {
         var builder = new DbContextOptionsBuilder<TtcDbContext>();
         GlobalBackendConfiguration.ConfigureDbContextBuilder(builder);
-        return new TtcDbContext(builder.Options, new MigrationsUserNameProvider());
+        return new TtcDbContext(builder.Options, new MigrationsUserProvider());
     }
 }
