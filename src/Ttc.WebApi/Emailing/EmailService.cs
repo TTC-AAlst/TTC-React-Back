@@ -1,5 +1,6 @@
 ﻿using SendGrid;
 using SendGrid.Helpers.Mail;
+using System.Text.RegularExpressions;
 using Ttc.DataAccess.Utilities;
 using Ttc.Model.Core;
 using Ttc.Model.Players;
@@ -17,14 +18,30 @@ public class EmailService
         _logger = logger;
     }
 
-    public async Task SendEmail(IEnumerable<Player> players, string subject, string content, EmailConfig config)
+    public async Task SendEmail(IEnumerable<Player> players, WeekCompetitionEmailModel email, EmailConfig config)
     {
         var client = new SendGridClient(config.SendGridApiKey);
         var from = new EmailAddress(config.EmailFrom);
-        var tos = players.Select(player => new EmailAddress(player.Contact.Email, player.FirstName + " " + player.LastName)).ToList();
-        var msg = MailHelper.CreateSingleEmailToMultipleRecipients(from, tos, subject, content, content, true);
-        var response = await client.SendEmailAsync(msg);
-        await CheckSendGridResponse(subject, response);
+
+        foreach (var player in players)
+        {
+            var to = new EmailAddress(player.Contact.Email, player.FirstName + " " + player.LastName);
+
+            string customContent;
+            if (email.Players.TryGetValue(player.Id, out string team))
+            {
+                customContent = email.Email.Replace("{{player-info}}", $"<br>Yaye! Je bent opgesteld in {team}. Succes!<br>");
+            }
+            else
+            {
+                customContent = email.Email.Replace("{{player-info}}", "");
+            }
+            
+            string plainContent = Regex.Replace(customContent.Replace("<br>", Environment.NewLine), "<.*?>", "");
+            var msg = MailHelper.CreateSingleEmail(from, to, email.Title, plainContent, customContent);
+            var response = await client.SendEmailAsync(msg);
+            await CheckSendGridResponse(email.Title, response);
+        }
     }
 
     public async Task SendEmail(string email, string subject, string content, EmailConfig config)

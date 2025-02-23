@@ -8,6 +8,7 @@ public class WeekCompetitionEmailModel
     public bool JustMe { get; set; }
     public string Title { get; set; } = "";
     public string Email { get; set; } = "";
+    public Dictionary<int, string> Players { get; set; } = [];
     
     public override string ToString() => $"{Title}: {Email}";
 }
