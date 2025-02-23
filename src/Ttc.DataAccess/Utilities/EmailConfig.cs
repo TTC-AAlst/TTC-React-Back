@@ -11,5 +11,5 @@ public class EmailConfig
         SendGridApiKey = sendGridApiKey;
     }
 
-    public override string ToString() => $"{EmailFrom}, ${SendGridApiKey}";
+    public override string ToString() => $"From={EmailFrom}";
 }
