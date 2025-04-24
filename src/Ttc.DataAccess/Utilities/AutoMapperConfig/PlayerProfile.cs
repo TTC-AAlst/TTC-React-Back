@@ -1,5 +1,6 @@
 using AutoMapper;
 using Ttc.DataEntities;
+using Ttc.Model;
 using Ttc.Model.Players;
 
 namespace Ttc.DataAccess.Utilities.AutoMapperConfig;
@@ -39,6 +40,15 @@ internal class PlayerProfile : Profile
                 opts => opts.MapFrom(src => src.ClubIdSporta.HasValue ?
                     CreateSportaPlayer(src.ClubIdSporta.Value, src.LidNummerSporta.Value, src.FrenoyLinkSporta, src.RankingSporta, src.VolgnummerSporta.Value, src.IndexSporta.Value, src.NextRankingSporta)
                     : null))
+            ;
+
+        CreateMap<EventEntity, EventModel>()
+            .ForMember(
+                dest => dest.CreatedOn,
+                opts => opts.MapFrom(x => x.Audit.CreatedOn))
+            .ForMember(
+                dest => dest.CreatedBy,
+                opts => opts.MapFrom(x => x.Audit.CreatedBy))
             ;
     }
 

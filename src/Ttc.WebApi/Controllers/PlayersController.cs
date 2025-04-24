@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Ttc.DataAccess.Services;
+using Ttc.Model;
 using Ttc.Model.Clubs;
 using Ttc.Model.Players;
 using Ttc.WebApi.Utilities;
@@ -38,6 +39,13 @@ public class PlayersController
 
         var cleanedResult = _user.CleanSensitiveData(result.Data);
         return new CacheResponse<Player>(cleanedResult, DateTime.MinValue);
+    }
+
+    [HttpGet("Events")]
+    public async Task<IEnumerable<EventModel>> GetEvents()
+    {
+        var result = await _service.GetEvents();
+        return result;
     }
 
     [HttpGet("Quitters")]

@@ -47,6 +47,10 @@ public class UploadController
             if (player != null)
             {
                 player.ImageVersion++;
+
+                var playerPictureEvent = EventEntity.PlayerPicture(data.DataId, data.Type);
+                await _context.Events.AddAsync(playerPictureEvent);
+
                 await _context.SaveChangesAsync();
                 await _hub.Clients.All.BroadcastReload(Entities.Player, player.Id);
             }

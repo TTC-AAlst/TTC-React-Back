@@ -3,18 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using Ttc.DataEntities.Core;
+using Ttc.Model;
 using Ttc.Model.Matches;
 
 namespace Ttc.DataEntities;
-
-public enum EventType
-{
-    Unknown,
-    PlayerStyleUpdated,
-    MatchReport,
-    MatchComment,
-    MatchPicture,
-}
 
 /// <summary>
 /// Something that happened in the club
@@ -74,12 +66,13 @@ public class EventEntity : IAudit
         };
     }
 
-    public static EventEntity MatchPicture(int matchId)
+    public static EventEntity PlayerPicture(int playerId, string pictureType)
     {
         return new EventEntity()
         {
-            Type = EventType.MatchPicture,
-            MatchId = matchId,
+            Type = EventType.PlayerPicture,
+            PlayerId = playerId,
+            Data = JsonSerializer.Serialize(new { Type = pictureType }),
         };
     }
 

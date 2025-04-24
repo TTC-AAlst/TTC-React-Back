@@ -30,6 +30,13 @@ public class PlayerService
 
     #region Player
 
+    public async Task<IEnumerable<EventModel>> GetEvents()
+    {
+        var events = await _context.Events.ToArrayAsync();
+        var result = _mapper.Map<IList<EventEntity>, IList<EventModel>>(events);
+        return result;
+    }
+
     public async Task<CacheResponse<Player>?> GetOwnClub(DateTime? lastChecked)
     {
         var players = await _cache.GetOrSet("players", GetOwnClub, TimeSpan.FromHours(1));
