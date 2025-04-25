@@ -6,4 +6,5 @@ public class TtcSettings
     public string Issuer { get; set; } = "";
     public string PublicImageFolder { get; set; } = "";
     public string Origins { get; set; } = "";
+    public bool StartSyncJob { get; set; }
 }

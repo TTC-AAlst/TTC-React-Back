@@ -72,7 +72,10 @@ try
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
     builder.Services.AddProblemDetails();
     builder.Services.AddSignalR();
-    builder.Services.AddHostedService<FrenoySyncJob>();
+    if (ttcSettings.StartSyncJob)
+    {
+        builder.Services.AddHostedService<FrenoySyncJob>();
+    }
 
     builder.Services.AddServiceModelServices().AddServiceModelMetadata();
     builder.Services.AddSingleton<IServiceBehavior, UseRequestHeadersForMetadataAddressBehavior>();
