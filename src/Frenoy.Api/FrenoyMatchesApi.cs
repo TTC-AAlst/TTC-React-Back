@@ -39,7 +39,14 @@ public class FrenoyMatchesApi : FrenoyApiBase
 
     private async Task SyncTeamsAndMatches(GetClubTeamsResponse frenoyTeams)
     {
-        foreach (var frenoyTeam in frenoyTeams.TeamEntries)
+        // ATTN: When doing an after season sync, "Eindrondes" are also included
+        //       The GetDivisionRankingAsync crashes on these DivisionIds because
+        //       for these, the RankingSystem parameter is required.
+        var actualFrenoyTeams = frenoyTeams.TeamEntries
+            .Where(team => !team.DivisionName.StartsWith("EINDRONDE"))
+            .ToArray();
+
+        foreach (var frenoyTeam in actualFrenoyTeams)
         {
             // Create new division for each team in the club
             // Check if it already exists: Two teams could play in the same division
