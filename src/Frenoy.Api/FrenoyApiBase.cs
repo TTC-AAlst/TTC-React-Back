@@ -36,9 +36,21 @@ public class FrenoyApiBase
         _settings = isVttl ? FrenoySettings.VttlSettings(_currentSeason) : FrenoySettings.SportaSettings(_currentSeason);
 
         _isVttl = isVttl;
+
+        var binding = new System.ServiceModel.BasicHttpBinding(System.ServiceModel.BasicHttpSecurityMode.Transport)
+        {
+            MaxReceivedMessageSize = 20000000,
+            MaxBufferSize = 20000000,
+            MaxBufferPoolSize = 20000000,
+            AllowCookies = true
+        };
+
         if (isVttl)
         {
-            _frenoy = new FrenoyVttl.TabTAPI_PortTypeClient();
+            _frenoy = new FrenoyVttl.TabTAPI_PortTypeClient(
+                binding,
+                new System.ServiceModel.EndpointAddress(new Uri(FrenoyVttlEndpoint))
+            );
             _thuisClubId = _db.Clubs.Single(x => x.CodeVttl == _settings.FrenoyClub).Id;
         }
         else
@@ -50,7 +62,7 @@ public class FrenoyApiBase
             // binding.Security.Mode = BasicHttpSecurityMode.Transport;
             //var endpoint = new EndpointAddress(FrenoySportaEndpoint);
             _frenoy = new TabTAPI_PortTypeClient(
-                new System.ServiceModel.BasicHttpBinding(System.ServiceModel.BasicHttpSecurityMode.Transport),
+                binding,
                 new System.ServiceModel.EndpointAddress(new Uri(FrenoySportaEndpoint))
             );
         }
