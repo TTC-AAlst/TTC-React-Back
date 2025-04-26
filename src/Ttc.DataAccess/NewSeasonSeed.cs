@@ -11,7 +11,8 @@ internal static class NewSeasonSeed
     /// </summary>
     public static async Task Seed(ITtcDbContext context, bool clearMatches, int year)
     {
-        throw new Exception("Need code to reset all IMemoryCaches and remove all localStorage caches");
+        if (year < 1000)
+            throw new Exception("Year should be actual year (ex: 2025), not FrenoySeason (ex: 26)");
 
         //if (clearMatches)
         //{
