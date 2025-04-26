@@ -586,7 +586,7 @@ public class FrenoyMatchesApi : FrenoyApiBase
             team.Competition = _settings.Competition;
         }
         
-        team.DivisionType = _settings.DivisionType;
+        team.DivisionType = frenoyTeam.DivisionName.StartsWith("ERE") ? "Ere" : _settings.DivisionType;
         team.Year = _settings.Year;
         team.LinkId = $"{frenoyTeam.DivisionId}_{frenoyTeam.Team}";
 

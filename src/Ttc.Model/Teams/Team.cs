@@ -28,6 +28,7 @@ public class Team
     /// <summary>
     /// Vttl: 2A
     /// Sporta: 1
+    /// Sporta Ere: empty
     /// </summary>
     public string DivisionName { get; set; } = "";
 
