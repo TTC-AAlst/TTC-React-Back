@@ -58,7 +58,12 @@ public class ConfigService
         {
             int newYear = int.Parse(value);
             param.Value = newYear.ToString();
+
             await NewSeasonSeed.Seed(_context, false, newYear);
+
+            _cache.Remove("clubs");
+            _cache.Remove("players");
+            _cache.Remove("teams");
         }
         else
         {
