@@ -568,6 +568,7 @@ public class FrenoyMatchesApi : FrenoyApiBase
     private const string MatchTypeJeugd = "6";
     private const string MatchTypeVttlMen = "2";
     private const string MatchTypeSportaMen = "4";
+    private const string MatchTypeSportaMenOld = "7";
     private TeamEntity CreateTeam(TeamEntryType frenoyTeam)
     {
         var team = new TeamEntity();
@@ -580,7 +581,7 @@ public class FrenoyMatchesApi : FrenoyApiBase
         }
         else
         {
-            if (frenoyTeam.MatchType != MatchTypeVttlMen && frenoyTeam.MatchType != MatchTypeSportaMen)
+            if (frenoyTeam.MatchType != MatchTypeVttlMen && frenoyTeam.MatchType != MatchTypeSportaMen && frenoyTeam.MatchType != MatchTypeSportaMenOld)
                 throw new Exception($"Expected MatchType to be SportaMen={MatchTypeSportaMen} or VttlMen={MatchTypeVttlMen}. Was={frenoyTeam.MatchType}");
 
             team.Competition = _settings.Competition;
