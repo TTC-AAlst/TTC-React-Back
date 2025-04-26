@@ -286,6 +286,8 @@ public class FrenoyMatchesApi : FrenoyApiBase
                 string score = frenoyMatch.Score.ToLowerInvariant();
                 bool isForfeit = score.Contains("ff") || score.Contains("af") || score.Contains("gu");
                 matchEntity.WalkOver = isForfeit;
+                if (matchEntity.WalkOver)
+                    matchEntity.IsSyncedWithFrenoy = true;
 
                 // Uitslag
                 var scoreRex = new Regex(@"^(\d+)-(\d+)");

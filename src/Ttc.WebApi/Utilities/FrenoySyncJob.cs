@@ -36,6 +36,8 @@ public class FrenoySyncJob : IHostedService, IDisposable
 
             var matchesToSync = await context.Matches
                 .Where(x => !x.IsSyncedWithFrenoy)
+                .Where(x => x.ShouldBePlayed)
+                .Where(x => !x.WalkOver)
                 .Where(x => x.Date < DateTime.Now)
                 .Where(x => x.Date != DateTime.MinValue)
                 .ToArrayAsync();
