@@ -103,35 +103,39 @@ public class FrenoyMatchesApi : FrenoyApiBase
                 Season = _settings.FrenoySeason.ToString(),
                 DivisionId = team.FrenoyDivisionId.ToString(),
                 Team = team.TeamCode,
-                WithDetailsSpecified = false,
-                WithDetails = false,
+                WithDetailsSpecified = ForceResync,
+                WithDetails = ForceResync,
             }
         });
 
         await SyncTeamMatches(team.Id, team.FrenoyDivisionId, matches.GetMatchesResponse);
     }
 
-    public async Task<bool> SyncMatchDetails(MatchEntity matchEntity)
+    public async Task<bool> SyncMatchDetails(MatchEntity matchEntity, TeamMatchEntryType? frenoyMatch = null)
     {
         if (_forceSync || ShouldAttemptMatchSync(matchEntity.Id))
         {
-            GetMatchesResponse1 matches = await _frenoy.GetMatchesAsync(new GetMatchesRequest1
+            if (frenoyMatch == null)
             {
-                GetMatchesRequest = new GetMatchesRequest()
+                GetMatchesResponse1 matches = await _frenoy.GetMatchesAsync(new GetMatchesRequest1
                 {
-                    DivisionId = matchEntity.FrenoyDivisionId.ToString(),
-                    WithDetailsSpecified = true,
-                    WithDetails = true,
-                    MatchId = matchEntity.FrenoyMatchId
-                }
-            });
+                    GetMatchesRequest = new GetMatchesRequest()
+                    {
+                        DivisionId = matchEntity.FrenoyDivisionId.ToString(),
+                        WithDetailsSpecified = true,
+                        WithDetails = true,
+                        MatchId = matchEntity.FrenoyMatchId
+                    }
+                });
 
-            Debug.Assert(matches.GetMatchesResponse.MatchCount == "1");
+                Debug.Assert(matches.GetMatchesResponse.MatchCount == "1");
 
-            var frenoyMatch = matches.GetMatchesResponse.TeamMatchesEntries[0];
-            int? ourTeamId = (matchEntity.HomeTeam ?? matchEntity.AwayTeam)?.Id;
+                frenoyMatch = matches.GetMatchesResponse.TeamMatchesEntries[0];
 
-            await MapMatch(matchEntity, ourTeamId, matchEntity.FrenoyDivisionId, frenoyMatch, matchEntity.FrenoySeason);
+                int? ourTeamId = (matchEntity.HomeTeam ?? matchEntity.AwayTeam)?.Id;
+                await MapMatch(matchEntity, ourTeamId, matchEntity.FrenoyDivisionId, frenoyMatch, matchEntity.FrenoySeason);
+            }
+            
             if (matchEntity.ShouldBePlayed)
             {
                 await SyncMatchResults(matchEntity, frenoyMatch);
@@ -217,12 +221,19 @@ public class FrenoyMatchesApi : FrenoyApiBase
             if (matchEntity == null)
             {
                 matchEntity = new MatchEntity();
+                // SyncMatchDetails does a MapMatch, but it expects teamId which
+                // is only correct when the match already exists in the database.
                 await MapMatch(matchEntity, teamId, frenoyDivisionId, frenoyMatch, frenoySeason.Value);
+                if (ForceResync)
+                    await SyncMatchDetails(matchEntity, frenoyMatch);
                 _db.Matches.Add(matchEntity);
             }
             else
             {
-                await MapMatch(matchEntity, teamId, frenoyDivisionId, frenoyMatch, frenoySeason);
+                if (ForceResync)
+                    await SyncMatchDetails(matchEntity, frenoyMatch);
+                else
+                    await MapMatch(matchEntity, teamId, frenoyDivisionId, frenoyMatch, frenoySeason);
             }
             await CommitChanges();
         }
@@ -441,20 +452,20 @@ public class FrenoyMatchesApi : FrenoyApiBase
         matchEntity.Games.Add(matchResult);
     }
 
-    private async Task AddMatchPlayers(TeamMatchPlayerEntryType[]? players, MatchEntity match, bool thuisSpeler)
+    private async Task AddMatchPlayers(TeamMatchPlayerEntryType[]? players, MatchEntity match, bool isHomePlayer)
     {
         if (players == null)
             return;
 
-        foreach (var frenoyVerslagSpeler in players)
+        foreach (var player in players)
         {
-            if (string.IsNullOrWhiteSpace(frenoyVerslagSpeler.UniqueIndex))
+            if (string.IsNullOrWhiteSpace(player.UniqueIndex))
             {
                 // Even more forfeited stuff
                 continue;
             }
 
-            if (frenoyVerslagSpeler.UniqueIndex == "0")
+            if (player.UniqueIndex == "0")
             {
                 // Sometimes dummy records are added to a match
                 continue;
@@ -463,32 +474,32 @@ public class FrenoyMatchesApi : FrenoyApiBase
             MatchPlayerEntity matchPlayerEntity = new MatchPlayerEntity
             {
                 MatchId = match.Id,
-                Ranking = frenoyVerslagSpeler.Ranking,
-                Home = thuisSpeler,
-                Name = GetSpelerNaam(frenoyVerslagSpeler),
-                Position = int.Parse(frenoyVerslagSpeler.Position),
-                UniqueIndex = int.Parse(frenoyVerslagSpeler.UniqueIndex),
+                Ranking = player.Ranking,
+                Home = isHomePlayer,
+                Name = GetSpelerNaam(player),
+                Position = int.Parse(player.Position),
+                UniqueIndex = int.Parse(player.UniqueIndex),
                 Status = PlayerMatchStatus.Major
             };
-            if (frenoyVerslagSpeler.VictoryCount != null)
+            if (player.VictoryCount != null)
             {
-                matchPlayerEntity.Won = int.Parse(frenoyVerslagSpeler.VictoryCount);
+                matchPlayerEntity.Won = int.Parse(player.VictoryCount);
             }
             else
             {
-                Debug.Assert(frenoyVerslagSpeler.IsForfeited, "Either a VictoryCount or IsForfeited");
+                Debug.Assert(player.IsForfeited, "Either a VictoryCount or IsForfeited");
             }
 
             PlayerEntity? dbPlayer = null;
-            if (match.IsHomeMatch.HasValue && ((match.IsHomeMatch.Value && thuisSpeler) || (!match.IsHomeMatch.Value && !thuisSpeler)))
+            if (match.IsHomeMatch.HasValue && ((match.IsHomeMatch.Value && isHomePlayer) || (!match.IsHomeMatch.Value && !isHomePlayer)))
             {
                 if (_isVttl)
                 {
-                    dbPlayer = await _db.Players.SingleOrDefaultAsync(x => x.ComputerNummerVttl.HasValue && x.ComputerNummerVttl.Value.ToString() == frenoyVerslagSpeler.UniqueIndex);
+                    dbPlayer = await _db.Players.SingleOrDefaultAsync(x => x.ComputerNummerVttl.HasValue && x.ComputerNummerVttl.Value.ToString() == player.UniqueIndex);
                 }
                 else
                 {
-                    dbPlayer = await _db.Players.SingleOrDefaultAsync(x => x.LidNummerSporta.HasValue && x.LidNummerSporta.Value.ToString() == frenoyVerslagSpeler.UniqueIndex);
+                    dbPlayer = await _db.Players.SingleOrDefaultAsync(x => x.LidNummerSporta.HasValue && x.LidNummerSporta.Value.ToString() == player.UniqueIndex);
                 }
             }
             if (dbPlayer != null)
