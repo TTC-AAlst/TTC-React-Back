@@ -12,6 +12,11 @@ namespace Frenoy.Api;
 
 public class FrenoyMatchesApi : FrenoyApiBase
 {
+    /// <summary>
+    /// Turn on to force a resync of entire season
+    /// </summary>
+    public bool ForceResync { get; set; }
+
     #region Constructor
     public FrenoyMatchesApi(ITtcDbContext ttcDbContext, Competition comp, bool forceSync = false)
         : base(ttcDbContext, comp, forceSync)
@@ -379,19 +384,27 @@ public class FrenoyMatchesApi : FrenoyApiBase
         }
 
         MatchGameEntity matchResult;
-        if (frenoyIndividual.AwayPlayerMatchIndex?.Length == 2 || frenoyIndividual.AwayPlayerMatchIndex?.Length == 2 ||
-            frenoyIndividual.HomePlayerMatchIndex?.Length == 2 || frenoyIndividual.HomePlayerUniqueIndex?.Length == 2)
+        if (frenoyIndividual.AwayPlayerMatchIndex?.Length == 2 && frenoyIndividual.AwayPlayerMatchIndex?.Length == 2 &&
+            frenoyIndividual.HomePlayerMatchIndex?.Length == 2 && frenoyIndividual.HomePlayerUniqueIndex?.Length == 2 &&
+            int.TryParse(frenoyIndividual.HomePlayerUniqueIndex?.First(), out int homeUniqueIndex1) &&
+            int.TryParse(frenoyIndividual.AwayPlayerUniqueIndex?.First(), out int awayUniqueIndex1) &&
+            int.TryParse(frenoyIndividual.HomePlayerUniqueIndex?.Last(), out int homeUniqueIndex2) &&
+            int.TryParse(frenoyIndividual.AwayPlayerUniqueIndex?.Last(), out int awayUniqueIndex2))
         {
             // Sporta doubles match:
             matchResult = new MatchGameEntity
             {
                 MatchId = matchEntity.Id,
                 MatchNumber = int.Parse(frenoyIndividual.Position),
+                HomePlayerUniqueIndex = homeUniqueIndex1,
+                AwayPlayerUniqueIndex = awayUniqueIndex1,
+                HomePlayerUniqueIndex2 = homeUniqueIndex2,
+                AwayPlayerUniqueIndex2 = awayUniqueIndex2,
                 WalkOver = WalkOver.None
             };
         }
-        else if (int.TryParse(frenoyIndividual.HomePlayerUniqueIndex?.SingleOrDefault(), out var homeUniqueIndex) &&
-                 int.TryParse(frenoyIndividual.AwayPlayerUniqueIndex?.SingleOrDefault(), out var awayUniqueIndex))
+        else if (int.TryParse(frenoyIndividual.HomePlayerUniqueIndex?.SingleOrDefault(), out int homeUniqueIndex) &&
+                 int.TryParse(frenoyIndividual.AwayPlayerUniqueIndex?.SingleOrDefault(), out int awayUniqueIndex))
         {
             // Sporta/Vttl singles match
             matchResult = new MatchGameEntity

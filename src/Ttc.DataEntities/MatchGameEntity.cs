@@ -16,8 +16,10 @@ public class MatchGameEntity
 
     public int MatchNumber { get; set; }
     public int HomePlayerUniqueIndex { get; set; }
+    public int HomePlayerUniqueIndex2 { get; set; }
     public int HomePlayerSets { get; set; }
     public int AwayPlayerUniqueIndex { get; set; }
+    public int AwayPlayerUniqueIndex2 { get; set; }
     public int AwayPlayerSets { get; set; }
     public WalkOver WalkOver { get; set; }
     /// <summary>
@@ -26,5 +28,5 @@ public class MatchGameEntity
     [StringLength(50)]
     public string? Scores { get; set; }
 
-    public override string ToString() => $"Id={MatchId}, Match#={MatchNumber}, ThuisSpeler={HomePlayerUniqueIndex}:{AwayPlayerUniqueIndex}, UitSpeler={HomePlayerSets}:{AwayPlayerSets}";
+    public override string ToString() => $"Id={MatchId}, Match#={MatchNumber}, Players={HomePlayerUniqueIndex}:{AwayPlayerUniqueIndex}, Sets={HomePlayerSets}:{AwayPlayerSets}";
 }
