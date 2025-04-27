@@ -82,8 +82,11 @@ public class PlayersController
     public async Task<Player> UpdatePlayer([FromBody] Player player)
     {
         var result = await _service.UpdatePlayer(player);
-        await _hub.Clients.All.BroadcastReload(Entities.Player, result.Id);
-        return result;
+        if (result != null)
+        {
+            await _hub.Clients.All.BroadcastReload(Entities.Player, result.Id);
+        }
+        return result ?? player;
     }
 
     [HttpPost]

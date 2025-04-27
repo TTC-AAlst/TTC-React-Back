@@ -96,7 +96,7 @@ public class PlayerService
         return updatedPlayer;
     }
 
-    public async Task<Player> UpdatePlayer(Player player)
+    public async Task<Player?> UpdatePlayer(Player player)
     {
         var existingPlayer= await _context.Players.FirstOrDefaultAsync(x => x.Id == player.Id);
         if (existingPlayer == null)
@@ -113,6 +113,9 @@ public class PlayerService
         await _context.SaveChangesAsync();
         _cache.Remove("players");
         player.Id = existingPlayer.Id;
+        if (player.QuitYear.HasValue)
+            return null;
+
         var newPlayer = await GetPlayer(player.Id);
         return newPlayer;
     }
