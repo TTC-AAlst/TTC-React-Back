@@ -277,6 +277,7 @@ public class FrenoyMatchesApi : FrenoyApiBase
         // do not pass teamId here but find out what the Team is based on HomeClubId and HomeTeamCode
         if (teamId.HasValue)
         {
+            Debug.Assert(entity.HomeClubId != Constants.OwnClubId || entity.AwayClubId != Constants.OwnClubId, "Derby Problem!!");
             if (entity.HomeClubId == Constants.OwnClubId)
             {
                 entity.HomeTeamId = teamId;
