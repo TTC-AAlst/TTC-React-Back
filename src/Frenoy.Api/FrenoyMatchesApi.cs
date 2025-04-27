@@ -423,6 +423,7 @@ public class FrenoyMatchesApi : FrenoyApiBase
 
             matchResult.HomePlayerSets = int.Parse(frenoyIndividual.HomeSetCount);
             matchResult.AwayPlayerSets = int.Parse(frenoyIndividual.AwaySetCount);
+            matchResult.Scores = frenoyIndividual.Scores;
         }
         matchEntity.Games.Add(matchResult);
     }

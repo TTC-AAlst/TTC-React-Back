@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using Ttc.DataEntities.Core;
 using Ttc.Model.Players;
 
 namespace Ttc.DataEntities;
@@ -9,7 +10,7 @@ namespace Ttc.DataEntities;
 [Index(nameof(FrenoyMatchId))]
 [Index(nameof(FrenoySeason), nameof(HomeClubId))]
 [Index(nameof(FrenoySeason), nameof(AwayClubId))]
-public class MatchEntity
+public class MatchEntity : IAudit
 {
     [Key]
     public int Id { get; set; }
@@ -69,6 +70,8 @@ public class MatchEntity
     /// True/False: Was TTC Aalst, True=Was in Aalst
     /// </summary>
     public bool? IsHomeMatch => !HomeTeamId.HasValue && !AwayTeamId.HasValue ? (bool?)null : HomeTeamId.HasValue;
+
+    public Audit Audit { get; } = new();
 
     public MatchEntity()
     {

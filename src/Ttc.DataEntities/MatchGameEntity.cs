@@ -20,6 +20,11 @@ public class MatchGameEntity
     public int AwayPlayerUniqueIndex { get; set; }
     public int AwayPlayerSets { get; set; }
     public WalkOver WalkOver { get; set; }
+    /// <summary>
+    /// Individual set scores
+    /// </summary>
+    [StringLength(50)]
+    public string? Scores { get; set; }
 
     public override string ToString() => $"Id={MatchId}, Match#={MatchNumber}, ThuisSpeler={HomePlayerUniqueIndex}:{AwayPlayerUniqueIndex}, UitSpeler={HomePlayerSets}:{AwayPlayerSets}";
 }
