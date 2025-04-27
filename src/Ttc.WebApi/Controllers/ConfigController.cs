@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Caching.Memory;
 using Ttc.DataAccess.Services;
 using Ttc.Model.Core;
 using Ttc.WebApi.Utilities;
@@ -15,12 +16,14 @@ public class ConfigController
     private readonly ConfigService _service;
     private readonly TtcLogger _logger;
     private readonly IHubContext<TtcHub, ITtcHub> _hub;
+    private readonly IMemoryCache _cache;
 
-    public ConfigController(ConfigService service, TtcLogger logger, IHubContext<TtcHub, ITtcHub> hub)
+    public ConfigController(ConfigService service, TtcLogger logger, IHubContext<TtcHub, ITtcHub> hub, IMemoryCache cache)
     {
         _service = service;
         _logger = logger;
         _hub = hub;
+        _cache = cache;
     }
     #endregion
 
@@ -37,6 +40,15 @@ public class ConfigController
     {
         await _service.Save(param.Key, param.Value);
         await _hub.Clients.All.BroadcastReload(Entities.Config, 0);
+    }
+
+    [HttpPost(nameof(ClearCache))]
+    public void ClearCache()
+    {
+        _cache.Remove("clubs");
+        _cache.Remove("players");
+        _cache.Remove("teams");
+        _cache.Remove("config");
     }
 
     [HttpPost]
