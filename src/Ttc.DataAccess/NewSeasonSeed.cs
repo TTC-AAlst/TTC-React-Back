@@ -14,6 +14,8 @@ internal static class NewSeasonSeed
         if (year < 1000)
             throw new Exception("Year should be actual year (ex: 2025), not FrenoySeason (ex: 26)");
 
+        context.CurrentSeason = year;
+
         //if (clearMatches)
         //{
         //    context.Database.ExecuteSqlCommand("DELETE FROM matchplayer");
@@ -40,8 +42,6 @@ internal static class NewSeasonSeed
 
             var sporta = new FrenoyMatchesApi(context, Competition.Sporta);
             await sporta.SyncTeamsAndMatches();
-
-            context.CurrentSeason = year;
         }
     }
 }

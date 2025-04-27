@@ -58,6 +58,7 @@ public class ConfigService
         {
             int newYear = int.Parse(value);
             param.Value = newYear.ToString();
+            await _context.SaveChangesAsync();
 
             await NewSeasonSeed.Seed(_context, false, newYear);
 
