@@ -77,6 +77,14 @@ public class MatchesController
         var result = await _service.GetOpponentMatch(id);
         return result;
     }
+
+    [HttpGet("GetPreviousEncounters")]
+    [AllowAnonymous]
+    public async Task<IEnumerable<PreviousEncounter>> GetPreviousEncounters(PreviousEncounterRequest request)
+    {
+        var result = await _service.GetPreviousEncounters(request);
+        return result;
+    }
     #endregion
 
 

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Linq;
 using AutoMapper;
 using Frenoy.Api;
 using Microsoft.EntityFrameworkCore;
@@ -378,4 +379,107 @@ public class MatchService
         return exceller;
     }
     #endregion
+
+    public async Task<IEnumerable<PreviousEncounter>> GetPreviousEncounters(PreviousEncounterRequest request)
+    {
+        // ATTN: This query is not going to work for a derby
+        var playerUniqueIds = request.OwnPlayerIds.Values.Union(request.OpponentPlayerNames.Values).ToArray();
+        IEnumerable<MatchGameEntity> data = await _context.MatchGames
+            .Include(x => x.Match.Players)
+            .Where(x => x.MatchId != request.MatchId)
+            .Where(x => x.Match.Competition == request.Competition)
+            .Where(x => playerUniqueIds.Contains(x.HomePlayerUniqueIndex))
+            .Where(x => playerUniqueIds.Contains(x.AwayPlayerUniqueIndex))
+            .Where(x => x.WalkOver == WalkOver.None)
+            .ToArrayAsync();
+
+        var result = data.Select(game =>
+        {
+            var homePlayer = game.Match.Players.FirstOrDefault(x => x.UniqueIndex == game.HomePlayerUniqueIndex);
+            var awayPlayer = game.Match.Players.FirstOrDefault(x => x.UniqueIndex == game.AwayPlayerUniqueIndex);
+            return new PreviousEncounter()
+            {
+                RequestMatchId = request.MatchId,
+                MatchId = game.MatchId,
+                MatchDate = game.Match.Date,
+                Competition = game.Match.Competition,
+                HomeName = homePlayer?.Name ?? "",
+                HomePlayerUniqueId = game.HomePlayerUniqueIndex,
+                HomePlayerSets = game.HomePlayerSets,
+                HomeRanking = homePlayer?.Ranking ?? "",
+                AwayName = awayPlayer?.Name ?? "",
+                AwayPlayerUniqueId = game.AwayPlayerUniqueIndex,
+                AwayPlayerSets = game.AwayPlayerSets,
+                AwayRanking = awayPlayer?.Ranking ?? "",
+            };
+        }).ToArray();
+
+        var otherCompetition = request.Competition == Competition.Sporta ? Competition.Vttl : Competition.Sporta;
+        var otherCompetitionMatches = await _context.Matches
+            .Include(x => x.Games)
+            .Include(x => x.Players)
+            .Where(x => x.Competition == otherCompetition)
+            .Where(x => x.Players.Any(player => request.OpponentPlayerNames.Keys.Contains(player.Name)))
+            .Where(x => x.Players.Any(player => player.PlayerId.HasValue && request.OwnPlayerIds.Keys.Contains(player.PlayerId.Value)))
+            .ToArrayAsync();
+
+        var otherResult = otherCompetitionMatches.SelectMany(match =>
+        {
+            var encounters = new List<PreviousEncounter>();
+
+            var ourPlayers = match.Players
+                .Where(x => x.PlayerId.HasValue && request.OwnPlayerIds.Keys.Contains(x.PlayerId.Value))
+                .ToArray();
+
+            var theirPlayers = match.Players
+                .Where(x => !x.PlayerId.HasValue)
+                .Where(x => request.OpponentPlayerNames.Keys.Contains(x.Name))
+                .ToArray();
+
+            var theirPlayerUniqueIds = theirPlayers.Select(x => x.UniqueIndex).ToArray();
+
+            foreach (var ourPlayer in ourPlayers)
+            {
+                var games = match.Games
+                    .Where(game => game.HomePlayerUniqueIndex == ourPlayer.UniqueIndex || game.AwayPlayerUniqueIndex == ourPlayer.UniqueIndex)
+                    .Where(game => theirPlayerUniqueIds.Contains(game.AwayPlayerUniqueIndex) || theirPlayerUniqueIds.Contains(game.HomePlayerUniqueIndex))
+                    .ToArray();
+
+                encounters.AddRange(games.Select(game =>
+                {
+                    MatchPlayerEntity homePlayer = game.Match.Players.First(x => x.UniqueIndex == ourPlayer.UniqueIndex);
+                    int homeUniqueIndex = request.OwnPlayerIds[ourPlayer.PlayerId!.Value];
+
+                    MatchPlayerEntity awayPlayer = theirPlayers.First(x => x.UniqueIndex == game.AwayPlayerUniqueIndex || x.UniqueIndex == game.HomePlayerUniqueIndex);
+                    int awayUniqueIndex = request.OpponentPlayerNames[awayPlayer.Name];
+
+                    if (homePlayer.UniqueIndex != game.HomePlayerUniqueIndex)
+                    {
+                        (homePlayer, awayPlayer) = (awayPlayer, homePlayer);
+                        (homeUniqueIndex, awayUniqueIndex) = (awayUniqueIndex, homeUniqueIndex);
+                    }
+
+                    return new PreviousEncounter()
+                    {
+                        RequestMatchId = request.MatchId,
+                        MatchId = game.MatchId,
+                        MatchDate = game.Match.Date,
+                        Competition = game.Match.Competition,
+                        HomeName = homePlayer.Name,
+                        HomePlayerUniqueId = homeUniqueIndex,
+                        HomePlayerSets = game.HomePlayerSets,
+                        HomeRanking = homePlayer.Ranking,
+                        AwayName = awayPlayer.Name,
+                        AwayPlayerUniqueId = awayUniqueIndex,
+                        AwayPlayerSets = game.AwayPlayerSets,
+                        AwayRanking = awayPlayer.Ranking,
+                    };
+                }));
+            }
+
+            return encounters;
+        }).ToArray();
+
+        return result.Concat(otherResult);
+    }
 }
