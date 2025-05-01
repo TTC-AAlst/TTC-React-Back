@@ -1,5 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Ttc.DataAccess.Utilities;
 using Ttc.DataEntities;
 using Ttc.DataEntities.Core;
 using Ttc.Model.Core;
@@ -12,16 +14,24 @@ public class PongRankClient
     private readonly TtcSettings _settings;
     private readonly ITtcDbContext _db;
     private readonly HttpClient _httpClient;
+    private readonly CacheHelper _cache;
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
-    public PongRankClient(TtcSettings settings, ITtcDbContext db, HttpClient httpClient)
+    public PongRankClient(TtcSettings settings, ITtcDbContext db, HttpClient httpClient, IMemoryCache cache)
     {
         _settings = settings;
         _db = db;
         _httpClient = httpClient;
+        _cache = new CacheHelper(cache);
     }
 
     public async Task<IEnumerable<PredictionResult>> Get()
+    {
+        var result = await _cache.GetOrSet("ranking-predictions", FetchRankings, TimeSpan.FromHours(10));
+        return result;
+    }
+
+    private async Task<IEnumerable<PredictionResult>> FetchRankings()
     {
         var club = await _db.Clubs.SingleAsync(x => x.Id == Constants.OwnClubId);
 
@@ -36,7 +46,7 @@ public class PongRankClient
             var vttl = await PredictionResults(Competition.Vttl, club.CodeVttl);
             result.AddRange(vttl);
         }
-        return result;
+        return result.AsEnumerable();
     }
 
     private async Task<IEnumerable<PredictionResult>> PredictionResults(Competition competition, string clubId)

@@ -49,6 +49,7 @@ public class ConfigController
         _cache.Remove("players");
         _cache.Remove("teams");
         _cache.Remove("config");
+        _cache.Remove("ranking-predictions");
     }
 
     [HttpPost]
