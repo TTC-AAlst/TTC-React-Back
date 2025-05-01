@@ -31,7 +31,7 @@ public class FrenoySyncJob : IHostedService, IDisposable
         {
             logger.Information($"SyncJob Started at {DateTime.Now:dd/MM/yyyy}");
 
-            var context = scope.ServiceProvider.GetRequiredService<ITtcDbContext>();
+            await using var context = scope.ServiceProvider.GetRequiredService<ITtcDbContext>();
             var controller = scope.ServiceProvider.GetRequiredService<MatchesController>();
 
             var matchesToSync = await context.Matches

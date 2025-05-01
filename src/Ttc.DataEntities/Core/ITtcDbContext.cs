@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Ttc.DataEntities.Core;
 
-public interface ITtcDbContext
+public interface ITtcDbContext : IAsyncDisposable
 {
     DbSet<PlayerEntity> Players { get; set; }
     DbSet<PlayerLoginEntity> PlayerLogins { get; set; }
