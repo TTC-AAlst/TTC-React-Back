@@ -12,6 +12,8 @@ using Ttc.WebApi.Utilities;
 using Ttc.WebApi.Utilities.Auth;
 using Microsoft.EntityFrameworkCore;
 using Ttc.DataEntities.Core;
+using Ttc.WebApi.Utilities.Pipeline;
+using Ttc.WebApi.Utilities.PongRank;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -59,7 +61,9 @@ try
     builder.Services.AddScoped<EmailService>();
     builder.Services.AddScoped<UserProvider>();
     builder.Services.AddScoped<IUserProvider>(sp => sp.GetRequiredService<UserProvider>());
+    builder.Services.AddScoped<PongRankClient>();
     builder.Services.AddMemoryCache();
+    builder.Services.AddHttpClient();
     builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
     builder.Services.AddControllers().AddControllersAsServices().AddJsonOptions(options =>
     {

@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Ttc.Model.Core;
-using Ttc.WebApi.Utilities.Auth;
 
-namespace Ttc.WebApi.Utilities;
+namespace Ttc.WebApi.Utilities.Auth;
 
 internal static class AddAuthentication
 {

@@ -7,4 +7,5 @@ public class TtcSettings
     public string PublicImageFolder { get; set; } = "";
     public string Origins { get; set; } = "";
     public bool StartSyncJob { get; set; }
+    public string PongRankUrl { get; set; } = "";
 }

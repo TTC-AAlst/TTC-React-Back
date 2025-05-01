@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Ttc.Model.Core;
 
-namespace Ttc.WebApi.Utilities;
+namespace Ttc.WebApi.Utilities.Pipeline;
 
 public class RequestLoggingFilter
 {

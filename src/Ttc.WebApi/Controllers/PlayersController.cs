@@ -7,6 +7,7 @@ using Ttc.Model.Clubs;
 using Ttc.Model.Players;
 using Ttc.WebApi.Utilities;
 using Ttc.WebApi.Utilities.Auth;
+using Ttc.WebApi.Utilities.PongRank;
 
 namespace Ttc.WebApi.Controllers;
 
@@ -17,13 +18,19 @@ public class PlayersController
     private readonly PlayerService _service;
     private readonly UserProvider _user;
     private readonly IHubContext<TtcHub, ITtcHub> _hub;
+    private readonly PongRankClient _pongRankClient;
 
     #region Constructor
-    public PlayersController(PlayerService service, UserProvider user, IHubContext<TtcHub, ITtcHub> hub)
+    public PlayersController(
+        PlayerService service,
+        UserProvider user,
+        IHubContext<TtcHub, ITtcHub> hub,
+        PongRankClient pongRankClient)
     {
         _service = service;
         _user = user;
         _hub = hub;
+        _pongRankClient = pongRankClient;
     }
     #endregion
 
@@ -101,6 +108,13 @@ public class PlayersController
     public async Task FrenoySync()
     {
         await _service.FrenoySync();
+    }
+
+    [HttpGet(nameof(GetNextYearRankings))]
+    [AllowAnonymous]
+    public Task<IEnumerable<PredictionResult>> GetNextYearRankings()
+    {
+        return _pongRankClient.Get();
     }
 
     [HttpGet]

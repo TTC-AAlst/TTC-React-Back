@@ -1,6 +1,6 @@
 ﻿using Ttc.Model.Core;
 
-namespace Ttc.WebApi.Utilities;
+namespace Ttc.WebApi.Utilities.Pipeline;
 
 internal static class LoadSettings
 {

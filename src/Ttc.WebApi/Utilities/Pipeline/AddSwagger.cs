@@ -1,6 +1,6 @@
 ﻿using Microsoft.OpenApi.Models;
 
-namespace Ttc.WebApi.Utilities;
+namespace Ttc.WebApi.Utilities.Pipeline;
 
 public static class AddSwagger
 {
