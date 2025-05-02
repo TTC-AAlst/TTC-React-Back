@@ -86,6 +86,7 @@ public class FrenoyPlayersApi : FrenoyApiBase
         player.ClubIdVttl = Constants.OwnClubId;
         player.RankingVttl = frenoyPlayer.Ranking;
         player.ComputerNummerVttl = int.Parse(frenoyPlayer.UniqueIndex);
+        player.NextRankingVttl = null;
     }
 
     private async Task<PlayerEntity> CreatePlayerEntity(MemberEntryType frenoyPlayer)
@@ -143,6 +144,7 @@ public class FrenoyPlayersApi : FrenoyApiBase
         player.RankingSporta = frenoyPlayer.Ranking;
         player.LidNummerSporta = int.Parse(frenoyPlayer.UniqueIndex);
         //player.LinkKaartSporta
+        player.NextRankingSporta = null;
     }
 
     public async Task<ICollection<PlayerEntity>> GetPlayers(int clubId)
