@@ -14,16 +14,18 @@ public class FrenoyPlayersApi : FrenoyApiBase
 
     }
 
-    public async Task StopAllPlayers(bool alsoSetGestopt)
+    public async Task StopAllPlayers(bool alsoSetQuit)
     {
         foreach (var dbPlayer in await _db.Players.Where(x => x.ClubIdVttl == Constants.OwnClubId || x.ClubIdSporta == Constants.OwnClubId).ToArrayAsync())
         {
-            if (alsoSetGestopt)
+            if (alsoSetQuit)
             {
                 dbPlayer.QuitYear = _currentSeason - 1;
             }
             dbPlayer.ClubIdSporta = null;
             dbPlayer.ClubIdVttl = null;
+            dbPlayer.NextRankingSporta = null;
+            dbPlayer.NextRankingVttl = null;
         }
         await _db.SaveChangesAsync();
     }
