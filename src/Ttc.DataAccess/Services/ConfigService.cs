@@ -39,8 +39,8 @@ public class ConfigService
     {
         var parameters = await _context.Parameters.Where(x => PublicParameters.Contains(x.Key)).ToArrayAsync();
         var dict = parameters.ToDictionary(x => x.Key, x => x.Value);
-        var lastChange = parameters.Max(x => x.Audit.ModifiedOn ?? DateTime.MinValue);
-        dict.Add(nameof(Audit.ModifiedOn), lastChange.ToString("yyyy-MM-ddTHH:mm:ss"));
+        //var lastChange = parameters.Max(x => x.Audit.ModifiedOn ?? DateTime.MinValue);
+        //dict.Add(nameof(Audit.ModifiedOn), lastChange.ToString("yyyy-MM-ddTHH:mm:ss"));
         return dict;
     }
 
