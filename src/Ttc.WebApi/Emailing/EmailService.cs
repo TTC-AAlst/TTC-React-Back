@@ -1,67 +1,71 @@
-﻿using SendGrid;
-using SendGrid.Helpers.Mail;
-using System.Text.RegularExpressions;
-using Ttc.DataAccess.Utilities;
+﻿using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
 using Ttc.Model.Core;
 using Ttc.Model.Players;
 
 namespace Ttc.WebApi.Emailing;
 
-// SendGrid API Example usage:
-// https://github.com/sendgrid/sendgrid-csharp/blob/master/USE_CASES.md
 public class EmailService
 {
-    private readonly TtcLogger _logger;
+    private readonly EmailConfig _config;
 
-    public EmailService(TtcLogger logger)
+    public EmailService(EmailConfig config)
     {
-        _logger = logger;
+        _config = config;
     }
 
-    public async Task SendEmail(IEnumerable<Player> players, WeekCompetitionEmailModel email, EmailConfig config)
+    public async Task SendEmail(IEnumerable<Player> players, WeekCompetitionEmailModel email)
     {
-        var client = new SendGridClient(config.SendGridApiKey);
-        var from = new EmailAddress(config.EmailFrom);
-
-        foreach (var player in players)
+        var message = new MimeMessage();
+        message.From.Add(new MailboxAddress(_config.EmailFromName, _config.EmailFrom));
+        var toEmails = players
+            .Where(ply => !string.IsNullOrWhiteSpace(ply.Contact?.Email))
+            .Select(ply => new MailboxAddress(ply.FirstName + " " + ply.LastName, ply.Contact!.Email));
+        message.To.AddRange(toEmails);
+        message.Subject = email.Title;
+        message.Body = new TextPart("html")
         {
-            var to = new EmailAddress(player.Contact.Email, player.FirstName + " " + player.LastName);
+            Text = email.Email.Replace("{{player-info}}", "")
+        };
 
-            string customContent;
-            if (email.Players.TryGetValue(player.Id, out string team))
-            {
-                customContent = email.Email.Replace("{{player-info}}", $"<br>Yaye! Je bent opgesteld in {team}. Succes!<br>");
-            }
-            else
-            {
-                customContent = email.Email.Replace("{{player-info}}", "");
-            }
-            
-            string plainContent = Regex.Replace(customContent.Replace("<br>", Environment.NewLine), "<.*?>", "");
-            var msg = MailHelper.CreateSingleEmail(from, to, email.Title, plainContent, customContent);
-            var response = await client.SendEmailAsync(msg);
-            await CheckSendGridResponse(email.Title, response);
-        }
+
+        using var client = new SmtpClient();
+        await client.ConnectAsync(_config.Host, _config.Port, SecureSocketOptions.StartTls);
+        await client.AuthenticateAsync(_config.UserName, _config.Password);
+        await client.SendAsync(message);
+        await client.DisconnectAsync(true);
+
+        // TODO: Send individual emails? Per team? Or one global one?
+        //foreach (var player in players)
+        //{
+        //    string customContent;
+        //    if (email.Players.TryGetValue(player.Id, out string team))
+        //    {
+        //        customContent = email.Email.Replace("{{player-info}}", $"<br>Yaye! Je bent opgesteld in {team}. Succes!<br>");
+        //    }
+        //    else
+        //    {
+        //        customContent = email.Email.Replace("{{player-info}}", "");
+        //    }
+        //}
     }
 
-    public async Task SendEmail(string email, string subject, string content, EmailConfig config)
+    public async Task SendEmail(string email, string subject, string content)
     {
-        var client = new SendGridClient(config.SendGridApiKey);
-        var from = new EmailAddress(config.EmailFrom);
-        var to = new EmailAddress(email);
-        var msg = MailHelper.CreateSingleEmail(from, to, subject, content, content);
-        var response = await client.SendEmailAsync(msg);
-        await CheckSendGridResponse(subject, response);
-    }
-
-    private async Task CheckSendGridResponse(string subject, Response response)
-    {
-        string statusCode = response.StatusCode.ToString();
-        if (statusCode != "Accepted")
+        var message = new MimeMessage();
+        message.From.Add(new MailboxAddress(_config.EmailFromName, _config.EmailFrom));
+        message.To.Add(MailboxAddress.Parse(email));
+        message.Subject = subject;
+        message.Body = new TextPart("html")
         {
-            string troubles = await response.Body.ReadAsStringAsync();
-            _logger.Error($"SendEmail {subject} returned {statusCode}{Environment.NewLine}{troubles}");
-            throw new Exception("Error sending email:" + Environment.NewLine + troubles);
-        }
+            Text = content
+        };
+
+        using var client = new SmtpClient();
+        await client.ConnectAsync(_config.Host, _config.Port, SecureSocketOptions.StartTls);
+        await client.AuthenticateAsync(_config.UserName, _config.Password);
+        await client.SendAsync(message);
+        await client.DisconnectAsync(true);
     }
 }

@@ -18,7 +18,6 @@ public class MatchesController
     #region Constructor
     private readonly MatchService _service;
     private readonly PlayerService _playerService;
-    private readonly ConfigService _configService;
     private readonly EmailService _emailService;
     private readonly UserProvider _user;
     private readonly IHubContext<TtcHub, ITtcHub> _hub;
@@ -26,14 +25,12 @@ public class MatchesController
     public MatchesController(
         MatchService service,
         PlayerService playerService,
-        ConfigService configService,
         EmailService emailService,
         UserProvider user,
         IHubContext<TtcHub, ITtcHub> hub)
     {
         _service = service;
         _playerService = playerService;
-        _configService = configService;
         _emailService = emailService;
         _user = user;
         _hub = hub;
@@ -210,7 +207,6 @@ public class MatchesController
     [Route("WeekCompetitionEmail")]
     public async Task WeekCompetitionEmail([FromBody] WeekCompetitionEmailModel email)
     {
-        var emailConfig = await _configService.GetEmailConfig();
         var players = await _playerService.GetOwnClub(null);
 
         IEnumerable<Player> sendTo;
@@ -222,7 +218,7 @@ public class MatchesController
         {
             sendTo = players!.Data.Where(player => player.Active).Where(x => !string.IsNullOrWhiteSpace(x.Contact?.Email));
         }
-        await _emailService.SendEmail(sendTo, email, emailConfig);
+        await _emailService.SendEmail(sendTo, email);
     }
 }
 

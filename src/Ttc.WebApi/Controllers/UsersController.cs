@@ -13,18 +13,15 @@ public class UsersController : ControllerBase
 {
     #region Constructor
     private readonly PlayerService _service;
-    private readonly ConfigService _configService;
     private readonly EmailService _emailService;
     private readonly UserProvider _user;
 
     public UsersController(
         PlayerService service,
-        ConfigService configService,
         EmailService emailService,
         UserProvider user)
     {
         _service = service;
-        _configService = configService;
         _emailService = emailService;
         _user = user;
     }
@@ -70,8 +67,7 @@ public class UsersController : ControllerBase
     {
         Guid resetLinkId = await _service.EmailMatchesPlayer(request.Email, request.PlayerId);
 
-        var emailConfig = await _configService.GetEmailConfig();
-        var email = new NewPasswordRequestEmailer(emailConfig, _emailService);
+        var email = new NewPasswordRequestEmail(_emailService);
         await email.Email(request.Email, resetLinkId);
     }
 
@@ -82,8 +78,7 @@ public class UsersController : ControllerBase
         string? playerEmail = await _service.SetNewPassword(request);
         if (!string.IsNullOrWhiteSpace(playerEmail))
         {
-            var emailConfig = await _configService.GetEmailConfig();
-            var email = new PasswordChangedEmailer(emailConfig, _emailService);
+            var email = new PasswordChangedEmail(_emailService);
             await email.Email(playerEmail);
         }
     }

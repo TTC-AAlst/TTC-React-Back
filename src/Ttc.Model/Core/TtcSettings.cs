@@ -8,4 +8,5 @@ public class TtcSettings
     public string Origins { get; set; } = "";
     public bool StartSyncJob { get; set; }
     public string PongRankUrl { get; set; } = "";
+    public EmailConfig Email { get; set; } = new();
 }

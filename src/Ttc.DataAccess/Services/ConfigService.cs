@@ -44,13 +44,6 @@ public class ConfigService
         return dict;
     }
 
-    public async Task<EmailConfig> GetEmailConfig()
-    {
-        var sendGridApiKey = (await _context.Parameters.SingleAsync(x => x.Key == "SendGridApiKey")).Value;
-        var fromEmail = (await _context.Parameters.SingleAsync(x => x.Key == "FromEmail")).Value;
-        return new EmailConfig(fromEmail, sendGridApiKey);
-    }
-
     public async Task Save(string key, string value)
     {
         var param = await _context.Parameters.SingleAsync(x => x.Key == key);

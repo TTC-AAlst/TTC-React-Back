@@ -30,6 +30,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Release
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MAILKIT_PASSWORD=${MAILKIT_PASSWORD}
     volumes:
       - ./upload:/upload
       - /volume1/Projects/Erembodegem-Logs:/app/logs

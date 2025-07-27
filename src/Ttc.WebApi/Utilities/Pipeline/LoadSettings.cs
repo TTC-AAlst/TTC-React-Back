@@ -19,6 +19,13 @@ internal static class LoadSettings
 
         services.AddSingleton(ttcSettings);
 
+        string? mailkitPassword = Environment.GetEnvironmentVariable("MAILKIT_PASSWORD");
+        if (!string.IsNullOrWhiteSpace(mailkitPassword))
+        {
+            ttcSettings.Email.Password = ttcSettings.Email.Password.Replace("{MAILKIT_PASSWORD}", mailkitPassword);
+        }
+        services.AddSingleton(ttcSettings.Email);
+
         return (ttcSettings, configuration);
     }
 }
