@@ -26,6 +26,7 @@ internal class TtcDbContext : DbContext, ITtcDbContext
     public DbSet<MatchPlayerEntity> MatchPlayers { get; set; }
     public DbSet<MatchGameEntity> MatchGames { get; set; }
     public DbSet<MatchCommentEntity> MatchComments { get; set; }
+    public DbSet<TournamentEntity> Tournaments { get; set; }
 
     public DbSet<ParameterEntity> Parameters { get; set; }
     public DbSet<EventEntity> Events { get; set; }
@@ -89,6 +90,10 @@ internal class TtcDbContext : DbContext, ITtcDbContext
             .Entity<EventEntity>()
             .Property(e => e.Type)
             .HasMaxLength(50)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<TournamentEntity>()
+            .Property(o => o.Competition)
             .HasConversion<string>();
 
 

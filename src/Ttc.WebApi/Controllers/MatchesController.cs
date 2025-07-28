@@ -127,6 +127,14 @@ public class MatchesController
     }
 
     [HttpPost]
+    [Route("FrenoySyncTournaments")]
+    [AllowAnonymous]
+    public async Task FrenoySyncTournaments()
+    {
+        await _service.FrenoyTournamentsSync();
+    }
+
+    [HttpPost]
     [Route("TogglePlayer")]
     public async Task<Match> TogglePlayer([FromBody] MatchPlayer player)
     {

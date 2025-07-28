@@ -207,6 +207,35 @@ public class FrenoyMatchesApi : FrenoyApiBase
             await SyncTeamMatches(team.Id, team.FrenoyDivisionId, matches.GetMatchesResponse);
         }
     }
+
+    public async Task SyncTournaments(int frenoySeason)
+    {
+        if (!_db.Tournaments.Any(x => x.FrenoySeason == _settings.FrenoySeason && x.Competition == _settings.Competition))
+        {
+            return;
+        }
+
+        var tournaments = await _frenoy.GetTournamentsAsync(new GetTournamentsRequest(new GetTournaments()
+        {
+            Season = _settings.FrenoySeason.ToString(),
+        }));
+
+        foreach (var tournament in tournaments.GetTournamentsResponse.TournamentEntries)
+        {
+            var tournamentEntity = new TournamentEntity()
+            {
+                Competition = _settings.Competition,
+                FrenoySeason = _settings.FrenoySeason,
+                Date = tournament.DateFrom,
+                UniqueIndex = tournament.UniqueIndex,
+                Name = tournament.Name,
+            };
+
+            await _db.Tournaments.AddAsync(tournamentEntity);
+        }
+
+        await _db.SaveChangesAsync();
+    }
     #endregion
 
     #region Match Creation

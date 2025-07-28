@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Linq;
 using AutoMapper;
 using Frenoy.Api;
 using Microsoft.EntityFrameworkCore;
@@ -340,6 +339,20 @@ public class MatchService
             return await frenoySync.SyncMatchDetails(match);
         }
         return false;
+    }
+
+    public async Task FrenoyTournamentsSync()
+    {
+        await _context.Tournaments
+            .Where(x => x.FrenoySeason == _context.CurrentFrenoySeason)
+            .ExecuteDeleteAsync();
+        await _context.SaveChangesAsync();
+
+        var sportaSync = new FrenoyMatchesApi(_context, Competition.Sporta);
+        await sportaSync.SyncTournaments(_context.CurrentFrenoySeason);
+
+        var vttlSync = new FrenoyMatchesApi(_context, Competition.Vttl);
+        await vttlSync.SyncTournaments(_context.CurrentFrenoySeason);
     }
     #endregion
     #endregion

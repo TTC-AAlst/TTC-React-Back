@@ -34,6 +34,7 @@ internal static class NewSeasonSeed
             await vttlPlayers.SyncPlayers();
 
             var vttl = new FrenoyMatchesApi(context, Competition.Vttl, true);
+            await vttl.SyncTournaments(context.CurrentFrenoySeason);
             vttl.ForceResync = forceSync;
             await vttl.SyncTeamsAndMatches();
 
@@ -44,6 +45,7 @@ internal static class NewSeasonSeed
             await sportaPlayers.SyncPlayers();
 
             var sporta = new FrenoyMatchesApi(context, Competition.Sporta, true);
+            await sporta.SyncTournaments(context.CurrentFrenoySeason);
             sporta.ForceResync = forceSync;
             await sporta.SyncTeamsAndMatches();
         }

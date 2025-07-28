@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ttc.DataAccess;
 
@@ -11,9 +12,11 @@ using Ttc.DataAccess;
 namespace Ttc.DataAccess.Migrations
 {
     [DbContext(typeof(TtcDbContext))]
-    partial class TtcDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250728194052_AddTournaments")]
+    partial class AddTournaments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
