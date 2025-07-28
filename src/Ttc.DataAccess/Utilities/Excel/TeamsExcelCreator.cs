@@ -107,10 +107,13 @@ internal class TeamsExcelCreator
         var headers = new List<string>() { ExcelExportResources.MatchFrenoyId, ExcelExportResources.MatchDay, ExcelExportResources.MatchDate, ExcelExportResources.MatchHour, ExcelExportResources.MatchHome, ExcelExportResources.MatchOut };
         int baseColumnIndex = headers.Count;
 
-        var players = team.Players
+        var sortedPlayers = team.Players
             .OrderBy(x => x.Reserve)
             .ThenBy(x => x.Ranking)
             .ThenBy(x => x.Name)
+            .ToArray();
+
+        var players = sortedPlayers
             .Select((player, index) => new { player.Name, player.Ranking, ColumnIndex = index + baseColumnIndex + 1 })
             .ToArray();
         headers.AddRange(players.Select(x => $"{x.Name} ({x.Ranking})"));
@@ -120,7 +123,7 @@ internal class TeamsExcelCreator
 
         ExcelHelper.SetHeader(sheet, headers.ToArray());
 
-        foreach (var player in team.Players.OrderBy(x => x.Reserve).ThenBy(x => x.Name))
+        foreach (var player in sortedPlayers)
         {
             baseColumnIndex++;
             if (player.Reserve)
