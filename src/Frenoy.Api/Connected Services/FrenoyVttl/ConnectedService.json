@@ -15,7 +15,7 @@
       "AutoMapper, {AutoMapper, 13.0.1}",
       "CoreWCF.Http, {CoreWCF.Http, 1.6.0}",
       "CoreWCF.Primitives, {CoreWCF.Primitives, 1.6.0}",
-      "EPPlus, {EPPlus, 4.5.3.3}",
+      "EPPlus, {EPPlus, 8.0.8}",
       "Microsoft.AspNetCore.Authentication, {Microsoft.AspNetCore.Authentication, 2.1.2}",
       "Microsoft.AspNetCore.Authentication.Abstractions, {Microsoft.AspNetCore.Authentication.Abstractions, 2.1.1}",
       "Microsoft.AspNetCore.Authentication.Core, {Microsoft.AspNetCore.Authentication.Core, 2.1.1}",

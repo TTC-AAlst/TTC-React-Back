@@ -11,6 +11,7 @@ using Ttc.WebApi.Emailing;
 using Ttc.WebApi.Utilities;
 using Ttc.WebApi.Utilities.Auth;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using Ttc.DataEntities.Core;
 using Ttc.WebApi.Utilities.Pipeline;
 using Ttc.WebApi.Utilities.PongRank;
@@ -43,6 +44,8 @@ Log.Information("Starting up...");
 
 try
 {
+    ExcelPackage.License.SetNonCommercialOrganization("TTC Aalst");
+
     var builder = WebApplication.CreateBuilder(args);
     var (ttcSettings, configuration) = LoadSettings.Configure(builder.Services);
     builder.Services.AddCors(options =>
