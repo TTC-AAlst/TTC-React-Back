@@ -133,6 +133,7 @@ internal class TeamsExcelCreator
             if (player.Captain)
             {
                 sheet.Cells[1, baseColumnIndex].Style.Font.Color.SetColor(Color.Yellow);
+                sheet.Cells[1, baseColumnIndex].Value = "\u2b50 " + sheet.Cells[1, baseColumnIndex].Text;
             }
         }
 
