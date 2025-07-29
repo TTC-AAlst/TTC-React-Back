@@ -15,7 +15,7 @@ public class ConfigService
         "email", "googleMapsUrl", "location", "trainingDays", "competitionDays",
         "adultMembership", "youthMembership", "additionalMembership", "recreationalMembers",
         "frenoyClubIdVttl", "frenoyClubIdSporta", "compBalls", "clubBankNr", "clubOrgNr", "year",
-        "endOfSeason"
+        "endOfSeason", "trainingDays2", "trainingDays3", "trainingDays4"
     };
 
     public ConfigService(ITtcDbContext context, IMemoryCache cache)
