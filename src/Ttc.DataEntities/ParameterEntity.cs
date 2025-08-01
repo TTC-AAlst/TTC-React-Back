@@ -10,7 +10,7 @@ public class ParameterEntity : IAudit
     [Key]
     [StringLength(20)]
     public string Key { get; set; } = "";
-    [StringLength(255)]
+    [StringLength(2000)]
     public string Value { get; set; } = "";
     [StringLength(255)]
     public string? Description { get; set; }
