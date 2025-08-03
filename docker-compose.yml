@@ -27,7 +27,7 @@ services:
       - "7200:8080"
     networks:
       - ttcnet
-      - monitoring
+      - monitoring_monitoring
     environment:
       - ASPNETCORE_ENVIRONMENT=Release
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -44,5 +44,5 @@ volumes:
 networks:
   ttcnet:
     driver: bridge
-  monitoring:
+  monitoring_monitoring:
     external: true
