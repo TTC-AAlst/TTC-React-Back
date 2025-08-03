@@ -17,7 +17,7 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
 
-  webapi:
+  ttc-webapi:
     build:
       context: ./
       dockerfile: ./src/Ttc.WebApi/Dockerfile
@@ -28,6 +28,7 @@ services:
     networks:
       - ttcnet
       - monitoring_monitoring
+      - pongrank_pongranknet
     environment:
       - ASPNETCORE_ENVIRONMENT=Release
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -45,4 +46,6 @@ networks:
   ttcnet:
     driver: bridge
   monitoring_monitoring:
+    external: true
+  pongrank_pongranknet:
     external: true
