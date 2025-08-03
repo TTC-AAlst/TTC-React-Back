@@ -59,6 +59,7 @@ public class ConfigController
     {
         string errMsg = error.Message + Environment.NewLine + error.Stack;
         errMsg += Environment.NewLine + Environment.NewLine + "Component Stack:" + Environment.NewLine + error.ComponentStack;
+        errMsg += Environment.NewLine + "Url: " + error.Url;
         _logger.Error(errMsg);
     }
 
@@ -92,6 +93,7 @@ public class ComponentError
     public string Message { get; set; } = "";
     public string Stack { get; set; } = "";
     public string ComponentStack { get; set; } = "";
+    public string Url { get; set; } = "";
 
     public override string ToString() => Message;
 }
