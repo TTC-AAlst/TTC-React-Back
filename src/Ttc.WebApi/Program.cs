@@ -71,6 +71,7 @@ try
     builder.Services.AddControllers().AddControllersAsServices().AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.JsonSerializerOptions.WriteIndented = false;
     });
     builder.Services.AddEndpointsApiExplorer();
     AddSwagger.Configure(builder.Services);
