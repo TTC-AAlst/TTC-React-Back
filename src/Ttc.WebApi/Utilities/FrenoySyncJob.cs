@@ -29,7 +29,7 @@ public class FrenoySyncJob : IHostedService, IDisposable
         var logger = scope.ServiceProvider.GetRequiredService<TtcLogger>();
         try
         {
-            logger.Information($"SyncJob Started at {DateTime.Now:dd/MM/yyyy}");
+            logger.Information("SyncJob Started at {date}", DateTime.Now.ToString("dd/MM/yyyy"));
 
             await using var context = scope.ServiceProvider.GetRequiredService<ITtcDbContext>();
             var controller = scope.ServiceProvider.GetRequiredService<MatchesController>();
@@ -42,7 +42,7 @@ public class FrenoySyncJob : IHostedService, IDisposable
                 .Where(x => x.Date != DateTime.MinValue)
                 .ToArrayAsync();
 
-            logger.Information($"Syncing {matchesToSync.Length} Matches.");
+            logger.Information("Syncing {matches} Matches.", matchesToSync.Length);
             bool allSynced = true;
             foreach (var match in matchesToSync)
             {
@@ -61,7 +61,7 @@ public class FrenoySyncJob : IHostedService, IDisposable
 
                 if (synced)
                 {
-                    logger.Information($"Sync completed for match {match.Id}");
+                    logger.Information("Sync completed for match {matchId}", match.Id);
                 }
                 else
                 {

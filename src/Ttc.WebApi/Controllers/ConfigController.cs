@@ -57,10 +57,8 @@ public class ConfigController
     [AllowAnonymous]
     public void Log([FromBody] ComponentError error)
     {
-        string errMsg = error.Message + Environment.NewLine + error.Stack;
-        errMsg += Environment.NewLine + Environment.NewLine + "Component Stack:" + Environment.NewLine + error.ComponentStack;
-        errMsg += Environment.NewLine + "Url: " + error.Url;
-        _logger.Error(errMsg);
+        string nl = Environment.NewLine;
+        _logger.Error($"{{ErrorMessage}}{nl}Url: {{Path}}{nl}Stack: {{Stack}}{nl}{nl}Component Stack: {{ComponentStack}}", error.Message, error.Url, error.Stack, error.ComponentStack);
     }
 
     [HttpGet]
@@ -69,13 +67,13 @@ public class ConfigController
     public string GetLogging()
     {
         string logDir = Path.Combine(Directory.GetCurrentDirectory(), "logs");
-        _logger.Information($"Looking for last log dir in: {logDir}");
+        _logger.Information("Looking for last log dir in: {logDir}", logDir);
         string fileName = Directory
             .GetFiles(logDir, "*.txt")
             .OrderByDescending(x => x)
             .First();
 
-        _logger.Information($"Current log file: {fileName}");
+        _logger.Information("Current log file: {fileName}", fileName);
         return File.ReadAllText(fileName);
     }
 }

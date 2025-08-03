@@ -11,14 +11,19 @@ public class TtcLogger
         _logger = logger;
     }
 
-    public void Information(string log)
+    public void Information(string messageTemplate, object propertyValue)
     {
-        _logger.Information(log);
+        _logger.Information(messageTemplate, propertyValue);
     }
 
-    public void Error(string log)
+    public void Information(string messageTemplate, params object[] propertyValues)
     {
-        _logger.Error(log);
+        _logger.Information(messageTemplate, propertyValues);
+    }
+
+    public void Error(string messageTemplate, params object[] propertyValues)
+    {
+        _logger.Error(messageTemplate, propertyValues);
     }
 
     public void Error(Exception exception, string messageTemplate, object propertyValue)

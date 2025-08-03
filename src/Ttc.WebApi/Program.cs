@@ -12,6 +12,7 @@ using Ttc.WebApi.Utilities;
 using Ttc.WebApi.Utilities.Auth;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using Serilog.Sinks.Grafana.Loki;
 using Ttc.DataEntities.Core;
 using Ttc.WebApi.Utilities.Pipeline;
 using Ttc.WebApi.Utilities.PongRank;
@@ -30,6 +31,7 @@ Log.Logger = new LoggerConfiguration()
     // Turn everything off:
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
 
+    .Enrich.WithMachineName()
     .Enrich.FromLogContext()
     .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}")
     .WriteTo.File(
@@ -38,6 +40,20 @@ Log.Logger = new LoggerConfiguration()
         outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}",
         shared: true
     )
+    .WriteTo.GrafanaLoki(
+        "http://localhost:3100", 
+        [
+            new LokiLabel() { Key = "service_name", Value = "ttc-backend" },
+            new LokiLabel() { Key = "app", Value = "ttc" },
+        ],
+        [
+            "level",
+            "MachineName",
+            "UserName",
+            "RequestId",
+            "app",
+            "env"
+        ])
     .CreateLogger();
 
 Log.Information("Starting up...");
@@ -119,6 +135,7 @@ try
     app.Use(async (context, next) =>
     {
         LogContext.PushProperty("UserName", context.User.Identity?.Name ?? "Anonymous");
+        LogContext.PushProperty("env", app.Environment.EnvironmentName);
         await next();
     });
     app.UseMiddleware<RequestLoggingFilter>();

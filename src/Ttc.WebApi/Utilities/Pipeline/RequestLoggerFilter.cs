@@ -1,5 +1,5 @@
-﻿using System.Diagnostics;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System.Diagnostics;
 using Ttc.Model.Core;
 
 namespace Ttc.WebApi.Utilities.Pipeline;
@@ -17,7 +17,8 @@ public class RequestLoggingFilter
 
     public async Task Invoke(HttpContext context)
     {
-        if (!context.Request.Path.ToString().StartsWith("/api") || context.Request.Method == HttpMethods.Options)
+        if (!context.Request.Path.ToString().StartsWith("/api") || context.Request.Method == HttpMethods.Options
+            || context.Request.Path.ToString() == "/api/config/Log")
         {
             await _next(context);
             return;
@@ -44,25 +45,25 @@ public class RequestLoggingFilter
 
         if (qs.Count > 0 && body.Length > 0)
         {
-            _logger.Information($"{request.Method} {request.Path} - Query: {queryParams}, Body: {body}");
+            _logger.Information("{Method} {Path} - Query: {Query}, Body: {Body}", request.Method, request.Path, queryParams, body);
         }
         else if (qs.Count > 0)
         {
-            _logger.Information($"{request.Method} {request.Path} - Query: {queryParams}");
+            _logger.Information("{Method} {Path} - Query: {Query}", request.Method, request.Path, queryParams);
         }
         else if (body.Length > 0)
         {
-            _logger.Information($"{request.Method} {request.Path} - Body: {body}");
+            _logger.Information("{Method} {Path} - Body: {Body}", request.Method, request.Path, body);
         }
         else
         {
-            _logger.Information($"{request.Method} {request.Path}");
+            _logger.Information("{Method} {Path}", request.Method, request.Path);
         }
 
 
         await _next(context);
 
 
-        _logger.Information($"{request.Method} {request.Path} - in {timer.Elapsed:g}");
+        _logger.Information("{Method} {Path} - in {Elapsed}", request.Method, request.Path, timer.Elapsed.ToString("g"));
     }
 }
