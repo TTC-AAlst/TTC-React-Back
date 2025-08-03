@@ -4,7 +4,7 @@ namespace Ttc.WebApi.Utilities.Pipeline;
 
 internal static class LoadSettings
 {
-    public static (TtcSettings, IConfigurationRoot) Configure(IServiceCollection services)
+    public static (TtcSettings, IConfigurationRoot) GetConfiguration()
     {
         var ttcSettings = new TtcSettings();
         var configuration = new ConfigurationBuilder()
@@ -17,14 +17,11 @@ internal static class LoadSettings
             .GetSection("TtcSettings")
             .Bind(ttcSettings);
 
-        services.AddSingleton(ttcSettings);
-
         string? mailkitPassword = Environment.GetEnvironmentVariable("MAILKIT_PASSWORD");
         if (!string.IsNullOrWhiteSpace(mailkitPassword))
         {
             ttcSettings.Email.Password = ttcSettings.Email.Password.Replace("{MAILKIT_PASSWORD}", mailkitPassword);
         }
-        services.AddSingleton(ttcSettings.Email);
 
         return (ttcSettings, configuration);
     }

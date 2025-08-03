@@ -1,69 +1,33 @@
 using CoreWCF.Configuration;
 using CoreWCF.Description;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
+using OfficeOpenXml;
 using Serilog;
 using Serilog.Context;
-using Serilog.Events;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.FileProviders;
 using Ttc.DataAccess;
+using Ttc.DataEntities.Core;
 using Ttc.Model.Core;
 using Ttc.WebApi.Emailing;
 using Ttc.WebApi.Utilities;
 using Ttc.WebApi.Utilities.Auth;
-using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml;
-using Serilog.Sinks.Grafana.Loki;
-using Ttc.DataEntities.Core;
 using Ttc.WebApi.Utilities.Pipeline;
 using Ttc.WebApi.Utilities.PongRank;
 
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
-    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
-
-    // These two don't seem to be turning anything off?
-    //.MinimumLevel.Override("Microsoft.AspNetCore.Mvc", LogEventLevel.Warning)
-    //.MinimumLevel.Override("Microsoft.AspNetCore.Routing", LogEventLevel.Warning)
-
-    // Turn off HTTP GET/POST logs:
-    //.MinimumLevel.Override("Microsoft.AspNetCore.Hosting", LogEventLevel.Warning)
-
-    // Turn everything off:
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-
-    .Enrich.WithMachineName()
-    .Enrich.FromLogContext()
-    .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}")
-    .WriteTo.File(
-        "logs/log.txt",
-        rollingInterval: RollingInterval.Day,
-        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}",
-        shared: true
-    )
-    .WriteTo.GrafanaLoki(
-        "http://localhost:3100", 
-        [
-            new LokiLabel() { Key = "service_name", Value = "ttc-backend" },
-            new LokiLabel() { Key = "app", Value = "ttc" },
-        ],
-        [
-            "level",
-            "MachineName",
-            "UserName",
-            "RequestId",
-            "app",
-            "env"
-        ])
-    .CreateLogger();
-
-Log.Information("Starting up...");
-
 try
 {
+    var (ttcSettings, configuration) = LoadSettings.GetConfiguration();
+
+    SetupLogger.Configure(ttcSettings);
+    Log.Information("Starting up...");
+
     ExcelPackage.License.SetNonCommercialOrganization("TTC Aalst");
 
     var builder = WebApplication.CreateBuilder(args);
-    var (ttcSettings, configuration) = LoadSettings.Configure(builder.Services);
+    builder.Services.AddSingleton(ttcSettings);
+    builder.Services.AddSingleton(ttcSettings.Email);
+
     builder.Services.AddCors(options =>
     {
         options.AddPolicy("CorsPolicy", corsBuilder =>

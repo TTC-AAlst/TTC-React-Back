@@ -9,4 +9,5 @@ public class TtcSettings
     public bool StartSyncJob { get; set; }
     public string PongRankUrl { get; set; } = "";
     public EmailConfig Email { get; set; } = new();
+    public string Loki { get; set; } = "";
 }
