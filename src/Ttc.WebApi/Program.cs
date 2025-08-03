@@ -89,16 +89,16 @@ try
     builder.Services.AddSingleton<IServiceBehavior, UseRequestHeadersForMetadataAddressBehavior>();
 
     var app = builder.Build();
+    app.UseSwagger();
+    app.UseSwaggerUI();
     if (app.Environment.IsDevelopment())
     {
-        Log.Information("Starting Development Server with Swagger");
-        app.UseSwagger();
-        app.UseSwaggerUI();
+        Log.Information("Starting Development Server");
         app.UseDeveloperExceptionPage();
     }
     else
     {
-        Log.Information("Starting Release Server with Https");
+        Log.Information("Starting Release Server");
         // app.UseHsts();
         // app.UseHttpsRedirection();
     }
