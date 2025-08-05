@@ -295,11 +295,12 @@ public class PlayerService
 
     public async Task<Guid> EmailMatchesPlayer(string email, int playerId)
     {
-        var player = await _context.Players.SingleOrDefaultAsync(x => x.Id == playerId && x.Email.ToLower() == email.ToLower());
+        var player = await _context.Players.SingleOrDefaultAsync(x => x.Id == playerId);
         if (player == null)
-        {
-            throw new Exception("Email komt niet overeen voor " + playerId);
-        }
+            throw new Exception($"User met id {playerId} bestaat niet");
+
+        if (player.Email?.ToLower().Trim() != email.ToLower().Trim())
+            throw new Exception($"Email '{email}' komt niet overeen voor speler {player.Alias} (Id={playerId})");
 
         var passwordReset = new PlayerPasswordResetEntity(playerId);
         _context.PlayerPasswordResets.Add(passwordReset);
