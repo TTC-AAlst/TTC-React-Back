@@ -46,7 +46,7 @@ public class EmailService
             tournamentInfo += "<b>Toernooitje doen?</b><br><ul>";
             foreach (var tournament in tournaments)
             {
-                tournamentInfo += $"<li>{tournament.Date.ToString("ddd dd/MM/yyyy", Culture)}: {tournament.Name}</li>";
+                tournamentInfo += $"<li>{tournament.Date.ToString("ddd dd/MM/yyyy", Culture)}: {tournament.Name} ({tournament.Competition})</li>";
             }
             tournamentInfo += "</ul>";
             body = body.Replace("{{tournament-info}}", tournamentInfo);
