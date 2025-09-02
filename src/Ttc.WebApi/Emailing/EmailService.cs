@@ -1,5 +1,4 @@
-﻿using MailKit;
-using MailKit.Net.Smtp;
+﻿using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
@@ -24,15 +23,6 @@ public class EmailService
 
     public async Task SendEmail(ICollection<Player> players, WeekCompetitionEmailModel email)
     {
-        //var message = new MimeMessage();
-        //message.From.Add(new MailboxAddress(_config.EmailFromName, _config.EmailFrom));
-        //var toEmails = players
-        //    .Where(ply => !string.IsNullOrWhiteSpace(ply.Contact?.Email))
-        //    .Select(ply => new MailboxAddress(ply.FirstName + " " + ply.LastName, ply.Contact!.Email));
-        //message.To.AddRange(toEmails);
-        //message.Subject = email.Title;
-
-
         string body = email.Email;
         var tournaments = await _context.Tournaments
             .Where(x => x.Date >= DateTime.Today && x.Date <= DateTime.Today.AddDays(30))
@@ -79,7 +69,8 @@ public class EmailService
             var toEmails = players
                 .Where(ply => !string.IsNullOrWhiteSpace(ply.Contact?.Email))
                 .Select(ply => new MailboxAddress(ply.FirstName + " " + ply.LastName, ply.Contact!.Email));
-            message.To.AddRange(toEmails);
+            message.ReplyTo.AddRange(toEmails);
+            message.To.Add(new MailboxAddress(player.FirstName + " " + player.LastName, player.Contact!.Email));
             message.Subject = email.Title;
             message.Body = new TextPart("html")
             {
