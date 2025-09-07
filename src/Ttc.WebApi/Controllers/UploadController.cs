@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Ttc.DataAccess.Services;
 using Ttc.DataEntities;
 using Ttc.DataEntities.Core;
 using Ttc.Model.Core;
@@ -16,12 +17,18 @@ public class UploadController
     private readonly TtcSettings _settings;
     private readonly ITtcDbContext _context;
     private readonly IHubContext<TtcHub, ITtcHub> _hub;
+    private readonly PlayerService _playerService;
 
-    public UploadController(TtcSettings settings, ITtcDbContext context, IHubContext<TtcHub, ITtcHub> hub)
+    public UploadController(
+        TtcSettings settings,
+        ITtcDbContext context,
+        IHubContext<TtcHub, ITtcHub> hub,
+        PlayerService playerService)
     {
         _settings = settings;
         _context = context;
         _hub = hub;
+        _playerService = playerService;
     }
 
     [HttpPost]
@@ -52,6 +59,7 @@ public class UploadController
                 await _context.Events.AddAsync(playerPictureEvent);
 
                 await _context.SaveChangesAsync();
+                _playerService.ClearCache();
                 await _hub.Clients.All.BroadcastReload(Entities.Player, player.Id);
             }
         }

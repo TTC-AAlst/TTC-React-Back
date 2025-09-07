@@ -226,6 +226,11 @@ public class PlayerService
         await sportaPlayers.SyncPlayers();
     }
 
+    public void ClearCache()
+    {
+        _cache.Remove("players");
+    }
+
     #region Login & Password
     private const int SystemPlayerIdFromFrontend = -1;
     public async Task<User?> Login(UserCredentials user)
