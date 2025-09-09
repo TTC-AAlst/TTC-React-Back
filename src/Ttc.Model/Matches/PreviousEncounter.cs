@@ -26,9 +26,6 @@ public class PreviousEncounterRequest
 {
     public int MatchId { get; set; }
     public Competition Competition { get; set; }
-    //public int[] PlayerUniqueIds { get; set; } = [];
-    //public string[] OpponentPlayerNames { get; set; } = [];
-    //public int[] OwnPlayerIds { get; set; } = [];
 
     /// <summary>
     /// Keys=Name, Values=UniqueId

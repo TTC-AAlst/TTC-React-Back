@@ -408,6 +408,7 @@ public class MatchService
             .Where(x => x.Match.Competition == request.Competition)
             .Where(x => playerUniqueIds.Contains(x.HomePlayerUniqueIndex))
             .Where(x => playerUniqueIds.Contains(x.AwayPlayerUniqueIndex))
+            .Where(x => x.AwayPlayerUniqueIndex2 == 0) // Filter out Sporta doubles
             .Where(x => x.WalkOver == WalkOver.None)
             .ToArrayAsync();
 
@@ -461,6 +462,7 @@ public class MatchService
                 var games = match.Games
                     .Where(game => game.HomePlayerUniqueIndex == ourPlayer.UniqueIndex || game.AwayPlayerUniqueIndex == ourPlayer.UniqueIndex)
                     .Where(game => theirPlayerUniqueIds.Contains(game.AwayPlayerUniqueIndex) || theirPlayerUniqueIds.Contains(game.HomePlayerUniqueIndex))
+                    .Where(game => game.AwayPlayerUniqueIndex2 == 0)
                     .ToArray();
 
                 encounters.AddRange(games.Select(game =>
