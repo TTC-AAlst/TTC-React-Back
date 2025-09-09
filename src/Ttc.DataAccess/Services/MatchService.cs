@@ -174,8 +174,8 @@ public class MatchService
         }
         else
         {
-            var verslagSpeler = _mapper.Map<MatchPlayer, MatchPlayerEntity>(matchPlayer);
-            _context.MatchPlayers.Add(verslagSpeler);
+            var playerEntity = _mapper.Map<MatchPlayer, MatchPlayerEntity>(matchPlayer);
+            _context.MatchPlayers.Add(playerEntity);
         }
         await _context.SaveChangesAsync();
         var newMatch = await GetMatch(matchPlayer.MatchId);
@@ -183,7 +183,7 @@ public class MatchService
     }
 
     /// <summary>
-    /// Toggle Captain/Major player by any player of the team on the day of the match
+    /// Toggle Captain/Major player by any player of the team
     /// </summary>
     public async Task<Match> ToggleMatchPlayer(MatchPlayer matchPlayer)
     {
@@ -226,12 +226,17 @@ public class MatchService
         }
 
         match.FormationComment = comment;
-        match.Block = blockAlso ? newStatus : null;
+        match.Block = blockAlso && playerIds.Any() ? newStatus : null;
         var existingPlayers = await _context.MatchPlayers
             .Where(x => x.MatchId == matchId)
-            .Where(x => x.Status == newStatus)
+            .Where(x => x.Status == "Captain" || x.Status == "Major")
             .ToArrayAsync();
         _context.MatchPlayers.RemoveRange(existingPlayers);
+
+        if (!blockAlso)
+        {
+            newStatus = "Captain";
+        }
 
         for (int i = 0; i < playerIds.Length; i++)
         {
