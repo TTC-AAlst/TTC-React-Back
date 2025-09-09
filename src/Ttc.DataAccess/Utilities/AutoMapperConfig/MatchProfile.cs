@@ -77,11 +77,6 @@ internal class MatchProfile : Profile
                 SetIndividualMatchesOutcome(match.Games, match.IsHomeMatch);
             });
 
-        ReportMapping();
-    }
-
-    private void ReportMapping()
-    {
         CreateMap<MatchCommentEntity, MatchComment>().ReverseMap();
         CreateMap<MatchPlayerEntity, MatchPlayer>().ReverseMap();
 
@@ -92,7 +87,10 @@ internal class MatchProfile : Profile
                 opts => opts.MapFrom(src => src.AwayPlayerSets))
             .ForMember(
                 dest => dest.OutPlayerUniqueIndex,
-                opts => opts.MapFrom(src => src.AwayPlayerUniqueIndex))
+                opts => opts.MapFrom(src => src.AwayPlayerUniqueIndex2 == 0 ? src.AwayPlayerUniqueIndex : 0))
+            .ForMember(
+                dest => dest.HomePlayerUniqueIndex,
+                opts => opts.MapFrom(src => src.HomePlayerUniqueIndex2 == 0 ? src.HomePlayerUniqueIndex : 0))
             .ReverseMap()
             ;
     }
