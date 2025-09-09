@@ -142,7 +142,10 @@ public class FrenoyMatchesApi : FrenoyApiBase
             }
 
             if (!matchEntity.IsSyncedWithFrenoy && matchEntity.FrenoySeason < _db.CurrentFrenoySeason)
+            {
                 matchEntity.IsSyncedWithFrenoy = true;
+                matchEntity.Block = PlayerMatchStatus.Major;
+            }
 
             await CommitChanges();
             return true;
@@ -296,10 +299,17 @@ public class FrenoyMatchesApi : FrenoyApiBase
         if (!entity.ShouldBePlayed)
         {
             if (frenoyMatch is { IsValidated: true, IsValidatedSpecified: true, IsLocked: true, IsLockedSpecified: true })
+            {
                 entity.IsSyncedWithFrenoy = true;
+                entity.Block = PlayerMatchStatus.Major;
+            }
+
 
             if (entity.FrenoySeason < _db.CurrentFrenoySeason)
+            {
                 entity.IsSyncedWithFrenoy = true;
+                entity.Block = PlayerMatchStatus.Major;
+            }
         }
 
         //TODO: The derby problem: both Home and AwayClubId are OwnClubId
@@ -333,7 +343,10 @@ public class FrenoyMatchesApi : FrenoyApiBase
                 bool isForfeit = score.Contains("ff") || score.Contains("af") || score.Contains("gu");
                 matchEntity.WalkOver = isForfeit;
                 if (matchEntity.WalkOver)
+                {
                     matchEntity.IsSyncedWithFrenoy = true;
+                    matchEntity.Block = PlayerMatchStatus.Major;
+                }
 
                 // Uitslag
                 var scoreRex = new Regex(@"^(\d+)-(\d+)");
@@ -366,7 +379,10 @@ public class FrenoyMatchesApi : FrenoyApiBase
                     if (matchEntity.Competition == Competition.Sporta)
                     {
                         if (totalScore == 10)
+                        {
                             matchEntity.IsSyncedWithFrenoy = true;
+                            matchEntity.Block = PlayerMatchStatus.Major;
+                        }
                     }
                     else
                     {
@@ -374,7 +390,10 @@ public class FrenoyMatchesApi : FrenoyApiBase
                             matchEntity.FrenoyMatchId?.StartsWith(frenoyPrefix) == true && totalScore == expectedScore;
 
                         if (IsMatchComplete("POVLH", 16) || IsMatchComplete("POVLJ", 5))
+                        {
                             matchEntity.IsSyncedWithFrenoy = true;
+                            matchEntity.Block = PlayerMatchStatus.Major;
+                        }
                     }
 
                     if (!matchEntity.IsSyncedWithFrenoy)
@@ -385,11 +404,16 @@ public class FrenoyMatchesApi : FrenoyApiBase
                             var players = frenoyMatch.MatchDetails.AwayPlayers.Players.Concat(frenoyMatch.MatchDetails.HomePlayers.Players);
                             var hasForfeit = players.Any(x => x.IsForfeited && x.IsForfeitedSpecified);
                             matchEntity.IsSyncedWithFrenoy = hasForfeit;
+                            if (hasForfeit)
+                            {
+                                matchEntity.Block = PlayerMatchStatus.Major;
+                            }
                         }
 
                         if (matchEntity.WalkOver)
                         {
                             matchEntity.IsSyncedWithFrenoy = true;
+                            matchEntity.Block = PlayerMatchStatus.Major;
                         }
                     }
                 }
