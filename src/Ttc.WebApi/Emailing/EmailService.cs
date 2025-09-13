@@ -14,11 +14,13 @@ public class EmailService
     private static readonly CultureInfo Culture = new("nl-BE");
     private readonly EmailConfig _config;
     private readonly ITtcDbContext _context;
+    private readonly IUserProvider _userProvider;
 
-    public EmailService(EmailConfig config, ITtcDbContext context)
+    public EmailService(EmailConfig config, ITtcDbContext context, IUserProvider userProvider)
     {
         _config = config;
         _context = context;
+        _userProvider = userProvider;
     }
 
     public async Task SendEmail(ICollection<Player> players, WeekCompetitionEmailModel email)
@@ -65,7 +67,7 @@ public class EmailService
             }
 
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(_config.EmailFromName, _config.EmailFrom));
+            message.From.Add(new MailboxAddress(_userProvider.Name, _config.EmailFrom));
             var toEmails = players
                 .Where(ply => !string.IsNullOrWhiteSpace(ply.Contact?.Email))
                 .Select(ply => new MailboxAddress(ply.FirstName + " " + ply.LastName, ply.Contact!.Email));
@@ -86,7 +88,7 @@ public class EmailService
     public async Task SendEmail(string email, string subject, string content)
     {
         var message = new MimeMessage();
-        message.From.Add(new MailboxAddress(_config.EmailFromName, _config.EmailFrom));
+        message.From.Add(new MailboxAddress(_userProvider.Name, _config.EmailFrom));
         message.To.Add(MailboxAddress.Parse(email));
         message.Subject = subject;
         message.Body = new TextPart("html")
