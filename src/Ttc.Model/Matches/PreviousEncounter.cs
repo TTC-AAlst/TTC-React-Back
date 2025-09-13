@@ -4,6 +4,7 @@ namespace Ttc.Model.Matches;
 
 public class PreviousEncounter
 {
+    public int MatchGameId { get; set; }
     public int RequestMatchId { get; set; }
     public int MatchId { get; set; }
     public DateTime MatchDate { get; set; }

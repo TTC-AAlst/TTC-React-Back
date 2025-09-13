@@ -418,6 +418,7 @@ public class MatchService
             var awayPlayer = game.Match.Players.FirstOrDefault(x => x.UniqueIndex == game.AwayPlayerUniqueIndex);
             return new PreviousEncounter()
             {
+                MatchGameId = game.Id,
                 RequestMatchId = request.MatchId,
                 MatchId = game.MatchId,
                 MatchDate = game.Match.Date,
@@ -481,6 +482,7 @@ public class MatchService
 
                     return new PreviousEncounter()
                     {
+                        MatchGameId = game.Id,
                         RequestMatchId = request.MatchId,
                         MatchId = game.MatchId,
                         MatchDate = game.Match.Date,
