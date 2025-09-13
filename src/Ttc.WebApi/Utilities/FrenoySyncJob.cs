@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Ttc.DataEntities;
 using Ttc.DataEntities.Core;
 using Ttc.Model.Core;
@@ -27,9 +28,10 @@ public class FrenoySyncJob : IHostedService, IDisposable
     {
         using var scope = _services.CreateScope();
         var logger = scope.ServiceProvider.GetRequiredService<TtcLogger>();
+        var hub = scope.ServiceProvider.GetRequiredService<IHubContext<TtcHub, ITtcHub>>();
         try
         {
-            logger.Information("SyncJob Started at {date}", DateTime.Now.ToString("dd/MM/yyyy"));
+            logger.Information("FrenoySyncJob Started at {date}", DateTime.Now.ToString("dd/MM/yyyy HH:mm"));
 
             await using var context = scope.ServiceProvider.GetRequiredService<ITtcDbContext>();
             var controller = scope.ServiceProvider.GetRequiredService<MatchesController>();
@@ -42,7 +44,7 @@ public class FrenoySyncJob : IHostedService, IDisposable
                 .Where(x => x.Date != DateTime.MinValue)
                 .ToArrayAsync();
 
-            logger.Information("Syncing {matches} Matches.", matchesToSync.Length);
+            logger.Information("FrenoySyncJob: Syncing {matches} Matches.", matchesToSync.Length);
             bool allSynced = true;
             foreach (var match in matchesToSync)
             {
@@ -51,20 +53,23 @@ public class FrenoySyncJob : IHostedService, IDisposable
                 if (match.AwayTeamId == Constants.OwnClubId || match.HomeClubId == Constants.OwnClubId)
                 {
                     Match? syncedMatch = await controller.FrenoyMatchSync(matchId, true);
+                    await hub.Clients.All.BroadcastReload(Entities.Match, match.Id);
                     synced = syncedMatch?.IsSyncedWithFrenoy == true;
                 }
                 else
                 {
                     OtherMatch? syncedMatch = await controller.FrenoyOtherMatchSync(matchId, true);
+                    await hub.Clients.All.BroadcastReload(Entities.ReadOnlyMatch, match.Id);
                     synced = syncedMatch?.IsSyncedWithFrenoy == true;
                 }
 
                 if (synced)
                 {
-                    logger.Information("Sync completed for match {matchId}", match.Id);
+                    logger.Information("FrenoySyncJob: Sync completed for match {matchId}", match.Id);
                 }
                 else
                 {
+                    logger.Information("FrenoySyncJob: Partial sync for match {matchId}", match.Id);
                     allSynced = false;
                 }
             }
@@ -78,10 +83,12 @@ public class FrenoySyncJob : IHostedService, IDisposable
                     .FirstOrDefaultAsync();
 
                 var nextMatchStart = nextMatch == null ? TimeSpan.FromDays(1) : nextMatch.Date - DateTime.Now;
+                logger.Information("FrenoySyncJob: Sync completed for all matches, next sync scheduled for {nextMatchStart}", nextMatchStart);
                 _timer?.Change(nextMatchStart, Timeout.InfiniteTimeSpan);
             }
             else
             {
+                logger.Information("FrenoySyncJob: Sync still busy, next run in 15min");
                 _timer?.Change(TimeSpan.FromMinutes(15), Timeout.InfiniteTimeSpan);
             }
         }
