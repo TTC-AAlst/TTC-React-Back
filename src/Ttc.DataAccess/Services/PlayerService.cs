@@ -32,7 +32,9 @@ public class PlayerService
 
     public async Task<IEnumerable<EventModel>> GetEvents()
     {
-        var events = await _context.Events.ToArrayAsync();
+        var events = await _context.Events
+            .Where(eventEntity => eventEntity.Type != EventType.PlayerPicture)
+            .ToArrayAsync();
         var result = _mapper.Map<IList<EventEntity>, IList<EventModel>>(events);
         return result;
     }
