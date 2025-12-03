@@ -34,6 +34,7 @@ public class PlayerService
     {
         var events = await _context.Events
             .Where(eventEntity => eventEntity.Type != EventType.PlayerPicture)
+            .Where(eventEntity => eventEntity.Audit.CreatedOn > DateTime.Today.AddMonths(-3))
             .ToArrayAsync();
         var result = _mapper.Map<IList<EventEntity>, IList<EventModel>>(events);
         return result;
