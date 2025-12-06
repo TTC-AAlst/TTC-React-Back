@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Frenoy.Api;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Ttc.DataAccess.Services;
 using Ttc.DataEntities;
+using Ttc.DataEntities.Core;
 using Ttc.Model.Clubs;
+using Ttc.Model.Core;
+using Ttc.Model.Players;
 using Ttc.WebApi.Utilities;
 
 namespace Ttc.WebApi.Controllers;
@@ -15,11 +19,15 @@ public class ClubsController
     #region Constructor
     private readonly ClubService _service;
     private readonly IHubContext<TtcHub, ITtcHub> _hub;
+    private readonly ITtcDbContext _dbContext;
+    private readonly TtcLogger _logger;
 
-    public ClubsController(ClubService service, IHubContext<TtcHub, ITtcHub> hub)
+    public ClubsController(ClubService service, IHubContext<TtcHub, ITtcHub> hub, ITtcDbContext dbContext, TtcLogger logger)
     {
         _service = service;
         _hub = hub;
+        _dbContext = dbContext;
+        _logger = logger;
     }
     #endregion
 
@@ -66,4 +74,15 @@ public class ClubsController
         public override string ToString() => $"{PlayerId} => {BoardFunction} ({Sort})";
     }
     #endregion
+
+    [HttpPost]
+    [Route("Sync")]
+    public async Task Sync()
+    {
+        var sportaApi = new FrenoyClubApi(_dbContext, _logger, Competition.Sporta);
+        await sportaApi.SyncClubVenues();
+
+        var vttlApi = new FrenoyClubApi(_dbContext, _logger, Competition.Vttl);
+        await vttlApi.SyncClubVenues();
+    }
 }

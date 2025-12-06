@@ -1,87 +1,130 @@
-﻿using System.Diagnostics;
-using FrenoyVttl;
+﻿using FrenoyVttl;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Ttc.DataEntities;
 using Ttc.DataEntities.Core;
+using Ttc.Model.Core;
 using Ttc.Model.Players;
 
 namespace Frenoy.Api;
 
 public class FrenoyClubApi : FrenoyApiBase
 {
-    public FrenoyClubApi(ITtcDbContext ttcDbContext, Competition comp) : base(ttcDbContext, comp)
+    private readonly TtcLogger _logger;
+
+    public FrenoyClubApi(ITtcDbContext ttcDbContext, TtcLogger logger, Competition comp) : base(ttcDbContext, comp)
     {
+        _logger = logger;
     }
 
-    #region ClubLokalen
-    public async Task SyncClubLokalen()
+    #region ClubVenues
+    public async Task SyncClubVenues()
     {
-        // TODO: these methods need to be applied to vttl and sporta together
-        // TODO: need to check if frenoy club locations are actually better than current data...
-
-        Debug.Assert(false, "legacy db data might be better?");
-
         Func<ClubEntity, string> getClubCode;
         IEnumerable<ClubEntity> clubs;
         if (_isVttl)
         {
-            getClubCode = dbClub => dbClub.CodeVttl;
-            clubs = _db.Clubs.Include(x => x.Locations).Where(club => !string.IsNullOrEmpty(club.CodeVttl)).ToArray();
+            getClubCode = dbClub => dbClub.CodeVttl!;
+            clubs = await _db.Clubs
+                .Include(x => x.Locations)
+                .Where(club => club.Active)
+                .Where(club => club.Id != Constants.OwnClubId)
+                .Where(club => !string.IsNullOrEmpty(club.CodeVttl))
+                .ToArrayAsync();
         }
         else
         {
-            getClubCode = dbClub => dbClub.CodeSporta;
-            clubs = _db.Clubs.Include(x => x.Locations).Where(club => !string.IsNullOrEmpty(club.CodeSporta)).ToArray();
+            getClubCode = dbClub => dbClub.CodeSporta!;
+            clubs = await _db.Clubs
+                .Include(x => x.Locations)
+                .Where(club => club.Active)
+                .Where(club => club.Id != Constants.OwnClubId)
+                .Where(club => !string.IsNullOrEmpty(club.CodeSporta))
+                .ToArrayAsync();
         }
-        await SyncClubLokalen(clubs, getClubCode);
+        await SyncClubVenues(clubs, getClubCode);
     }
 
-    private async Task SyncClubLokalen(IEnumerable<ClubEntity> clubs, Func<ClubEntity, string> getClubCode)
+    private async Task SyncClubVenues(IEnumerable<ClubEntity> clubs, Func<ClubEntity, string> getClubCode)
     {
         foreach (var dbClub in clubs)
         {
-            var oldLokalen = await _db.ClubLocations.Where(x => x.ClubId == dbClub.Id).ToArrayAsync();
+            var oldVenues = await _db.ClubLocations.Where(x => x.ClubId == dbClub.Id).ToArrayAsync();
 
-            var frenoyClubs = await _frenoy.GetClubsAsync(new GetClubsRequest
+            GetClubsResponse1? frenoyClubs;
+
+            try
             {
-                GetClubs = new GetClubs()
+                frenoyClubs = await _frenoy.GetClubsAsync(new GetClubsRequest
                 {
-                    Club = getClubCode(dbClub)
+                    GetClubs = new GetClubs()
+                    {
+                        Club = getClubCode(dbClub)
+                    }
+                });
+            }
+            catch (Exception ex) when (ex.Message == $"Club [{getClubCode(dbClub)}] is not valid.")
+            {
+                if (_isVttl)
+                {
+                    if (string.IsNullOrWhiteSpace(dbClub.CodeSporta))
+                    {
+                        dbClub.Active = false;
+                    }
+                    else
+                    {
+                        dbClub.CodeVttl = null;
+                    }
                 }
-            });
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(dbClub.CodeVttl))
+                    {
+                        dbClub.Active = false;
+                    }
+                    else
+                    {
+                        dbClub.CodeSporta = null;
+                    }
+                }
+                continue;
+            }
+            catch (Exception ex)
+            {
+                var comp = _isVttl ? Competition.Vttl : Competition.Sporta;
+                _logger.Error(ex, $"ClubVenueSync: For {comp} ClubId={dbClub.Id} ({dbClub.Name}), Code {getClubCode(dbClub)} crashed", ex.Message);
+                continue;
+            }
 
             var frenoyClub = frenoyClubs.GetClubsResponse.ClubEntries.FirstOrDefault();
             if (frenoyClub == null)
             {
-                Debug.Print("Got some wrong CodeSporta/Vttl in legacy db: " + dbClub.Name);
+                var comp = _isVttl ? Competition.Vttl : Competition.Sporta;
+                _logger.Information($"ClubVenueSync: For {comp} ClubId={dbClub.Id} ({dbClub.Name}), Code {getClubCode(dbClub)} is incorrect");
             }
             else if (frenoyClub.VenueEntries == null)
             {
-                Debug.Print("Missing frenoy data?: " + dbClub.Name);
-            }
-            else if (frenoyClub.VenueEntries.Length < dbClub.Locations.Count)
-            {
-                Debug.Print("we got better data...: " + dbClub.Name);
+                var comp = _isVttl ? Competition.Vttl : Competition.Sporta;
+                _logger.Information($"ClubVenueSync: For {comp} ClubId={dbClub.Id} ({dbClub.Name}), Code {getClubCode(dbClub)} there are no venues");
             }
             else
             {
-                _db.ClubLocations.RemoveRange(oldLokalen);
+                _db.ClubLocations.RemoveRange(oldVenues);
 
-                foreach (var frenoyLokaal in frenoyClub.VenueEntries)
+                foreach (var frenoyVenue in frenoyClub.VenueEntries)
                 {
-                    //Debug.Assert(string.IsNullOrWhiteSpace(frenoyLokaal.Comment), "comments opslaan in db?");
-                    Debug.Assert(frenoyLokaal.ClubVenue == "1");
-                    var lokaal = new ClubLocationEntity
+                    var venue = new ClubLocationEntity
                     {
-                        Description = frenoyLokaal.Name,
-                        Address = frenoyLokaal.Street,
+                        Description = frenoyVenue.Name,
+                        Address = frenoyVenue.Street,
                         ClubId = dbClub.Id,
-                        City = frenoyLokaal.Town.Substring(frenoyLokaal.Town.IndexOf(" ") + 1),
-                        Mobile = frenoyLokaal.Phone,
-                        PostalCode = int.Parse(frenoyLokaal.Town.Substring(0, frenoyLokaal.Town.IndexOf(" "))),
-                        MainLocation = frenoyLokaal.ClubVenue == "1"
+                        City = frenoyVenue.Town.Substring(frenoyVenue.Town.IndexOf(" ") + 1),
+                        Mobile = frenoyVenue.Phone,
+                        PostalCode = int.Parse(frenoyVenue.Town.Substring(0, frenoyVenue.Town.IndexOf(" "))),
+                        MainLocation = frenoyVenue.ClubVenue == "1",
+                        Comment = frenoyVenue.Comment
                     };
-                    _db.ClubLocations.Add(lokaal);
+                    await _db.ClubLocations.AddAsync(venue);
                 }
             }
         }

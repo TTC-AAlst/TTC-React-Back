@@ -22,6 +22,8 @@ public class ClubLocationEntity
     [ForeignKey("ClubId")]
     public ClubEntity Club { get; set; }
     public int ClubId { get; set; }
+    [StringLength(4000)]
+    public string? Comment { get; set; }
 
     public override string ToString() => $"Id={Id}, ClubId={ClubId}, Desc={Description}, Address={Address}, City={City}";
 }

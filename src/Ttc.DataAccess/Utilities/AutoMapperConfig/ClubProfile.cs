@@ -57,7 +57,8 @@ internal class ClubProfile : Profile
             Address = location.Address,
             PostalCode = location.PostalCode.ToString(),
             City = location.City,
-            Mobile = location.Mobile
+            Mobile = location.Mobile,
+            Comment = location.Comment ?? "",
         };
     }
 }
