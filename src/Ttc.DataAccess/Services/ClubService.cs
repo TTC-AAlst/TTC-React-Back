@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
-using Ttc.DataEntities;
+using Frenoy.Api;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Ttc.DataAccess.Utilities;
+using Ttc.DataEntities;
 using Ttc.DataEntities.Core;
 using Ttc.Model.Clubs;
+using Ttc.Model.Core;
+using Ttc.Model.Players;
 
 namespace Ttc.DataAccess.Services;
 
@@ -12,12 +15,14 @@ public class ClubService
 {
     private readonly ITtcDbContext _context;
     private readonly IMapper _mapper;
+    private readonly TtcLogger _logger;
     private readonly CacheHelper _cache;
 
-    public ClubService(ITtcDbContext context, IMapper mapper, IMemoryCache cache)
+    public ClubService(ITtcDbContext context, IMapper mapper, IMemoryCache cache, TtcLogger logger)
     {
         _context = context;
         _mapper = mapper;
+        _logger = logger;
         _cache = new CacheHelper(cache);
     }
 
@@ -101,6 +106,17 @@ public class ClubService
         await _context.SaveChangesAsync();
         _cache.Remove("clubs");
         return club;
+    }
+
+    public async Task Sync()
+    {
+        var sportaApi = new FrenoyClubApi(_context, _logger, Competition.Sporta);
+        await sportaApi.SyncClubVenues();
+
+        var vttlApi = new FrenoyClubApi(_context, _logger, Competition.Vttl);
+        await vttlApi.SyncClubVenues();
+
+        _cache.Remove("clubs");
     }
 
     private async Task ChangeClub(int clubId)
