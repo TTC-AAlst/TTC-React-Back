@@ -188,7 +188,7 @@ public class FrenoyPlayersApi : FrenoyApiBase
 
         return frenoyPlayers.GetMembersResponse.MemberEntries
             .Select(p => new ClubPlayer(
-                p.FirstName + " " + p.LastName,
+                CultureInfo.InvariantCulture.TextInfo.ToTitleCase($"{p.FirstName} {p.LastName}".ToLowerInvariant()),
                 p.Ranking,
                 int.Parse(p.UniqueIndex)
             ))
