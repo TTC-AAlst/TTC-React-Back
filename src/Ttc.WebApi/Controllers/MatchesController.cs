@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Frenoy.Api;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Ttc.DataAccess.Services;
@@ -162,6 +163,15 @@ public class MatchesController
     }
 
     [HttpPost]
+    [Route("EditOpponentPlayers")]
+    public async Task<Match> EditOpponentPlayers([FromBody] OpponentPlayersDto dto)
+    {
+        var result = await _service.EditOpponentPlayers(dto.MatchId, dto.Players);
+        await _hub.Clients.All.BroadcastReload(Entities.Match, dto.MatchId);
+        return result;
+    }
+
+    [HttpPost]
     [Route("Report")]
     public async Task<Match> Report([FromBody] MatchReport report)
     {
@@ -254,4 +264,12 @@ public class MatchPlayersDto
     public string Comment { get; set; } = "";
 
     public override string ToString() => $"MatchId={MatchId}, Block={BlockAlso}, Status={NewStatus}, Players={string.Join(",", PlayerIds)}";
+}
+
+public class OpponentPlayersDto
+{
+    public int MatchId { get; set; }
+    public ClubPlayer[] Players { get; set; } = [];
+
+    public override string ToString() => $"MatchId={MatchId}, Players={Players.Length}";
 }

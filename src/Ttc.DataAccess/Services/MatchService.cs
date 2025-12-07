@@ -257,6 +257,42 @@ public class MatchService
         var newMatch = await GetMatch(matchId);
         return newMatch;
     }
+
+    public async Task<Match> EditOpponentPlayers(int matchId, ClubPlayer[] players)
+    {
+        var match = await _context.Matches.SingleAsync(x => x.Id == matchId);
+        if (match.IsSyncedWithFrenoy)
+        {
+            return await GetMatch(matchId);
+        }
+
+        var existingOpponentPlayers = await _context.MatchPlayers
+            .Where(x => x.MatchId == matchId)
+            .Where(x => x.Home != (match.IsHomeMatch ?? false))
+            .ToArrayAsync();
+        _context.MatchPlayers.RemoveRange(existingOpponentPlayers);
+
+        bool isOpponentHome = !(match.IsHomeMatch ?? false);
+        for (int i = 0; i < players.Length; i++)
+        {
+            var newMatchPlayer = new MatchPlayerEntity
+            {
+                MatchId = matchId,
+                PlayerId = null,
+                Name = players[i].Name,
+                Status = PlayerMatchStatus.Captain,
+                StatusNote = null,
+                Ranking = players[i].Ranking,
+                UniqueIndex = players[i].UniqueIndex,
+                Home = isOpponentHome,
+                Position = i,
+                Won = 0
+            };
+            _context.MatchPlayers.Add(newMatchPlayer);
+        }
+        await _context.SaveChangesAsync();
+        return await GetMatch(matchId);
+    }
     #endregion
 
     #region Report & Comments
