@@ -174,4 +174,26 @@ public class FrenoyPlayersApi : FrenoyApiBase
 
         return players;
     }
+
+    public async Task<ICollection<ClubPlayer>> GetMembersAsync(string clubCode)
+    {
+        var frenoyPlayers = await _frenoy.GetMembersAsync(new GetMembersRequest1
+        {
+            GetMembersRequest = new GetMembersRequest()
+            {
+                Club = clubCode,
+                Season = (_currentSeason - 2000 + 1).ToString(),
+            }
+        });
+
+        return frenoyPlayers.GetMembersResponse.MemberEntries
+            .Select(p => new ClubPlayer(
+                p.FirstName + " " + p.LastName,
+                p.Ranking,
+                int.Parse(p.UniqueIndex)
+            ))
+            .ToArray();
+    }
 }
+
+public record ClubPlayer(string Name, string Ranking, int UniqueIndex);

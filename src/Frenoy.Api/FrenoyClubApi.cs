@@ -1,6 +1,5 @@
 ﻿using FrenoyVttl;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Ttc.DataEntities;
 using Ttc.DataEntities.Core;
 using Ttc.Model.Core;

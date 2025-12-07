@@ -8,6 +8,7 @@ using Ttc.DataEntities.Core;
 using Ttc.Model.Clubs;
 using Ttc.Model.Core;
 using Ttc.Model.Players;
+using FrenoyVttl;
 
 namespace Ttc.DataAccess.Services;
 
@@ -119,6 +120,16 @@ public class ClubService
         await vttlApi.SyncClubVenues();
 
         _cache.Remove("clubs");
+    }
+
+    public async Task<ICollection<ClubPlayer>> GetClubPlayers(Competition competition, string clubCode)
+    {
+        var cacheKey = $"club-players-{competition}-{clubCode}";
+        return await _cache.GetOrSet(cacheKey, async () =>
+        {
+            var api = new FrenoyPlayersApi(_context, competition);
+            return await api.GetMembersAsync(clubCode);
+        }, TimeSpan.FromHours(4));
     }
 
     private async Task ChangeClub(int clubId)

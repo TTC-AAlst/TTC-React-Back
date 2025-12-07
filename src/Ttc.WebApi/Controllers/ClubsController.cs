@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Frenoy.Api;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Ttc.DataAccess.Services;
 using Ttc.DataEntities;
 using Ttc.Model.Clubs;
+using Ttc.Model.Players;
 using Ttc.WebApi.Utilities;
 
 namespace Ttc.WebApi.Controllers;
@@ -72,5 +74,12 @@ public class ClubsController
     public async Task Sync()
     {
         await _service.Sync();
+    }
+
+    [HttpGet]
+    [Route("Players/{competition}/{clubCode}")]
+    public async Task<ICollection<ClubPlayer>> GetPlayers(Competition competition, string clubCode)
+    {
+        return await _service.GetClubPlayers(competition, clubCode);
     }
 }
