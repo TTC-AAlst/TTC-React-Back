@@ -10,6 +10,7 @@ namespace Ttc.WebApi.Utilities;
 
 public class FrenoySyncJob : IHostedService, IDisposable
 {
+    private static readonly TimeSpan SyncFrequency = TimeSpan.FromMinutes(10);
     private readonly IServiceProvider _services;
     private Timer? _timer;
 
@@ -63,13 +64,24 @@ public class FrenoySyncJob : IHostedService, IDisposable
                     synced = syncedMatch?.IsSyncedWithFrenoy == true;
                 }
 
+                var clubs = await context.Clubs
+                    .Where(x => x.Id == match.HomeClubId || x.Id == match.AwayClubId)
+                    .ToArrayAsync();
+
+                var clubInfo = new
+                {
+                    Home = $"{clubs.SingleOrDefault(x => x.Id == match.HomeClubId)?.Name} {match.HomeTeamCode}",
+                    Away = $"{clubs.SingleOrDefault(x => x.Id == match.AwayClubId)?.Name} {match.AwayTeamCode}"
+                };
+
                 if (synced)
                 {
-                    logger.Information("FrenoySyncJob: Sync completed for match {matchId}", match.Id);
+                    
+                    logger.Information("FrenoySyncJob: Sync completed for match {@clubInfo} (Id={matchId}, Frenoy={FrenoyId}, Score={Score})", clubInfo, match.Id, match.FrenoyMatchId ?? "?", $"{match.HomeScore}-{match.AwayScore}");
                 }
                 else
                 {
-                    logger.Information("FrenoySyncJob: Partial sync for match {matchId}", match.Id);
+                    logger.Information("FrenoySyncJob: Partial sync for match {@clubInfo} (Id={matchId}, Frenoy={FrenoyId}, Score={Score})", clubInfo, match.Id, match.FrenoyMatchId ?? "?", $"{match.HomeScore}-{match.AwayScore}");
                     allSynced = false;
                 }
             }
@@ -89,13 +101,13 @@ public class FrenoySyncJob : IHostedService, IDisposable
             else
             {
                 logger.Information("FrenoySyncJob: Sync still busy, next run in 15min");
-                _timer?.Change(TimeSpan.FromMinutes(15), Timeout.InfiniteTimeSpan);
+                _timer?.Change(SyncFrequency, Timeout.InfiniteTimeSpan);
             }
         }
         catch (Exception ex)
         {
             logger.Error(ex, "FrenoySyncJob failed {Message}", ex.Message);
-            _timer?.Change(TimeSpan.FromMinutes(15), Timeout.InfiniteTimeSpan);
+            _timer?.Change(SyncFrequency, Timeout.InfiniteTimeSpan);
         }
     }
 
