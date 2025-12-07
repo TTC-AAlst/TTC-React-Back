@@ -249,7 +249,8 @@ public class MatchService
                 Status = newStatus,
                 Ranking = match.Competition is Competition.Vttl or Competition.Jeugd ? player.RankingVttl : player.RankingSporta,
                 Home = match.IsHomeMatch ?? false,
-                Position = i
+                Position = i,
+                UniqueIndex = match.Competition is Competition.Vttl or Competition.Jeugd ? player.ComputerNummerVttl ?? 0 : player.LidNummerSporta ?? 0
             };
             _context.MatchPlayers.Add(newMatchPlayer);
         }
@@ -442,6 +443,7 @@ public class MatchService
             .Include(x => x.Match.Players)
             .Where(x => x.MatchId != request.MatchId)
             .Where(x => x.Match.Competition == request.Competition)
+            .Where(x => x.Match.IsSyncedWithFrenoy)
             .Where(x => playerUniqueIds.Contains(x.HomePlayerUniqueIndex))
             .Where(x => playerUniqueIds.Contains(x.AwayPlayerUniqueIndex))
             .Where(x => x.AwayPlayerUniqueIndex2 == 0) // Filter out Sporta doubles
@@ -475,6 +477,7 @@ public class MatchService
             .Include(x => x.Games)
             .Include(x => x.Players)
             .Where(x => x.Competition == otherCompetition)
+            .Where(x => x.IsSyncedWithFrenoy)
             .Where(x => x.Players.Any(player => request.OpponentPlayerNames.Keys.Contains(player.Name)))
             .Where(x => x.Players.Any(player => player.PlayerId.HasValue && request.OwnPlayerIds.Keys.Contains(player.PlayerId.Value)))
             .ToArrayAsync();
