@@ -11,8 +11,11 @@ namespace Ttc.WebApi.Utilities;
 public class FrenoySyncJob : IHostedService, IDisposable
 {
     private static readonly TimeSpan SyncFrequency = TimeSpan.FromMinutes(10);
+    private static readonly TimeZoneInfo BelgianTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
     private readonly IServiceProvider _services;
     private Timer? _timer;
+
+    private static DateTime BelgianNow => TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, BelgianTimeZone);
 
     public FrenoySyncJob(IServiceProvider services)
     {
@@ -32,7 +35,7 @@ public class FrenoySyncJob : IHostedService, IDisposable
         var hub = scope.ServiceProvider.GetRequiredService<IHubContext<TtcHub, ITtcHub>>();
         try
         {
-            logger.Information("FrenoySyncJob Started at {date}", DateTime.Now.ToString("dd/MM/yyyy HH:mm"));
+            logger.Information("FrenoySyncJob Started at {date}", BelgianNow.ToString("dd/MM/yyyy HH:mm"));
 
             await using var context = scope.ServiceProvider.GetRequiredService<ITtcDbContext>();
             var controller = scope.ServiceProvider.GetRequiredService<MatchesController>();
@@ -41,7 +44,7 @@ public class FrenoySyncJob : IHostedService, IDisposable
                 .Where(x => !x.IsSyncedWithFrenoy)
                 .Where(x => x.ShouldBePlayed)
                 .Where(x => !x.WalkOver)
-                .Where(x => x.Date < DateTime.Now)
+                .Where(x => x.Date < BelgianNow)
                 .Where(x => x.Date != DateTime.MinValue)
                 .ToArrayAsync();
 
@@ -90,17 +93,17 @@ public class FrenoySyncJob : IHostedService, IDisposable
             {
                 var nextMatch = await context.Matches
                     .Where(x => !x.IsSyncedWithFrenoy)
-                    .Where(x => x.Date > DateTime.Now)
+                    .Where(x => x.Date > BelgianNow)
                     .OrderBy(x => x.Date)
                     .FirstOrDefaultAsync();
 
-                var nextMatchStart = nextMatch == null ? TimeSpan.FromDays(1) : nextMatch.Date - DateTime.Now;
+                var nextMatchStart = nextMatch == null ? TimeSpan.FromDays(1) : nextMatch.Date - BelgianNow;
                 logger.Information("FrenoySyncJob: Sync completed for all matches, next sync scheduled for {nextMatchStart}", nextMatchStart);
                 _timer?.Change(nextMatchStart, Timeout.InfiniteTimeSpan);
             }
             else
             {
-                logger.Information("FrenoySyncJob: Sync still busy, next run in 15min");
+                logger.Information($"FrenoySyncJob: Sync still busy, next run in {SyncFrequency.TotalMinutes}min");
                 _timer?.Change(SyncFrequency, Timeout.InfiniteTimeSpan);
             }
         }
