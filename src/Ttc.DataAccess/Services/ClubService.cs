@@ -95,7 +95,9 @@ public class ClubService
 
     public async Task<Club> UpdateClub(Club club)
     {
-        var existingClub = await _context.Clubs.FirstOrDefaultAsync(x => x.Id == club.Id);
+        var existingClub = await _context.Clubs
+            .Include(x => x.Locations)
+            .FirstOrDefaultAsync(x => x.Id == club.Id);
         if (existingClub == null)
         {
             throw new Exception("Club not found");
@@ -133,6 +135,66 @@ public class ClubService
         existingClub.Name = club.Name;
         existingClub.Shower = club.Shower;
         existingClub.Website = club.Website;
-        // existingClub.Lokalen = club.MainLocation
+
+        // Map MainLocation
+        if (club.MainLocation != null)
+        {
+            var mainLocationEntity = existingClub.Locations.FirstOrDefault(x => x.MainLocation);
+            if (mainLocationEntity != null)
+            {
+                MapLocation(club.MainLocation, mainLocationEntity);
+            }
+            else
+            {
+                mainLocationEntity = new ClubLocationEntity { MainLocation = true, ClubId = existingClub.Id };
+                MapLocation(club.MainLocation, mainLocationEntity);
+                existingClub.Locations.Add(mainLocationEntity);
+            }
+        }
+
+        var incomingAlternativeIds = club.AlternativeLocations
+            .Where(x => x.Id != 0)
+            .Select(x => x.Id)
+            .ToHashSet();
+
+        // Delete locations that no longer exist
+        var locationsToDelete = existingClub.Locations
+            .Where(x => !x.MainLocation && !incomingAlternativeIds.Contains(x.Id))
+            .ToList();
+        foreach (var location in locationsToDelete)
+        {
+            existingClub.Locations.Remove(location);
+        }
+
+        // Update or add alternative locations
+        foreach (var altLocation in club.AlternativeLocations)
+        {
+            if (altLocation.Id == 0)
+            {
+                // Add new location
+                var newLocation = new ClubLocationEntity { MainLocation = false, ClubId = existingClub.Id };
+                MapLocation(altLocation, newLocation);
+                existingClub.Locations.Add(newLocation);
+            }
+            else
+            {
+                // Update existing location
+                var existingLocation = existingClub.Locations.FirstOrDefault(x => x.Id == altLocation.Id);
+                if (existingLocation != null)
+                {
+                    MapLocation(altLocation, existingLocation);
+                }
+            }
+        }
+    }
+
+    private static void MapLocation(ClubLocation source, ClubLocationEntity target)
+    {
+        target.Description = source.Description;
+        target.Address = source.Address;
+        target.City = source.City;
+        target.PostalCode = int.TryParse(source.PostalCode, out var postalCode) ? postalCode : 0;
+        target.Mobile = source.Mobile;
+        target.Comment = source.Comment;
     }
 }
