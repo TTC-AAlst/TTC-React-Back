@@ -95,12 +95,12 @@ public class Match : ITtcConfidential
     public void Hide()
     {
         FormationComment = "";
-        Block = "";
 
         // Duplicated above
         if (!(IsPlayed || IsSyncedWithFrenoy || Helpers.HasMatchStarted(Date)))
         {
             Players = [];
+            Block = "";
         }
 
         var toRemove = Comments.Where(c => c.Hidden).ToArray();
