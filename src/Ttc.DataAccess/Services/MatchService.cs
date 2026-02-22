@@ -41,8 +41,8 @@ public class MatchService
             match.Comments = comments.Where(x => x.MatchId == match.Id).ToArray();
         }
 
-        var result = _mapper.Map<IList<MatchEntity>, IList<Match>>(matchEntities);
-        return result;
+		var result = _mapper.Map<IList<MatchEntity>, IList<Match>>(matchEntities);
+		return result;
     }
 
     public async Task<ICollection<OtherMatch>> GetOpponentMatches(int teamId, OpposingTeam? opponent = null)
