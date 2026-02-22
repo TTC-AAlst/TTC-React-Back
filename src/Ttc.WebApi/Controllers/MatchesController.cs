@@ -76,9 +76,9 @@ public class MatchesController
         return result;
     }
 
-    [HttpGet("GetPreviousEncounters")]
+    [HttpPost("GetPreviousEncounters")]
     [AllowAnonymous]
-    public async Task<IEnumerable<PreviousEncounter>> GetPreviousEncounters(PreviousEncounterRequest request)
+    public async Task<IEnumerable<PreviousEncounter>> GetPreviousEncounters([FromBody] PreviousEncounterRequest request)
     {
         var result = await _service.GetPreviousEncounters(request);
         return result;
