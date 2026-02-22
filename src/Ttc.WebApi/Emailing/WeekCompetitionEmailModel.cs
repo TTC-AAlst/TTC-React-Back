@@ -12,6 +12,6 @@ public class WeekCompetitionEmailModel
     /// PlayerId to Team dictionary
     /// </summary>
     public Dictionary<int, string> Players { get; set; } = [];
-    
+
     public override string ToString() => $"{Title}: {Email}";
 }

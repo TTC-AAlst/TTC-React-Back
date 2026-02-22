@@ -53,7 +53,7 @@ public class EmailService
         using var client = new SmtpClient();
         await client.ConnectAsync(_config.Host, _config.Port, SecureSocketOptions.Auto);
         await client.AuthenticateAsync(_config.UserName, _config.Password);
-        
+
         foreach (var player in players)
         {
             string customContent;

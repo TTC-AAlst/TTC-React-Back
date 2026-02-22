@@ -29,7 +29,7 @@ public class RequestLoggingFilter
         var request = context.Request;
 
         string body = "";
-        if (request.Method != HttpMethods.Get && request.Method != HttpMethods.Delete && request.ContentLength > 0 
+        if (request.Method != HttpMethods.Get && request.Method != HttpMethods.Delete && request.ContentLength > 0
             && request.Path != "/api/User/sign-in" && request.Path != "/api/users/ValidateToken"
             && request.Path != "/api/User/ChangePassword" && request.Path != "/api/User/SetNewPasswordFromGuid"
             && request.Path != "/api/User/AdminSetNewPassword")

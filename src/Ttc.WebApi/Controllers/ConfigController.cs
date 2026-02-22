@@ -29,7 +29,7 @@ public class ConfigController
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<Dictionary<string, string>?> Get([FromQuery]DateTime? lastChecked)
+    public async Task<Dictionary<string, string>?> Get([FromQuery] DateTime? lastChecked)
     {
         var config = await _service.Get(lastChecked);
         return config;
@@ -59,7 +59,7 @@ public class ConfigController
     {
         string nl = Environment.NewLine;
         _logger.Error(
-            $"{{ErrorMessage}}{nl}Url: {{Path}}{nl}Stack: {{Stack}}{nl}{nl}Component Stack: {{ComponentStack}}{nl}{nl}Stacktrace.js: {{ParsedStackTrace}}", 
+            $"{{ErrorMessage}}{nl}Url: {{Path}}{nl}Stack: {{Stack}}{nl}{nl}Component Stack: {{ComponentStack}}{nl}{nl}Stacktrace.js: {{ParsedStackTrace}}",
             error.Message,
             error.Url,
             error.Stack,

@@ -80,7 +80,7 @@ public class PlayerService
 
     public async Task<Player?> UpdateStyle(PlayerStyle playerStyle)
     {
-        var existingPlayer= await _context.Players.SingleOrDefaultAsync(x => x.Id == playerStyle.PlayerId);
+        var existingPlayer = await _context.Players.SingleOrDefaultAsync(x => x.Id == playerStyle.PlayerId);
         if (existingPlayer == null)
         {
             return null;
@@ -101,7 +101,7 @@ public class PlayerService
 
     public async Task<Player?> UpdatePlayer(Player player)
     {
-        var existingPlayer= await _context.Players.FirstOrDefaultAsync(x => x.Id == player.Id);
+        var existingPlayer = await _context.Players.FirstOrDefaultAsync(x => x.Id == player.Id);
         if (existingPlayer == null)
         {
             existingPlayer = new PlayerEntity();

@@ -12,5 +12,5 @@ public class ClubLocation
     public string Comment { get; set; } = "";
     #endregion
 
-    public override string ToString() =>  $"Id={Id}, Desc={Description}, Loc={Address}";
+    public override string ToString() => $"Id={Id}, Desc={Description}, Loc={Address}";
 }

@@ -1,0 +1,22 @@
+#!/bin/sh
+# Pre-commit hook: verify formatting and build
+
+echo "Running pre-commit checks..."
+
+# Check formatting
+echo "Checking code formatting..."
+dotnet format Ttc.sln --verify-no-changes --verbosity quiet
+if [ $? -ne 0 ]; then
+    echo "Format check failed. Run 'dotnet format Ttc.sln' to fix."
+    exit 1
+fi
+
+# Build
+echo "Building solution..."
+dotnet build Ttc.sln --verbosity quiet --no-restore
+if [ $? -ne 0 ]; then
+    echo "Build failed. Fix compilation errors before committing."
+    exit 1
+fi
+
+echo "Pre-commit checks passed."

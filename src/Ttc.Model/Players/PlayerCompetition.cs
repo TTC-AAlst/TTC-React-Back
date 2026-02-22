@@ -16,7 +16,7 @@ public class PlayerCompetition
     /// Index in de club (volgnummer)
     /// </summary>
     public int Position { get; set; }
-    
+
     /// <summary>
     /// ComputerNummer (VTTL) of LidNummer (Sporta)
     /// </summary>
@@ -36,7 +36,7 @@ public class PlayerCompetition
     #region Constructors
     public PlayerCompetition()
     {
-        
+
     }
 
     public PlayerCompetition(Competition competition, int clubId, int uniqueIndex, string frenoyLink, string ranking, int position, int rankingIndex, int rankingValue, string nextRanking)

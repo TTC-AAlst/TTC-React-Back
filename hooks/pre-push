@@ -1,0 +1,22 @@
+#!/bin/sh
+# Pre-push hook: build and run tests
+
+echo "Running pre-push checks..."
+
+# Build
+echo "Building solution..."
+dotnet build Ttc.sln --verbosity quiet
+if [ $? -ne 0 ]; then
+    echo "Build failed. Fix compilation errors before pushing."
+    exit 1
+fi
+
+# Run tests
+echo "Running tests..."
+dotnet test Ttc.sln --verbosity quiet --no-build
+if [ $? -ne 0 ]; then
+    echo "Tests failed. Fix failing tests before pushing."
+    exit 1
+fi
+
+echo "Pre-push checks passed."

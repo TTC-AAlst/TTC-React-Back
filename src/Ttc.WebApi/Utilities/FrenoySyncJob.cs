@@ -79,7 +79,7 @@ public class FrenoySyncJob : IHostedService, IDisposable
 
                 if (synced)
                 {
-                    
+
                     logger.Information("FrenoySyncJob: Sync completed for match {@clubInfo} (Id={matchId}, Frenoy={FrenoyId}, Score={Score})", clubInfo, match.Id, match.FrenoyMatchId ?? "?", $"{match.HomeScore}-{match.AwayScore}");
                 }
                 else

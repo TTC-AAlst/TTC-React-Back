@@ -135,7 +135,7 @@ public class FrenoyMatchesApi : FrenoyApiBase
                 int? ourTeamId = (matchEntity.HomeTeam ?? matchEntity.AwayTeam)?.Id;
                 await MapMatch(matchEntity, ourTeamId, matchEntity.FrenoyDivisionId, frenoyMatch, matchEntity.FrenoySeason);
             }
-            
+
             if (matchEntity.ShouldBePlayed)
             {
                 await SyncMatchResults(matchEntity, frenoyMatch);
@@ -667,7 +667,7 @@ public class FrenoyMatchesApi : FrenoyApiBase
 
             team.Competition = _settings.Competition;
         }
-        
+
         team.DivisionType = frenoyTeam.DivisionName.StartsWith("ERE") ? "Ere" : _settings.DivisionType;
         team.Year = _settings.Year;
         team.LinkId = $"{frenoyTeam.DivisionId}_{frenoyTeam.Team}";
