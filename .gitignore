@@ -217,3 +217,4 @@ src/Ttc.WebApi/logs/
 upload/
 .env
 appsettings.Release.json
+.claude/settings.local.json
