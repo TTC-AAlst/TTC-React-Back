@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 WORKDIR /source
 
-COPY *.sln .
+COPY *.slnx .
 COPY src/Ttc.WebApi/*.csproj ./src/Ttc.WebApi/
 COPY src/Frenoy.Api/*.csproj ./src/Frenoy.Api/
 COPY src/Ttc.DataAccess/*.csproj ./src/Ttc.DataAccess/

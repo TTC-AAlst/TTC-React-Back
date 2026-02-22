@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".dockerignore" />
+    <File Path=".editorconfig" />
+    <File Path=".example.env" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="docker-compose.yml" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="src/Ttc.DataAccess/Ttc.DataAccess.csproj" />
+  <Project Path="src/Ttc.DataEntities/Ttc.DataEntities.csproj" />
+  <Project Path="src/Ttc.Model/Ttc.Model.csproj" />
+  <Project Path="src/Ttc.WebApi/Ttc.WebApi.csproj" />
+  <Project Path="src/Frenoy.Api/Frenoy.Api.csproj" />
+  <Project Path="src/Ttc.UnitTests/Ttc.UnitTests.csproj" />
+</Solution>
