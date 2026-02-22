@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    image: mysql:5.5.60
+    image: mysql:8.0
     container_name: ttc-mysql
     restart: always
     environment:
@@ -16,6 +16,7 @@ services:
       - ttcnet
     volumes:
       - mysql-data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
 
   ttc-webapi:
     build:
