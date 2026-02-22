@@ -69,7 +69,7 @@ internal class PlayersExcelCreator
             worksheet.Cells[i, 3].Value = player.LidNummerSporta;
             worksheet.Cells[i, 4].Value = player.Name;
             worksheet.Cells[i, 5].Value = player.RankingSporta;
-            worksheet.Cells[i, 6].Value = KlassementValueConverter.Sporta(player.RankingSporta);
+            worksheet.Cells[i, 6].Value = KlassementValueConverter.Sporta(player.RankingSporta ?? "");
 
             i++;
         }

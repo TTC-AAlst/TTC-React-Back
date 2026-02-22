@@ -8,9 +8,9 @@ public class PlayerCompetition
     #region Properties
     public Competition Competition { get; set; }
     public int ClubId { get; set; }
-    public string FrenoyLink { get; set; }
-    public string Ranking { get; set; }
-    public string NextRanking { get; set; }
+    public string? FrenoyLink { get; set; }
+    public string? Ranking { get; set; }
+    public string? NextRanking { get; set; }
 
     /// <summary>
     /// Index in de club (volgnummer)

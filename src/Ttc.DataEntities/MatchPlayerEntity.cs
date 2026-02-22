@@ -10,7 +10,7 @@ public class MatchPlayerEntity
     public int Id { get; set; }
 
     [ForeignKey("MatchId")]
-    public MatchEntity Match { get; set; }
+    public MatchEntity Match { get; set; } = null!;
     public int MatchId { get; set; }
 
     [ForeignKey("PlayerId")]
@@ -18,7 +18,7 @@ public class MatchPlayerEntity
     public int? PlayerId { get; set; }
 
     [MaxLength(10)]
-    public string Status { get; set; }
+    public string? Status { get; set; }
     [MaxLength(300)]
     public string? StatusNote { get; set; }
 

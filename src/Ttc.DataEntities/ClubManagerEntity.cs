@@ -11,7 +11,7 @@ public class ClubManagerEntity
     public int ClubId { get; set; }
     public int PlayerId { get; set; }
 
-    public ClubEntity Club { get; set; }
+    public ClubEntity Club { get; set; } = null!;
     [StringLength(100)]
     public string Description { get; set; } = "";
     public int SortOrder { get; set; }

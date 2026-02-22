@@ -57,7 +57,7 @@ public class UsersController : ControllerBase
     [AllowAnonymous]
     public async Task SetNewPasswordFromGuid([FromBody] NewPasswordRequest request)
     {
-        await _service.SetNewPasswordFromGuid(request.Guid, request.PlayerId, request.Password);
+        await _service.SetNewPasswordFromGuid(request.Guid, request.PlayerId, request.Password!);
     }
 
     [HttpPost]
@@ -65,10 +65,10 @@ public class UsersController : ControllerBase
     [AllowAnonymous]
     public async Task RequestResetPasswordLink([FromBody] NewPasswordLinkRequest request)
     {
-        Guid resetLinkId = await _service.EmailMatchesPlayer(request.Email, request.PlayerId);
+        Guid resetLinkId = await _service.EmailMatchesPlayer(request.Email!, request.PlayerId);
 
         var email = new NewPasswordRequestEmail(_emailService);
-        await email.Email(request.Email, resetLinkId);
+        await email.Email(request.Email!, resetLinkId);
     }
 
     [HttpPost]

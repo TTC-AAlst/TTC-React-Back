@@ -38,7 +38,7 @@ internal class MatchProfile : Profile
                 opts => opts.MapFrom(src => GetScoreType(src)))
             .ForMember(
                 dest => dest.Score,
-                opts => opts.MapFrom(src => !src.WalkOver && src.HomeScore.HasValue ? new MatchScore(src.HomeScore.Value, src.AwayScore.Value) : null))
+                opts => opts.MapFrom(src => !src.WalkOver && src.HomeScore.HasValue && src.AwayScore.HasValue ? new MatchScore(src.HomeScore.Value, src.AwayScore.Value) : null))
 
             .AfterMap((matchEntity, match) =>
             {
@@ -68,7 +68,7 @@ internal class MatchProfile : Profile
                 opts => opts.MapFrom(src => GetScoreType(src)))
             .ForMember(
                 dest => dest.Score,
-                opts => opts.MapFrom(src => !src.WalkOver && src.HomeScore.HasValue ? new MatchScore(src.HomeScore.Value, src.AwayScore.Value) : null))
+                opts => opts.MapFrom(src => !src.WalkOver && src.HomeScore.HasValue && src.AwayScore.HasValue ? new MatchScore(src.HomeScore.Value, src.AwayScore.Value) : null))
 
             .AfterMap((matchEntity, match) =>
             {

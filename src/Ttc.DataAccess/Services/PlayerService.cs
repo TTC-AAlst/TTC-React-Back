@@ -134,13 +134,13 @@ public class PlayerService
 
     private static void MapPlayer(Player player, PlayerEntity existingPlayer)
     {
-        existingPlayer.Mobile = player.Contact.Mobile;
-        existingPlayer.Email = player.Contact.Email;
-        existingPlayer.Address = player.Contact.Address;
-        existingPlayer.City = player.Contact.City;
+        existingPlayer.Mobile = player.Contact?.Mobile;
+        existingPlayer.Email = player.Contact?.Email;
+        existingPlayer.Address = player.Contact?.Address;
+        existingPlayer.City = player.Contact?.City;
 
-        existingPlayer.Style = player.Style.Name;
-        existingPlayer.BestStroke = player.Style.BestStroke;
+        existingPlayer.Style = player.Style?.Name;
+        existingPlayer.BestStroke = player.Style?.BestStroke;
 
         existingPlayer.QuitYear = player.QuitYear;
         existingPlayer.Security = (PlayerAccess)Enum.Parse(typeof(PlayerAccess), player.Security);

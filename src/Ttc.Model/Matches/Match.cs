@@ -12,20 +12,20 @@ public class OtherMatch : ITtcConfidential
     public int Id { get; set; }
     public DateTime Date { get; set; }
     public bool ShouldBePlayed { get; set; }
-    public string FrenoyMatchId { get; set; }
+    public string? FrenoyMatchId { get; set; }
     public bool IsSyncedWithFrenoy { get; set; }
     public int Week { get; set; }
-    public string Competition { get; set; }
+    public string? Competition { get; set; }
     public int FrenoyDivisionId { get; set; }
 
-    public OpposingTeam Home { get; set; }
-    public OpposingTeam Away { get; set; }
+    public OpposingTeam? Home { get; set; }
+    public OpposingTeam? Away { get; set; }
 
-    public MatchScore Score { get; set; }
+    public MatchScore? Score { get; set; }
     public MatchOutcome ScoreType { get; set; }
     public bool IsPlayed { get; set; }
-    public ICollection<MatchPlayer> Players { get; set; }
-    public ICollection<MatchGame> Games { get; set; }
+    public ICollection<MatchPlayer> Players { get; set; } = [];
+    public ICollection<MatchGame> Games { get; set; } = [];
     #endregion
 
     public void Hide()
@@ -47,12 +47,12 @@ public class Match : ITtcConfidential
     public int Id { get; set; }
     public DateTime Date { get; set; }
     public bool ShouldBePlayed { get; set; }
-    public string FrenoyMatchId { get; set; }
+    public string? FrenoyMatchId { get; set; }
     public bool IsSyncedWithFrenoy { get; set; }
     public int Week { get; set; }
-    public string Competition { get; set; }
+    public string? Competition { get; set; }
     public int FrenoyDivisionId { get; set; }
-    public string Block { get; set; }
+    public string? Block { get; set; }
 
     public int TeamId { get; set; }
     /// <summary>
@@ -60,18 +60,18 @@ public class Match : ITtcConfidential
     /// True/False: Was TTC Aalst, True=Was in Aalst
     /// </summary>
     public bool? IsHomeMatch { get; set; }
-    public OpposingTeam Opponent { get; set; }
+    public OpposingTeam? Opponent { get; set; }
     #endregion
 
     #region Verslag Properties
     public int ReportPlayerId { get; set; }
-    public MatchScore Score { get; set; }
+    public MatchScore? Score { get; set; }
     public MatchOutcome ScoreType { get; set; }
-    public string Description { get; set; }
+    public string? Description { get; set; }
     public bool IsPlayed { get; set; }
 
     public ICollection<MatchPlayer> Players { get; set; }
-    public string FormationComment { get; set; }
+    public string? FormationComment { get; set; }
     public ICollection<MatchGame> Games { get; set; }
     public ICollection<MatchComment> Comments { get; set; }
     #endregion

@@ -11,6 +11,6 @@ public class DivisionRanking
     public int GamesDraw { get; set; }
     public int Points { get; set; }
     public int ClubId { get; set; }
-    public string TeamCode { get; set; }
+    public string? TeamCode { get; set; }
     public bool IsForfait { get; set; }
 }

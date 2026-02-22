@@ -12,10 +12,10 @@ namespace Ttc.DataAccess.Utilities.Excel;
 
 public class SportaMatchFileInfo
 {
-    public string FrenoyId { get; set; }
-    public string TheirTeamCode { get; set; }
-    public string TheirTeamName { get; set; }
-    public string OurTeamCode { get; set; }
+    public string FrenoyId { get; set; } = "";
+    public string? TheirTeamCode { get; set; }
+    public string TheirTeamName { get; set; } = "";
+    public string OurTeamCode { get; set; } = "";
 
     public override string ToString() => $"{FrenoyId} Sporta {OurTeamCode}: {TheirTeamName} {TheirTeamCode}";
 }
@@ -30,14 +30,14 @@ internal class SportaMatchExcelCreator
     private readonly ICollection<PlayerEntity> _opponentPlayers;
     private readonly ITtcDbContext _context;
     private readonly MatchEntity _match;
-    private SportaMatchFileInfo _fileInfo;
+    private SportaMatchFileInfo? _fileInfo;
 
     private static string TemplatePath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\SportaScoresheetTemplate.xlsx");
 
     /// <summary>
     /// ATTN: Set after create!
     /// </summary>
-    public SportaMatchFileInfo FileInfo => _fileInfo;
+    public SportaMatchFileInfo FileInfo => _fileInfo!;
 
     public SportaMatchExcelCreator(
         ITtcDbContext context,
@@ -73,7 +73,7 @@ internal class SportaMatchExcelCreator
             scoresheet.Cells["G6"].Value = _match.Date.ToString(@"HH\umm");
             scoresheet.Cells["U4"].Value = _match.FrenoyMatchId;
 
-            var ourTeam = _match.HomeTeam ?? _match.AwayTeam;
+            var ourTeam = _match.HomeTeam ?? _match.AwayTeam!;
             scoresheet.Cells["W5"].Value = string.IsNullOrWhiteSpace(ourTeam.DivisionNumber) ? "Ere" : ourTeam.DivisionNumber + ourTeam.DivisionCode;
             scoresheet.Cells["A9"].Value = $"Aalst {ourTeam.TeamCode}";
 
@@ -82,7 +82,7 @@ internal class SportaMatchExcelCreator
 
             _fileInfo = new SportaMatchFileInfo()
             {
-                FrenoyId = _match.FrenoyMatchId.Replace("/", "-"),
+                FrenoyId = _match.FrenoyMatchId?.Replace("/", "-") ?? "",
                 OurTeamCode = ourTeam.TeamCode,
                 TheirTeamName = theirTeam.ClubName,
                 TheirTeamCode = theirTeam.TeamCode,
@@ -97,9 +97,9 @@ internal class SportaMatchExcelCreator
 
                 // OrderBy(SportaKlassementn,j ).ThenBy(Postion)
 
-                foreach (var player in _match.Players.Where(x => x.Player != null).Where(x => x.Status == PlayerMatchStatus.Major).OrderBy(x => x.Player.IndexSporta))
+                foreach (var player in _match.Players.Where(x => x.Player != null).Where(x => x.Status == PlayerMatchStatus.Major).OrderBy(x => x.Player!.IndexSporta))
                 {
-                    scoresheet.Cells["B" + playerIndex].Value = player.Player.Name;
+                    scoresheet.Cells["B" + playerIndex].Value = player.Player!.Name;
                     playerIndex++;
                 }
             }
@@ -147,7 +147,7 @@ internal class SportaMatchExcelCreator
             sheet.Cells["A" + rowIndex].Value = opponent.Name;
             sheet.Cells["B" + rowIndex].Value = opponent.LidNummerSporta;
             sheet.Cells["C" + rowIndex].Value = opponent.RankingSporta;
-            sheet.Cells["D" + rowIndex].Value = KlassementValueConverter.Sporta(opponent.RankingSporta);
+            sheet.Cells["D" + rowIndex].Value = KlassementValueConverter.Sporta(opponent.RankingSporta ?? "");
             rowIndex++;
         }
 
@@ -204,7 +204,7 @@ internal class SportaMatchExcelCreator
             .Select(x => new
             {
                 Naam = x.Name,
-                Klassement = KlassementValueConverter.Sporta(x.RankingSporta),
+                Klassement = KlassementValueConverter.Sporta(x.RankingSporta ?? ""),
                 Waarde = x.RankingSporta,
                 Lidkaart = x.LidNummerSporta
             })

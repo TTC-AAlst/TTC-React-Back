@@ -12,11 +12,11 @@ public class TeamPlayerEntity
     public TeamPlayerType PlayerType { get; set; }
 
     [ForeignKey("PlayerId")]
-    public PlayerEntity Player { get; set; }
+    public PlayerEntity Player { get; set; } = null!;
     public int PlayerId { get; set; }
 
     [ForeignKey("TeamId")]
-    public TeamEntity Team { get; set; }
+    public TeamEntity Team { get; set; } = null!;
     public int TeamId { get; set; }
 
     public override string ToString() => $"Id={Id}, Team={TeamId}, SpelerId={PlayerId}, Type={PlayerType}";

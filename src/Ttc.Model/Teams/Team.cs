@@ -35,7 +35,7 @@ public class Team
     /// <summary>
     /// Links to Frenoy website and API details of TTC Aalst Team
     /// </summary>
-    public FrenoyTeamLinks Frenoy { get; set; }
+    public FrenoyTeamLinks? Frenoy { get; set; }
     #endregion
 
     public override string ToString() => $"{Competition} {Year} {TeamCode}: {DivisionName}";

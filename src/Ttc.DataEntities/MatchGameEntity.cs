@@ -11,7 +11,7 @@ public class MatchGameEntity
     public int Id { get; set; }
 
     [ForeignKey("MatchId")]
-    public MatchEntity Match { get; set; }
+    public MatchEntity Match { get; set; } = null!;
     public int MatchId { get; set; }
 
     public int MatchNumber { get; set; }

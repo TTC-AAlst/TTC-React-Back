@@ -17,7 +17,7 @@ public class MatchCommentEntity
     public string? ImageUrl { get; set; }
 
     [ForeignKey("MatchId")]
-    public MatchEntity Match { get; set; }
+    public MatchEntity Match { get; set; } = null!;
     public int MatchId { get; set; }
     public int PlayerId { get; set; }
 

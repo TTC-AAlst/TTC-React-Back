@@ -8,10 +8,10 @@ namespace Frenoy.Api;
 /// </summary>
 public class FrenoySettings
 {
-    public string FrenoyClub { get; set; }
+    public string FrenoyClub { get; set; } = null!;
     public int FrenoySeason => Year - 2000 + 1;
     public Competition Competition { get; set; }
-    public string DivisionType { get; set; }
+    public string DivisionType { get; set; } = null!;
     public int Year { get; set; }
 
     public override string ToString() => $"FrenoyClub={FrenoyClub}, FrenoySeason={FrenoySeason}, Competitie={Competition}, Division={DivisionType}, Jaar={Year}";

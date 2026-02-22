@@ -26,19 +26,19 @@ internal class PlayerProfile : Profile
                 opts => opts.MapFrom(src => src.Security.ToString()))
             .ForMember(
                 dest => dest.Style,
-                opts => opts.MapFrom(src => new PlayerStyle(src.Id, src.Style, src.BestStroke)))
+                opts => opts.MapFrom(src => new PlayerStyle(src.Id, src.Style ?? "", src.BestStroke ?? "")))
             .ForMember(
                 dest => dest.Contact,
-                opts => opts.MapFrom(src => new PlayerContact(src.Id, src.Email, src.Mobile, src.Address, src.City)))
+                opts => opts.MapFrom(src => new PlayerContact(src.Id, src.Email ?? "", src.Mobile ?? "", src.Address ?? "", src.City ?? "")))
             .ForMember(
                 dest => dest.Vttl,
                 opts => opts.MapFrom(src => src.ClubIdVttl.HasValue ?
-                    CreateVttlPlayer(src.ClubIdVttl.Value, src.ComputerNummerVttl.Value, src.FrenoyLinkVttl, src.RankingVttl, src.VolgnummerVttl.Value, src.IndexVttl.Value, src.NextRankingVttl)
+                    CreateVttlPlayer(src.ClubIdVttl.Value, src.ComputerNummerVttl ?? 0, src.FrenoyLinkVttl ?? "", src.RankingVttl ?? "", src.VolgnummerVttl ?? 0, src.IndexVttl ?? 0, src.NextRankingVttl ?? "")
                     : null))
             .ForMember(
                 dest => dest.Sporta,
                 opts => opts.MapFrom(src => src.ClubIdSporta.HasValue ?
-                    CreateSportaPlayer(src.ClubIdSporta.Value, src.LidNummerSporta.Value, src.FrenoyLinkSporta, src.RankingSporta, src.VolgnummerSporta.Value, src.IndexSporta.Value, src.NextRankingSporta)
+                    CreateSportaPlayer(src.ClubIdSporta.Value, src.LidNummerSporta ?? 0, src.FrenoyLinkSporta ?? "", src.RankingSporta ?? "", src.VolgnummerSporta ?? 0, src.IndexSporta ?? 0, src.NextRankingSporta ?? "")
                     : null))
             ;
 

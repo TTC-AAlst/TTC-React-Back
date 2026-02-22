@@ -169,7 +169,7 @@ internal class TeamsExcelCreator
                 var teamMatch = new TeamMatchExcelModel(match, clubs);
                 foreach (var matchPlayer in match.Players.Where(x => x.Status != PlayerMatchStatus.Captain && x.Status != PlayerMatchStatus.Major))
                 {
-                    if (!teamMatch.PlayerDecisions.ContainsKey(matchPlayer.Name))
+                    if (!teamMatch.PlayerDecisions.ContainsKey(matchPlayer.Name) && matchPlayer.Status != null)
                     {
                         teamMatch.PlayerDecisions.Add(matchPlayer.Name, matchPlayer.Status);
                     }
@@ -247,20 +247,20 @@ internal class TeamMatchExcelModel
     public TeamMatchExcelModel(MatchEntity match, ClubEntity[] clubs)
     {
         Match = match;
-        Home = GetTeamDesc(match.HomeClubId, match.HomeTeamCode, clubs);
-        Out = GetTeamDesc(match.AwayClubId, match.AwayTeamCode, clubs);
+        Home = GetTeamDesc(match.HomeClubId, match.HomeTeamCode ?? "", clubs);
+        Out = GetTeamDesc(match.AwayClubId, match.AwayTeamCode ?? "", clubs);
         PlayerDecisions = new Dictionary<string, string>();
         CaptainDecisions = new List<string>();
     }
 
-    private string GetTeamDesc(int clubId, string teamCode, ClubEntity[] clubs)
+    private static string GetTeamDesc(int clubId, string? teamCode, ClubEntity[] clubs)
     {
         if (clubId == Constants.OwnClubId)
         {
-            return "Aalst " + teamCode;
+            return "Aalst " + (teamCode ?? "");
         }
         var club = clubs.Single(x => x.Id == clubId);
-        return club.Name + " " + teamCode;
+        return club.Name + " " + (teamCode ?? "");
     }
 
     public override string ToString() => $"{Match.FrenoyMatchId}";

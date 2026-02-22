@@ -10,11 +10,11 @@ public class TeamOpponentEntity
     public int Id { get; set; }
 
     [ForeignKey("TeamId")]
-    public TeamEntity Team { get; set; }
+    public TeamEntity Team { get; set; } = null!;
     public int TeamId { get; set; }
 
     [ForeignKey("ClubId")]
-    public ClubEntity Club { get; set; }
+    public ClubEntity Club { get; set; } = null!;
     public int ClubId { get; set; }
 
     /// <summary>

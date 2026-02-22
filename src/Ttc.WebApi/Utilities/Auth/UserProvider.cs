@@ -48,8 +48,8 @@ public class UserProvider : IUserProvider
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.PlayerId.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Name, user.Alias),
-            new Claim("alias", user.Alias),
+            new Claim(ClaimTypes.Name, user.Alias ?? ""),
+            new Claim("alias", user.Alias ?? ""),
             new Claim("playerId", user.PlayerId.ToString()),
             new Claim("security", JsonConvert.SerializeObject(user.Security)),
             new Claim("teams", string.Join(",", user.Teams)),

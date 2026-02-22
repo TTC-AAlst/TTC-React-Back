@@ -241,13 +241,17 @@ public class MatchService
         for (int i = 0; i < playerIds.Length; i++)
         {
             var player = await _context.Players.FindAsync(playerIds[i]);
+            if (player == null)
+            {
+                continue;
+            }
             var newMatchPlayer = new MatchPlayerEntity
             {
                 MatchId = matchId,
                 PlayerId = player.Id,
                 Name = player.Alias ?? "",
                 Status = newStatus,
-                Ranking = match.Competition is Competition.Vttl or Competition.Jeugd ? player.RankingVttl : player.RankingSporta,
+                Ranking = (match.Competition is Competition.Vttl or Competition.Jeugd ? player.RankingVttl : player.RankingSporta) ?? "",
                 Home = match.IsHomeMatch ?? false,
                 Position = i,
                 UniqueIndex = match.Competition is Competition.Vttl or Competition.Jeugd ? player.ComputerNummerVttl ?? 0 : player.LidNummerSporta ?? 0

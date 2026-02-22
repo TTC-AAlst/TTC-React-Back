@@ -43,9 +43,9 @@ public class FrenoyPlayersApi : FrenoyApiBase
 
         foreach (MemberEntryType frenoyPlayer in frenoyPlayers.GetMembersResponse.MemberEntries)
         {
-            string frenoyFirstName = frenoyPlayer.FirstName.ToUpperInvariant();
-            string frenoyLastName = frenoyPlayer.LastName.ToUpperInvariant();
-            var existingPlayer = await _db.Players.SingleOrDefaultAsync(ply => ply.FirstName.ToUpper() == frenoyFirstName && ply.LastName.ToUpper() == frenoyLastName);
+            string frenoyFirstName = frenoyPlayer.FirstName!.ToUpperInvariant();
+            string frenoyLastName = frenoyPlayer.LastName!.ToUpperInvariant();
+            var existingPlayer = await _db.Players.SingleOrDefaultAsync(ply => ply.FirstName!.ToUpper() == frenoyFirstName && ply.LastName!.ToUpper() == frenoyLastName);
             if (_isVttl)
             {
                 if (existingPlayer == null)
@@ -93,7 +93,7 @@ public class FrenoyPlayersApi : FrenoyApiBase
 
     private async Task<PlayerEntity> CreatePlayerEntity(MemberEntryType frenoyPlayer)
     {
-        var existingPlayer = await _db.Players.SingleOrDefaultAsync(x => x.FirstName.ToUpper() == frenoyPlayer.FirstName && x.LastName.ToUpper() == frenoyPlayer.LastName);
+        var existingPlayer = await _db.Players.SingleOrDefaultAsync(x => x.FirstName!.ToUpper() == frenoyPlayer.FirstName && x.LastName!.ToUpper() == frenoyPlayer.LastName);
         bool isNew = existingPlayer == null;
         if (isNew)
         {
@@ -101,17 +101,17 @@ public class FrenoyPlayersApi : FrenoyApiBase
         }
 
         if (_isVttl)
-            SetVttl(existingPlayer, frenoyPlayer);
+            SetVttl(existingPlayer!, frenoyPlayer);
         else
-            SetSporta(existingPlayer, frenoyPlayer);
+            SetSporta(existingPlayer!, frenoyPlayer);
 
         if (isNew)
         {
-            _db.Players.Add(existingPlayer);
+            _db.Players.Add(existingPlayer!);
             await _db.SaveChangesAsync();
         }
 
-        return existingPlayer;
+        return existingPlayer!;
     }
 
     private static PlayerEntity CreatePlayerEntityCore(MemberEntryType frenoyPlayer)
@@ -156,7 +156,7 @@ public class FrenoyPlayersApi : FrenoyApiBase
         {
             GetMembersRequest = new GetMembersRequest()
             {
-                Club = club.CodeSporta,
+                Club = club?.CodeSporta,
             }
         });
 

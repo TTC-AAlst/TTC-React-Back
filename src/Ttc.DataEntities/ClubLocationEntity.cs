@@ -20,7 +20,7 @@ public class ClubLocationEntity
     public string Mobile { get; set; } = "";
 
     [ForeignKey("ClubId")]
-    public ClubEntity Club { get; set; }
+    public ClubEntity Club { get; set; } = null!;
     public int ClubId { get; set; }
     [StringLength(4000)]
     public string? Comment { get; set; }
