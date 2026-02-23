@@ -5,7 +5,7 @@ using Ttc.DataEntities.Core;
 
 namespace Ttc.DataAccess;
 
-internal class TtcDbContext : DbContext, ITtcDbContext
+public class TtcDbContext : DbContext, ITtcDbContext
 {
     private static int? CachedCurrentSeason;
     private readonly IUserProvider _userProvider;

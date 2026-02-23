@@ -88,11 +88,21 @@ try
 
     app.UseCors("CorsPolicy");
 
-    app.UseStaticFiles(new StaticFileOptions
+    if (!string.IsNullOrEmpty(ttcSettings.PublicImageFolder))
     {
-        FileProvider = new PhysicalFileProvider(ttcSettings.PublicImageFolder),
-        RequestPath = "/img"
-    });
+        var imagePath = Path.IsPathRooted(ttcSettings.PublicImageFolder)
+            ? ttcSettings.PublicImageFolder
+            : Path.Combine(app.Environment.ContentRootPath, ttcSettings.PublicImageFolder);
+
+        if (Directory.Exists(imagePath))
+        {
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(imagePath),
+                RequestPath = "/img"
+            });
+        }
+    }
 
     app.UseAuthentication();
     app.UseAuthorization();
@@ -129,3 +139,6 @@ finally
 {
     await Log.CloseAndFlushAsync();
 }
+
+// Required for integration tests
+public partial class Program { }

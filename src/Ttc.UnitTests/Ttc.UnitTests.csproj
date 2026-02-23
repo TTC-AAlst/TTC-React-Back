@@ -10,17 +10,20 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="System.Net.Http" />
     <PackageReference Include="System.Text.Encodings.Web" />
     <PackageReference Include="System.Text.RegularExpressions" />
+    <PackageReference Include="Testcontainers.MySql" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Frenoy.Api\Frenoy.Api.csproj" />
+    <ProjectReference Include="..\Ttc.WebApi\Ttc.WebApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>
