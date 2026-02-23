@@ -1,7 +1,37 @@
 # TTC-React-Back
 
-## Deploy
+## Development Setup
 
+```sh
+# Install git hooks (required for all developers)
+./hooks/install.sh      # Unix/Mac/Git Bash
+.\hooks\install.ps1     # PowerShell
+```
+
+## Development Commands
+
+```sh
+# Build
+dotnet build Ttc.slnx
+
+# Run tests
+dotnet test Ttc.slnx
+
+# Format code
+dotnet format Ttc.slnx
+
+# Check formatting (used by pre-commit hook)
+dotnet format Ttc.slnx --verify-no-changes
+```
+
+## Git Hooks
+
+The repository uses git hooks for quality checks:
+
+- **pre-commit**: Runs `dotnet format --verify-no-changes` and `dotnet build`
+- **pre-push**: Runs `dotnet build` and `dotnet test`
+
+## Deploy
 
 ```sh
 cp .example.env .env
@@ -15,7 +45,7 @@ docker-compose up -d --build
 Use `docker compose up -d --build` or:
 
 ```sh
-docker run --name ttc-mysql -p 7202:3306 -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:5.5.60
+docker run --name ttc-mysql -p 7202:3306 -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:8.0
 ```
 
 
