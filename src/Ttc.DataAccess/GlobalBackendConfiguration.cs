@@ -43,11 +43,6 @@ public static class GlobalBackendConfiguration
 
     internal static void ConfigureDbContextBuilder(DbContextOptionsBuilder builder, string? connectionString = null)
     {
-        // Replace with your server version and type.
-        // Use 'MariaDbServerVersion' for MariaDB.
-        // Alternatively, use 'ServerVersion.AutoDetect(connectionString)'.
-        var serverVersion = new MySqlServerVersion(new Version(5, 5, 60));
-
         if (connectionString == null)
         {
             var configuration = new ConfigurationBuilder()
@@ -64,6 +59,7 @@ public static class GlobalBackendConfiguration
             connectionString = connectionString.Replace("{MYSQL_ROOT_PASSWORD}", mysqlPassword);
         }
 
+        var serverVersion = ServerVersion.AutoDetect(connectionString);
         builder.UseMySql(connectionString, serverVersion)
             // The following three options help with debugging, but should
             // be changed or removed for production.

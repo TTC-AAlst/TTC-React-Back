@@ -15,7 +15,7 @@ namespace Ttc.UnitTests.Integration;
 public class TtcWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly MySqlContainer _mySqlContainer = new MySqlBuilder()
-        .WithImage("mysql:8.0")
+        .WithImage("mysql:8.4")
         .WithDatabase("ttc_aalst_test")
         .WithUsername("root")
         .WithPassword("testpassword")
