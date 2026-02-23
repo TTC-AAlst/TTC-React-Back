@@ -5,12 +5,12 @@ namespace Ttc.DataAccess.Utilities;
 /// </summary>
 internal class KlassementValueConverter
 {
-    private static readonly IDictionary<string, int> _sporta;
-    private static readonly IDictionary<string, int> _vttl;
+    private static readonly IDictionary<string, int> SportaRankings;
+    private static readonly IDictionary<string, int> VttlRankings;
 
     static KlassementValueConverter()
     {
-        _vttl = new Dictionary<string, int>
+        VttlRankings = new Dictionary<string, int>
         {
             ["A"] = 18,
             ["B0"] = 17,
@@ -32,7 +32,7 @@ internal class KlassementValueConverter
             ["NG"] = 1
         };
 
-        _sporta = new Dictionary<string, int>
+        SportaRankings = new Dictionary<string, int>
         {
             ["A"] = 19,
             ["B0"] = 18,
@@ -58,7 +58,7 @@ internal class KlassementValueConverter
 
     public static int Vttl(string ranking)
     {
-        if (_vttl.TryGetValue(ranking, out int value))
+        if (VttlRankings.TryGetValue(ranking, out int value))
         {
             return value;
         }
@@ -67,7 +67,7 @@ internal class KlassementValueConverter
 
     public static int Sporta(string ranking)
     {
-        if (_sporta.TryGetValue(ranking, out int value))
+        if (SportaRankings.TryGetValue(ranking, out int value))
         {
             return value;
         }

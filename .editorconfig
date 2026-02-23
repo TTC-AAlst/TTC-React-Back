@@ -168,21 +168,29 @@ dotnet_naming_symbols.public_symbols.applicable_accessibilities = public,interna
 
 dotnet_naming_style.pascal_case_style.capitalization = pascal_case
 
+# PascalCase for static fields (must come before instance fields rule)
+dotnet_naming_rule.static_fields_should_be_pascal_case.severity = warning
+dotnet_naming_rule.static_fields_should_be_pascal_case.symbols = static_fields
+dotnet_naming_rule.static_fields_should_be_pascal_case.style = pascal_case_style
+
+dotnet_naming_symbols.static_fields.applicable_kinds = field
+dotnet_naming_symbols.static_fields.required_modifiers = static
+
 # PascalCase for constants
-dotnet_naming_rule.constants_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.constants_should_be_pascal_case.severity = warning
 dotnet_naming_rule.constants_should_be_pascal_case.symbols = constants
 dotnet_naming_rule.constants_should_be_pascal_case.style = pascal_case_style
 
 dotnet_naming_symbols.constants.applicable_kinds = field
 dotnet_naming_symbols.constants.required_modifiers = const
 
-# _camelCase for private fields (suggestion only - mixed patterns in codebase)
-dotnet_naming_rule.private_fields_should_be_camel_case.severity = suggestion
-dotnet_naming_rule.private_fields_should_be_camel_case.symbols = private_fields
+# _camelCase for private/protected instance fields
+dotnet_naming_rule.private_fields_should_be_camel_case.severity = warning
+dotnet_naming_rule.private_fields_should_be_camel_case.symbols = private_protected_fields
 dotnet_naming_rule.private_fields_should_be_camel_case.style = camel_case_underscore_style
 
-dotnet_naming_symbols.private_fields.applicable_kinds = field
-dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_protected_fields.applicable_kinds = field
+dotnet_naming_symbols.private_protected_fields.applicable_accessibilities = private,protected,private_protected
 
 dotnet_naming_style.camel_case_underscore_style.required_prefix = _
 dotnet_naming_style.camel_case_underscore_style.capitalization = camel_case
@@ -207,8 +215,8 @@ dotnet_naming_symbols.type_parameters.applicable_kinds = type_parameter
 dotnet_naming_style.type_parameter_style.required_prefix = T
 dotnet_naming_style.type_parameter_style.capitalization = pascal_case
 
-# Async methods should end with Async
-dotnet_naming_rule.async_methods_should_end_with_async.severity = suggestion
+# Async methods should end with Async (not enforced - many existing methods don't follow this)
+dotnet_naming_rule.async_methods_should_end_with_async.severity = none
 dotnet_naming_rule.async_methods_should_end_with_async.symbols = async_methods
 dotnet_naming_rule.async_methods_should_end_with_async.style = async_style
 
@@ -249,5 +257,5 @@ dotnet_diagnostic.IDE0060.severity = suggestion
 # IDE0130: Namespace does not match folder structure
 dotnet_diagnostic.IDE0130.severity = suggestion
 
-# IDE1006: Naming rule violation (disabled - mixed patterns in codebase)
-dotnet_diagnostic.IDE1006.severity = none
+# IDE1006: Naming rule violation
+dotnet_diagnostic.IDE1006.severity = warning
