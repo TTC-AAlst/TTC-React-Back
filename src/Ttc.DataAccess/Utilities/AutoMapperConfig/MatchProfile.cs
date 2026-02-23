@@ -107,11 +107,11 @@ internal class MatchProfile : Profile
         }
     }
 
-    private static string GetFirstName(string fullName)
+    private static string GetFirstName(string? fullName)
     {
-        if (fullName.IndexOf(" ", StringComparison.InvariantCulture) == -1)
+        if (string.IsNullOrEmpty(fullName) || fullName.IndexOf(" ", StringComparison.InvariantCulture) == -1)
         {
-            return fullName;
+            return fullName ?? "";
         }
         return fullName.Substring(0, fullName.IndexOf(" ", StringComparison.InvariantCulture));
     }
@@ -129,7 +129,7 @@ internal class MatchProfile : Profile
             var otherPlayers = players.Where(otherPly => ply.Position != otherPly.Position);
             if (otherPlayers.Any(otherPly => GetFirstName(otherPly.Alias) == ply.Alias))
             {
-                if (ply.Name.IndexOf(" ", StringComparison.InvariantCulture) != -1)
+                if (ply.Name != null && ply.Name.IndexOf(" ", StringComparison.InvariantCulture) != -1)
                 {
                     ply.Alias += ply.Name.Substring(ply.Name.IndexOf(" ", StringComparison.InvariantCulture));
                 }

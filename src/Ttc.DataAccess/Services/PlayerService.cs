@@ -262,7 +262,7 @@ public class PlayerService
         var player = await _context.Players.FromSqlRaw(
             $"SELECT * FROM {PlayerEntity.TableName} WHERE id={{0}} AND Password=MD5({{1}})",
             userNewCredentials.PlayerId,
-            userNewCredentials.OldPassword).SingleOrDefaultAsync();
+            userNewCredentials.OldPassword!).SingleOrDefaultAsync();
 
         if (player == null)
         {
@@ -272,7 +272,7 @@ public class PlayerService
         await _context.Database.ExecuteSqlRawAsync(
             $"UPDATE {PlayerEntity.TableName} SET Password=MD5({{1}}) WHERE id={{0}}",
             userNewCredentials.PlayerId,
-            userNewCredentials.NewPassword);
+            userNewCredentials.NewPassword!);
 
         return await GetUser(userNewCredentials.PlayerId, false);
     }
@@ -294,7 +294,7 @@ public class PlayerService
             await _context.Database.ExecuteSqlRawAsync(
                 $"UPDATE {PlayerEntity.TableName} SET Password=MD5({{1}}) WHERE id={{0}}",
                 player.Id,
-                request.NewPassword);
+                request.NewPassword!);
 
             return player.Email;
         }
