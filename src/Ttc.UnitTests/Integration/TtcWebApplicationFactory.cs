@@ -21,18 +21,18 @@ public class TtcWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLi
         .WithPassword("testpassword")
         .Build();
 
-    private string? _webApiDir;
+    private readonly string _webApiDir;
+
+    public TtcWebApplicationFactory()
+    {
+        var solutionDir = FindSolutionDirectory();
+        _webApiDir = Path.Combine(solutionDir, "src", "Ttc.WebApi");
+    }
 
     public string ConnectionString => _mySqlContainer.GetConnectionString();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        // Set content root explicitly (WebApplicationFactory looks for .sln but we have .slnx)
-        if (_webApiDir != null)
-        {
-            builder.UseContentRoot(_webApiDir);
-        }
-
         builder.ConfigureAppConfiguration((context, config) =>
         {
             // Add test-specific configuration
@@ -80,10 +80,6 @@ public class TtcWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLi
 
     public async Task InitializeAsync()
     {
-        // Find WebApi directory
-        var solutionDir = FindSolutionDirectory();
-        _webApiDir = Path.Combine(solutionDir, "src", "Ttc.WebApi");
-
         // Set environment variables BEFORE the app starts (LoadSettings reads these)
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Testing");
         Environment.SetEnvironmentVariable("MYSQL_ROOT_PASSWORD", "testpassword");
