@@ -1,4 +1,4 @@
-﻿namespace Ttc.DataEntities;
+namespace Ttc.DataEntities;
 
 public static class Constants
 {

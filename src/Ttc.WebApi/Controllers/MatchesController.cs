@@ -1,4 +1,4 @@
-﻿using Frenoy.Api;
+using Frenoy.Api;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -202,10 +202,23 @@ public class MatchesController
     [Route("UpdateScore")]
     public async Task<Match> UpdateScore([FromBody] MatchScoreDto score)
     {
-        if (score.Home < 0) score.Home = 0;
-        else if (score.Home > 15) score.Home = 16;
-        if (score.Out < 0) score.Out = 0;
-        else if (score.Out > 15) score.Out = 16;
+        if (score.Home < 0)
+        {
+            score.Home = 0;
+        }
+        else if (score.Home > 15)
+        {
+            score.Home = 16;
+        }
+
+        if (score.Out < 0)
+        {
+            score.Out = 0;
+        }
+        else if (score.Out > 15)
+        {
+            score.Out = 16;
+        }
 
         var result = await _service.UpdateScore(score.MatchId, new MatchScore(score.Home, score.Out));
         await _hub.Clients.All.BroadcastReload(Entities.Match, result.Id);
@@ -218,7 +231,7 @@ public class MatchesController
     public async Task<string> GetExcelExport(int matchId)
     {
         var result = await _service.GetExcelExport(matchId);
-        return Convert.ToBase64String(result.Item1);
+        return Convert.ToBase64String(result.file);
     }
 
     [HttpPost]

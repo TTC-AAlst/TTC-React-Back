@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 

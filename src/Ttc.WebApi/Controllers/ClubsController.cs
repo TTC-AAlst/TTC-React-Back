@@ -1,4 +1,4 @@
-﻿using Frenoy.Api;
+using Frenoy.Api;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;

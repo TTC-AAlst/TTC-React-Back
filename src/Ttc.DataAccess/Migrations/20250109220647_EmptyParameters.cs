@@ -1,16 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Ttc.DataAccess.Migrations
+namespace Ttc.DataAccess.Migrations;
+
+/// <inheritdoc />
+public partial class EmptyParameters : Migration
 {
     /// <inheritdoc />
-    public partial class EmptyParameters : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.Sql(@"
+        migrationBuilder.Sql(@"
             INSERT INTO `Parameter` (`Key`, `Value`, `Description`) VALUES
 	            ('email', 'info@ttc.be', 'Email club'),
 	            ('year', '2024', 'Huidig speeljaar'),
@@ -33,12 +33,11 @@ namespace Ttc.DataAccess.Migrations
 	            ('additionalMembership', '', NULL),
 	            ('recreationalMembers', '€75 voor recreanten', NULL);
             ");
-        }
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.Sql(@"DELETER FROM Parameter");
-        }
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.Sql(@"DELETER FROM Parameter");
     }
 }

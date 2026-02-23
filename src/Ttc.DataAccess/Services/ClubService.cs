@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Frenoy.Api;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -8,7 +8,6 @@ using Ttc.DataEntities.Core;
 using Ttc.Model.Clubs;
 using Ttc.Model.Core;
 using Ttc.Model.Players;
-using FrenoyVttl;
 
 namespace Ttc.DataAccess.Services;
 
@@ -98,11 +97,7 @@ public class ClubService
     {
         var existingClub = await _context.Clubs
             .Include(x => x.Locations)
-            .FirstOrDefaultAsync(x => x.Id == club.Id);
-        if (existingClub == null)
-        {
-            throw new Exception("Club not found");
-        }
+            .FirstOrDefaultAsync(x => x.Id == club.Id) ?? throw new Exception("Club not found");
 
         MapClub(club, existingClub);
         await ChangeClub(club.Id);

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Ttc.Model.Core;
 
 namespace Ttc.WebApi.Utilities.Auth;

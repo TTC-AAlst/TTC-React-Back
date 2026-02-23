@@ -1,4 +1,4 @@
-﻿namespace Ttc.WebApi.Emailing;
+namespace Ttc.WebApi.Emailing;
 
 public class PasswordChangedEmail
 {

@@ -1,23 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Ttc.DataAccess.Migrations
+namespace Ttc.DataAccess.Migrations;
+
+/// <inheritdoc />
+public partial class RemoveSendGrid : Migration
 {
     /// <inheritdoc />
-    public partial class RemoveSendGrid : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.Sql("DELETE FROM Parameter WHERE `Key`='SendGridApiKey'");
-            migrationBuilder.Sql("DELETE FROM Parameter WHERE `Key`='FromEmail'");
-        }
+        migrationBuilder.Sql("DELETE FROM Parameter WHERE `Key`='SendGridApiKey'");
+        migrationBuilder.Sql("DELETE FROM Parameter WHERE `Key`='FromEmail'");
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
 
-        }
     }
 }

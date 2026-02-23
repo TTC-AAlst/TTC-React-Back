@@ -1,4 +1,4 @@
-﻿namespace Ttc.Model.Core;
+namespace Ttc.Model.Core;
 
 internal static class Helpers
 {

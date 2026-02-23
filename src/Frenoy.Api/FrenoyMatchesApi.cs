@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using FrenoyVttl;
 using Microsoft.EntityFrameworkCore;
@@ -257,15 +257,22 @@ public class FrenoyMatchesApi : FrenoyApiBase
                 // is only correct when the match already exists in the database.
                 await MapMatch(matchEntity, teamId, frenoyDivisionId, frenoyMatch, frenoySeason.Value);
                 if (ForceResync)
+                {
                     await SyncMatchDetails(matchEntity, frenoyMatch);
+                }
+
                 _db.Matches.Add(matchEntity);
             }
             else
             {
                 if (ForceResync)
+                {
                     await SyncMatchDetails(matchEntity, frenoyMatch);
+                }
                 else
+                {
                     await MapMatch(matchEntity, teamId, frenoyDivisionId, frenoyMatch, frenoySeason);
+                }
             }
             await CommitChanges();
         }
@@ -509,7 +516,9 @@ public class FrenoyMatchesApi : FrenoyApiBase
     private async Task AddMatchPlayers(TeamMatchPlayerEntryType[]? players, MatchEntity match, bool isHomePlayer)
     {
         if (players == null)
+        {
             return;
+        }
 
         foreach (var player in players)
         {
@@ -656,14 +665,18 @@ public class FrenoyMatchesApi : FrenoyApiBase
         if (frenoyTeam.MatchType == MatchTypeJeugd)
         {
             if (_settings.Competition != Competition.Vttl)
+            {
                 throw new Exception($"Jeugd is only possible for Vttl. Was={_settings.Competition}");
+            }
 
             team.Competition = Competition.Jeugd;
         }
         else
         {
             if (frenoyTeam.MatchType != MatchTypeVttlMen && frenoyTeam.MatchType != MatchTypeSportaMen && frenoyTeam.MatchType != MatchTypeSportaMenOld)
+            {
                 throw new Exception($"Expected MatchType to be SportaMen={MatchTypeSportaMen} or VttlMen={MatchTypeVttlMen}. Was={frenoyTeam.MatchType}");
+            }
 
             team.Competition = _settings.Competition;
         }

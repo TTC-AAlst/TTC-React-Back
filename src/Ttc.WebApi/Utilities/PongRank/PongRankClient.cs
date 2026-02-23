@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Ttc.DataAccess.Utilities;
@@ -56,7 +56,9 @@ public class PongRankClient
         var stream = await response.Content.ReadAsStreamAsync();
         var result = await JsonSerializer.DeserializeAsync<IEnumerable<PredictionResult>>(stream, JsonOptions);
         if (result == null)
+        {
             return [];
+        }
 
         var list = result.ToList();
         list.ForEach(x => x.Competition = competition);

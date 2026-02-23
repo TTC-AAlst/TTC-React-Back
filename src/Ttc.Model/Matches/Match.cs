@@ -1,4 +1,4 @@
-﻿using Ttc.Model.Core;
+using Ttc.Model.Core;
 using Ttc.Model.Teams;
 
 namespace Ttc.Model.Matches;

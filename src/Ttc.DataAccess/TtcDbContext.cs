@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Ttc.DataEntities;
 using Ttc.DataEntities.Core;
@@ -11,25 +11,25 @@ internal class TtcDbContext : DbContext, ITtcDbContext
     private readonly IUserProvider _userProvider;
 
     #region DbSets
-    public DbSet<PlayerEntity> Players { get; set; }
-    public DbSet<PlayerLoginEntity> PlayerLogins { get; set; }
-    public DbSet<PlayerPasswordResetEntity> PlayerPasswordResets { get; set; }
+    public DbSet<PlayerEntity> Players { get; set; } = null!;
+    public DbSet<PlayerLoginEntity> PlayerLogins { get; set; } = null!;
+    public DbSet<PlayerPasswordResetEntity> PlayerPasswordResets { get; set; } = null!;
 
-    public DbSet<ClubEntity> Clubs { get; set; }
-    public DbSet<ClubLocationEntity> ClubLocations { get; set; }
-    public DbSet<ClubManagerEntity> ClubManagers { get; set; }
+    public DbSet<ClubEntity> Clubs { get; set; } = null!;
+    public DbSet<ClubLocationEntity> ClubLocations { get; set; } = null!;
+    public DbSet<ClubManagerEntity> ClubManagers { get; set; } = null!;
 
-    public DbSet<TeamEntity> Teams { get; set; }
-    public DbSet<TeamOpponentEntity> TeamOpponents { get; set; }
-    public DbSet<TeamPlayerEntity> TeamPlayers { get; set; }
-    public DbSet<MatchEntity> Matches { get; set; }
-    public DbSet<MatchPlayerEntity> MatchPlayers { get; set; }
-    public DbSet<MatchGameEntity> MatchGames { get; set; }
-    public DbSet<MatchCommentEntity> MatchComments { get; set; }
-    public DbSet<TournamentEntity> Tournaments { get; set; }
+    public DbSet<TeamEntity> Teams { get; set; } = null!;
+    public DbSet<TeamOpponentEntity> TeamOpponents { get; set; } = null!;
+    public DbSet<TeamPlayerEntity> TeamPlayers { get; set; } = null!;
+    public DbSet<MatchEntity> Matches { get; set; } = null!;
+    public DbSet<MatchPlayerEntity> MatchPlayers { get; set; } = null!;
+    public DbSet<MatchGameEntity> MatchGames { get; set; } = null!;
+    public DbSet<MatchCommentEntity> MatchComments { get; set; } = null!;
+    public DbSet<TournamentEntity> Tournaments { get; set; } = null!;
 
-    public DbSet<ParameterEntity> Parameters { get; set; }
-    public DbSet<EventEntity> Events { get; set; }
+    public DbSet<ParameterEntity> Parameters { get; set; } = null!;
+    public DbSet<EventEntity> Events { get; set; } = null!;
     #endregion
 
     #region Properties
@@ -42,7 +42,9 @@ internal class TtcDbContext : DbContext, ITtcDbContext
         get
         {
             if (_currentSeason.HasValue)
+            {
                 return _currentSeason.Value;
+            }
 
             var year = Parameters.Single(x => x.Key == "year").Value;
             _currentSeason = int.Parse(year);

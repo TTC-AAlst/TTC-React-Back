@@ -1,4 +1,4 @@
-﻿namespace Ttc.DataEntities.Core;
+namespace Ttc.DataEntities.Core;
 
 /// <summary>
 /// DbMigrations UserName

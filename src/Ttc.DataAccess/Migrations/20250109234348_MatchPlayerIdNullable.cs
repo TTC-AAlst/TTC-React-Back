@@ -1,59 +1,58 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Ttc.DataAccess.Migrations
+namespace Ttc.DataAccess.Migrations;
+
+/// <inheritdoc />
+public partial class MatchPlayerIdNullable : Migration
 {
     /// <inheritdoc />
-    public partial class MatchPlayerIdNullable : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropForeignKey(
-                name: "FK_MatchPlayer_Player_PlayerId",
-                table: "MatchPlayer");
+        migrationBuilder.DropForeignKey(
+            name: "FK_MatchPlayer_Player_PlayerId",
+            table: "MatchPlayer");
 
-            migrationBuilder.AlterColumn<int>(
-                name: "PlayerId",
-                table: "MatchPlayer",
-                type: "int",
-                nullable: true,
-                oldClrType: typeof(int),
-                oldType: "int");
+        migrationBuilder.AlterColumn<int>(
+            name: "PlayerId",
+            table: "MatchPlayer",
+            type: "int",
+            nullable: true,
+            oldClrType: typeof(int),
+            oldType: "int");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_MatchPlayer_Player_PlayerId",
-                table: "MatchPlayer",
-                column: "PlayerId",
-                principalTable: "Player",
-                principalColumn: "Id");
-        }
+        migrationBuilder.AddForeignKey(
+            name: "FK_MatchPlayer_Player_PlayerId",
+            table: "MatchPlayer",
+            column: "PlayerId",
+            principalTable: "Player",
+            principalColumn: "Id");
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropForeignKey(
-                name: "FK_MatchPlayer_Player_PlayerId",
-                table: "MatchPlayer");
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropForeignKey(
+            name: "FK_MatchPlayer_Player_PlayerId",
+            table: "MatchPlayer");
 
-            migrationBuilder.AlterColumn<int>(
-                name: "PlayerId",
-                table: "MatchPlayer",
-                type: "int",
-                nullable: false,
-                defaultValue: 0,
-                oldClrType: typeof(int),
-                oldType: "int",
-                oldNullable: true);
+        migrationBuilder.AlterColumn<int>(
+            name: "PlayerId",
+            table: "MatchPlayer",
+            type: "int",
+            nullable: false,
+            defaultValue: 0,
+            oldClrType: typeof(int),
+            oldType: "int",
+            oldNullable: true);
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_MatchPlayer_Player_PlayerId",
-                table: "MatchPlayer",
-                column: "PlayerId",
-                principalTable: "Player",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-        }
+        migrationBuilder.AddForeignKey(
+            name: "FK_MatchPlayer_Player_PlayerId",
+            table: "MatchPlayer",
+            column: "PlayerId",
+            principalTable: "Player",
+            principalColumn: "Id",
+            onDelete: ReferentialAction.Cascade);
     }
 }

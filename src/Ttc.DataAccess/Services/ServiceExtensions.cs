@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Ttc.DataEntities;
 
 namespace Ttc.DataAccess.Services;

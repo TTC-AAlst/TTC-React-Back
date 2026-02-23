@@ -1,15 +1,15 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using AutoMapper;
 using Frenoy.Api;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Ttc.Model.Teams;
+using Ttc.DataAccess.Utilities;
+using Ttc.DataAccess.Utilities.Excel;
 using Ttc.DataEntities;
 using Ttc.DataEntities.Core;
-using Ttc.Model.Players;
-using Ttc.DataAccess.Utilities.Excel;
-using Ttc.DataAccess.Utilities;
 using Ttc.Model.Clubs;
+using Ttc.Model.Players;
+using Ttc.Model.Teams;
 
 namespace Ttc.DataAccess.Services;
 
@@ -102,16 +102,36 @@ public class TeamService
 
         public override bool Equals(object? obj)
         {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj is null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != GetType())
+            {
+                return false;
+            }
+
             return Equals((TeamRankingKey)obj);
         }
 
         public bool Equals(TeamRankingKey? other)
         {
-            if (other is null) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (other is null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
             return _competition == other._competition && _divisionId == other._divisionId;
         }
 

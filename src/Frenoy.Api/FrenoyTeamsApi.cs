@@ -1,4 +1,4 @@
-﻿using FrenoyVttl;
+using FrenoyVttl;
 using Ttc.DataEntities.Core;
 using Ttc.Model.Players;
 using Ttc.Model.Teams;

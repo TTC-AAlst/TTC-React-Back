@@ -1,4 +1,4 @@
-﻿namespace Ttc.WebApi.Utilities.Auth;
+namespace Ttc.WebApi.Utilities.Auth;
 
 public class ValidateTokenRequest
 {

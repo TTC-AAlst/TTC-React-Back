@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using OfficeOpenXml;
 using Ttc.DataEntities;
 using Ttc.DataEntities.Core;
@@ -178,7 +174,9 @@ internal class SportaMatchExcelCreator
         foreach (var team in teams)
         {
             if (team.TeamCode == "G")
+            {
                 Debug.Fail("Not available in the Excel... But can just as easily be added in code?");
+            }
 
             ploegenSheet.Cells[i, 1].Value = $"Bezoekers {team.TeamCode}-ploeg";
             var opponents = team.Opponents

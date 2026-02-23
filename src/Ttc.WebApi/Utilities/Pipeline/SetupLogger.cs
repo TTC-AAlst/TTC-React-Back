@@ -1,4 +1,4 @@
-﻿using Serilog;
+using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.Grafana.Loki;
 using Ttc.Model.Core;

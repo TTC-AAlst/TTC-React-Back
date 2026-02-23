@@ -1,4 +1,4 @@
-﻿namespace Ttc.Model.Matches;
+namespace Ttc.Model.Matches;
 
 public class MatchScore
 {

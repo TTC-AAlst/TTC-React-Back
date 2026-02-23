@@ -1,4 +1,4 @@
-﻿namespace Ttc.Model.Clubs;
+namespace Ttc.Model.Clubs;
 
 public class CacheResponse<T>
 {

@@ -1,4 +1,4 @@
-﻿using Ttc.Model.Core;
+using Ttc.Model.Core;
 
 namespace Ttc.WebApi.Utilities.Pipeline;
 

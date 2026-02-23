@@ -1,4 +1,4 @@
-﻿using Ttc.Model.Players;
+using Ttc.Model.Players;
 
 namespace Ttc.Model.Teams;
 

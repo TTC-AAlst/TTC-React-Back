@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using CoreWCF.Configuration;
 using CoreWCF.Description;
 using Microsoft.EntityFrameworkCore;
@@ -5,7 +6,6 @@ using Microsoft.Extensions.FileProviders;
 using OfficeOpenXml;
 using Serilog;
 using Serilog.Context;
-using System.Text.Json.Serialization;
 using Ttc.DataAccess;
 using Ttc.DataEntities.Core;
 using Ttc.Model.Core;

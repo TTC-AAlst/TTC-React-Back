@@ -1,4 +1,4 @@
-﻿namespace Ttc.DataAccess.Utilities;
+namespace Ttc.DataAccess.Utilities;
 
 /// <summary>
 /// Convert a ranking in Vttl/Sporta to its competition value

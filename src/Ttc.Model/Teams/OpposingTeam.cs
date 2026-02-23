@@ -1,4 +1,4 @@
-﻿namespace Ttc.Model.Teams;
+namespace Ttc.Model.Teams;
 
 public class OpposingTeam
 {
@@ -23,7 +23,11 @@ public class OpposingTeam
     }
     public static OpposingTeam? Create(int? clubId, string? teamCode)
     {
-        if (!clubId.HasValue) return null;
+        if (!clubId.HasValue)
+        {
+            return null;
+        }
+
         return new OpposingTeam(clubId.Value, teamCode);
     }
 

@@ -1,8 +1,8 @@
-﻿using MailKit.Net.Smtp;
+using System.Globalization;
+using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
-using System.Globalization;
 using Ttc.DataEntities.Core;
 using Ttc.Model.Core;
 using Ttc.Model.Players;

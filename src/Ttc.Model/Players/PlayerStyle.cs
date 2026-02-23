@@ -1,4 +1,4 @@
-﻿namespace Ttc.Model.Players;
+namespace Ttc.Model.Players;
 
 public class PlayerStyle
 {

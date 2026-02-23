@@ -1,7 +1,7 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text.Json;
 using System.Text;
+using System.Text.Json;
 using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
 using Ttc.DataEntities.Core;
@@ -29,7 +29,9 @@ public class UserProvider : IUserProvider
         {
             string? playerId = Principal?.Claims.FirstOrDefault(x => x.Type == "playerId")?.Value;
             if (string.IsNullOrWhiteSpace(playerId))
+            {
                 return null;
+            }
 
             return int.Parse(playerId);
         }
@@ -81,7 +83,9 @@ public class UserProvider : IUserProvider
             string? security = jwt.Claims.FirstOrDefault(x => x.Type == "security")?.Value;
             string? teams = jwt.Claims.FirstOrDefault(x => x.Type == "teams")?.Value;
             if (alias == null || playerId == null || security == null || teams == null)
+            {
                 return null;
+            }
 
             var userModel = new User
             {
@@ -119,7 +123,9 @@ public class UserProvider : IUserProvider
         where T : ITtcConfidential
     {
         if (IsAuthenticated)
+        {
             return data;
+        }
 
         // Due to AutoMapper configuration this will create copies
         // for Players, but not for Matches. Since Players are being
@@ -137,7 +143,9 @@ public class UserProvider : IUserProvider
         where T : ITtcConfidential
     {
         if (IsAuthenticated)
+        {
             return data;
+        }
 
         var dataCopy = _mapper.Map<T>(data);
         dataCopy.Hide();

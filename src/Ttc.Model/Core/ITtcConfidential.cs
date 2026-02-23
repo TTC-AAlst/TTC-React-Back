@@ -1,4 +1,4 @@
-﻿namespace Ttc.Model.Core;
+namespace Ttc.Model.Core;
 
 /// <summary>
 /// Hide properties when the user is not logged in

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using FrenoyVttl;
 using Microsoft.EntityFrameworkCore;
@@ -109,10 +109,7 @@ public class FrenoyApiBase
         {
             club = await _db.Clubs.SingleOrDefaultAsync(x => x.CodeSporta == frenoyClubCode);
         }
-        if (club == null)
-        {
-            club = await CreateClub(frenoyClubCode);
-        }
+        club ??= await CreateClub(frenoyClubCode);
         return club.Id;
     }
 

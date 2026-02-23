@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using FrenoyVttl;
 using Microsoft.EntityFrameworkCore;
 using Ttc.DataEntities;
@@ -48,8 +48,7 @@ public class FrenoyPlayersApi : FrenoyApiBase
             var existingPlayer = await _db.Players.SingleOrDefaultAsync(ply => ply.FirstName!.ToUpper() == frenoyFirstName && ply.LastName!.ToUpper() == frenoyLastName);
             if (_isVttl)
             {
-                if (existingPlayer == null)
-                    existingPlayer = await _db.Players.SingleOrDefaultAsync(ply => ply.ComputerNummerVttl.HasValue && ply.ComputerNummerVttl.Value.ToString() == frenoyPlayer.UniqueIndex);
+                existingPlayer ??= await _db.Players.SingleOrDefaultAsync(ply => ply.ComputerNummerVttl.HasValue && ply.ComputerNummerVttl.Value.ToString() == frenoyPlayer.UniqueIndex);
 
                 if (existingPlayer != null)
                 {
@@ -62,8 +61,7 @@ public class FrenoyPlayersApi : FrenoyApiBase
             }
             else
             {
-                if (existingPlayer == null)
-                    existingPlayer = await _db.Players.SingleOrDefaultAsync(ply => ply.LidNummerSporta.HasValue && ply.LidNummerSporta.Value.ToString() == frenoyPlayer.UniqueIndex);
+                existingPlayer ??= await _db.Players.SingleOrDefaultAsync(ply => ply.LidNummerSporta.HasValue && ply.LidNummerSporta.Value.ToString() == frenoyPlayer.UniqueIndex);
 
                 if (existingPlayer != null)
                 {
@@ -101,9 +99,13 @@ public class FrenoyPlayersApi : FrenoyApiBase
         }
 
         if (_isVttl)
+        {
             SetVttl(existingPlayer!, frenoyPlayer);
+        }
         else
+        {
             SetSporta(existingPlayer!, frenoyPlayer);
+        }
 
         if (isNew)
         {
@@ -116,9 +118,11 @@ public class FrenoyPlayersApi : FrenoyApiBase
 
     private static PlayerEntity CreatePlayerEntityCore(MemberEntryType frenoyPlayer)
     {
-        var newPlayer = new PlayerEntity();
-        newPlayer.FirstName = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(frenoyPlayer.FirstName.ToLowerInvariant());
-        newPlayer.LastName = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(frenoyPlayer.LastName.ToLowerInvariant());
+        var newPlayer = new PlayerEntity
+        {
+            FirstName = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(frenoyPlayer.FirstName.ToLowerInvariant()),
+            LastName = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(frenoyPlayer.LastName.ToLowerInvariant())
+        };
         newPlayer.Alias = newPlayer.Name;
         newPlayer.Security = PlayerAccess.Player;
         newPlayer.Email = frenoyPlayer.Email;
@@ -165,9 +169,14 @@ public class FrenoyPlayersApi : FrenoyApiBase
             {
                 var ply = CreatePlayerEntityCore(frenoyPlayer);
                 if (_isVttl)
+                {
                     SetVttl(ply, frenoyPlayer);
+                }
                 else
+                {
                     SetSporta(ply, frenoyPlayer);
+                }
+
                 return ply;
             })
             .ToArray();

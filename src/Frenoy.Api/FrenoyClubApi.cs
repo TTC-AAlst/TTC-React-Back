@@ -1,4 +1,4 @@
-﻿using FrenoyVttl;
+using FrenoyVttl;
 using Microsoft.EntityFrameworkCore;
 using Ttc.DataEntities;
 using Ttc.DataEntities.Core;

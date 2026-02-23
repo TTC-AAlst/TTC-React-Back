@@ -1,15 +1,15 @@
-﻿using Ttc.DataEntities;
-using Ttc.Model;
-using Ttc.Model.Players;
 using AutoMapper;
 using Frenoy.Api;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using MySqlConnector;
 using Ttc.DataAccess.Utilities;
-using Ttc.DataEntities.Core;
-using Microsoft.Extensions.Caching.Memory;
 using Ttc.DataAccess.Utilities.Excel;
+using Ttc.DataEntities;
+using Ttc.DataEntities.Core;
+using Ttc.Model;
 using Ttc.Model.Clubs;
+using Ttc.Model.Players;
 
 namespace Ttc.DataAccess.Services;
 
@@ -117,7 +117,9 @@ public class PlayerService
         _cache.Remove("players");
         player.Id = existingPlayer.Id;
         if (player.QuitYear.HasValue)
+        {
             return null;
+        }
 
         var newPlayer = await GetPlayer(player.Id);
         return newPlayer;
@@ -126,7 +128,11 @@ public class PlayerService
     public async Task DeletePlayer(int playerId)
     {
         var player = await _context.Players.FindAsync(playerId);
-        if (player == null) return;
+        if (player == null)
+        {
+            return;
+        }
+
         _context.Players.Remove(player);
         await _context.SaveChangesAsync();
         _cache.Remove("players");
@@ -303,12 +309,12 @@ public class PlayerService
 
     public async Task<Guid> EmailMatchesPlayer(string email, int playerId)
     {
-        var player = await _context.Players.SingleOrDefaultAsync(x => x.Id == playerId);
-        if (player == null)
-            throw new Exception($"User met id {playerId} bestaat niet");
+        var player = await _context.Players.SingleOrDefaultAsync(x => x.Id == playerId) ?? throw new Exception($"User met id {playerId} bestaat niet");
 
         if (player.Email?.ToLower().Trim() != email.ToLower().Trim())
+        {
             throw new Exception($"Email '{email}' komt niet overeen voor speler {player.Alias} (Id={playerId})");
+        }
 
         var passwordReset = new PlayerPasswordResetEntity(playerId);
         _context.PlayerPasswordResets.Add(passwordReset);

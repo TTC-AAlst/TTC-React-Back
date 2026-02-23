@@ -1,4 +1,4 @@
-﻿using Frenoy.Api;
+using Frenoy.Api;
 using Ttc.DataEntities.Core;
 using Ttc.Model.Players;
 
@@ -14,7 +14,9 @@ internal static class NewSeasonSeed
         const bool forceSync = false;
 
         if (year < 1000)
+        {
             throw new Exception("Year should be actual year (ex: 2025), not FrenoySeason (ex: 26)");
+        }
 
         context.CurrentSeason = year;
 

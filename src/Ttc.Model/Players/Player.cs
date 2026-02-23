@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Ttc.Model.Core;
 
 namespace Ttc.Model.Players;

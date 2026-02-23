@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <!-- Treat warnings as errors in CI/Release builds -->
+    <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
+
+    <!-- Enable strict nullable analysis -->
+    <Nullable>enable</Nullable>
+
+    <!-- Enable code analysis -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- Enable IDE0005 (remove unnecessary usings) -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Suppress XML doc warnings (1591=missing, 1573=param mismatch, 1572=unreferenced param) -->
+    <NoWarn>$(NoWarn);1591;1573;1572</NoWarn>
+  </PropertyGroup>
+</Project>

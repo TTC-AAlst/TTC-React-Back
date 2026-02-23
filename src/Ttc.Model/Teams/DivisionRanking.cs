@@ -1,4 +1,4 @@
-﻿namespace Ttc.Model.Teams;
+namespace Ttc.Model.Teams;
 
 /// <summary>
 /// This is mapped from Frenoy API call
