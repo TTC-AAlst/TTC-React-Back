@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,16 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CoreWCF.Http" Version="1.8.0" />
-    <PackageReference Include="CoreWCF.Primitives" Version="1.8.0" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.7" />
-    <PackageReference Include="System.ServiceModel.Duplex" Version="6.0.*" />
-    <PackageReference Include="System.ServiceModel.Federation" Version="6.0.*" />
-    <PackageReference Include="System.ServiceModel.Http" Version="6.0.*" />
-    <PackageReference Include="System.ServiceModel.NetTcp" Version="6.0.*" />
-    <PackageReference Include="System.ServiceModel.Security" Version="6.0.*" />
-    <PackageReference Include="System.Text.Encodings.Web" Version="9.0.7" />
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+    <PackageReference Include="CoreWCF.Http" />
+    <PackageReference Include="CoreWCF.Primitives" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="System.ServiceModel.Duplex" />
+    <PackageReference Include="System.ServiceModel.Federation" />
+    <PackageReference Include="System.ServiceModel.Http" />
+    <PackageReference Include="System.ServiceModel.NetTcp" />
+    <PackageReference Include="System.ServiceModel.Security" />
+    <PackageReference Include="System.Text.Encodings.Web" />
+    <PackageReference Include="System.Text.RegularExpressions" />
   </ItemGroup>
 
   <ItemGroup>

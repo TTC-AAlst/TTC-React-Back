@@ -1,0 +1,67 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- AutoMapper -->
+    <PackageVersion Include="AutoMapper" Version="13.0.1" />
+
+    <!-- CoreWCF -->
+    <PackageVersion Include="CoreWCF.Http" Version="1.8.0" />
+    <PackageVersion Include="CoreWCF.Primitives" Version="1.8.0" />
+
+    <!-- Entity Framework -->
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.2" />
+    <PackageVersion Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
+
+    <!-- Authentication & Identity -->
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.13.0" />
+    <PackageVersion Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.13.0" />
+
+    <!-- ASP.NET Core -->
+    <PackageVersion Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+
+    <!-- Logging -->
+    <PackageVersion Include="Serilog" Version="4.2.0" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageVersion Include="Serilog.Enrichers.Environment" Version="3.0.1" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Grafana.Loki" Version="8.3.1" />
+
+    <!-- Email -->
+    <PackageVersion Include="MailKit" Version="4.13.0" />
+
+    <!-- Excel -->
+    <PackageVersion Include="EPPlus" Version="8.0.8" />
+
+    <!-- WCF/SOAP (Frenoy API) -->
+    <PackageVersion Include="System.ServiceModel.Duplex" Version="6.0.0" />
+    <PackageVersion Include="System.ServiceModel.Federation" Version="6.0.0" />
+    <PackageVersion Include="System.ServiceModel.Http" Version="6.0.0" />
+    <PackageVersion Include="System.ServiceModel.NetTcp" Version="6.0.0" />
+    <PackageVersion Include="System.ServiceModel.Security" Version="6.0.0" />
+
+    <!-- Microsoft Extensions -->
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.7" />
+
+    <!-- System Libraries -->
+    <PackageVersion Include="System.Net.Http" Version="4.3.4" />
+    <PackageVersion Include="System.Text.Encodings.Web" Version="9.0.7" />
+    <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
+
+    <!-- Testing -->
+    <PackageVersion Include="coverlet.collector" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageVersion Include="xunit" Version="2.5.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3" />
+
+    <!-- Tooling -->
+    <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+  </ItemGroup>
+</Project>
