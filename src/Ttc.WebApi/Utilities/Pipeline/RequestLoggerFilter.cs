@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.Text.Json;
 using Ttc.Model.Core;
 
 namespace Ttc.WebApi.Utilities.Pipeline;
@@ -41,7 +41,7 @@ public class RequestLoggingFilter
         }
 
         var qs = request.Query.ToDictionary(q => q.Key, q => q.Value.ToString());
-        var queryParams = JsonConvert.SerializeObject(qs);
+        var queryParams = JsonSerializer.Serialize(qs);
 
         if (qs.Count > 0 && body.Length > 0)
         {

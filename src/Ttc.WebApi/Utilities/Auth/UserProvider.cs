@@ -1,6 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using Newtonsoft.Json;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Text;
 using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
@@ -51,7 +51,7 @@ public class UserProvider : IUserProvider
             new Claim(ClaimTypes.Name, user.Alias ?? ""),
             new Claim("alias", user.Alias ?? ""),
             new Claim("playerId", user.PlayerId.ToString()),
-            new Claim("security", JsonConvert.SerializeObject(user.Security)),
+            new Claim("security", JsonSerializer.Serialize(user.Security)),
             new Claim("teams", string.Join(",", user.Teams)),
         };
 
@@ -88,7 +88,7 @@ public class UserProvider : IUserProvider
                 Alias = alias,
                 PlayerId = int.Parse(playerId),
                 Teams = !string.IsNullOrWhiteSpace(teams) ? teams.Split(',').Select(int.Parse).ToArray() : [],
-                Security = JsonConvert.DeserializeObject<List<string>>(security) ?? [],
+                Security = JsonSerializer.Deserialize<List<string>>(security) ?? [],
                 Token = token,
             };
             return userModel;
