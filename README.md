@@ -14,6 +14,12 @@
 # Build
 dotnet build Ttc.slnx
 
+# Run the backend (once)
+dotnet run --project src/Ttc.WebApi
+
+# Run the backend (watch mode - auto-restart on file changes)
+dotnet watch --project src/Ttc.WebApi
+
 # Run tests
 dotnet test Ttc.slnx
 
