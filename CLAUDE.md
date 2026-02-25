@@ -1,4 +1,4 @@
-# Claude Code Instructions
+# TTC Aalst Backend
 
 ## Project Overview
 
