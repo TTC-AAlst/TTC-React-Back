@@ -11,31 +11,16 @@
 ## Development Commands
 
 ```sh
-# Build
 dotnet build Ttc.slnx
 
-# Run the backend (once)
+# Run the backend
 dotnet run --project src/Ttc.WebApi
-
-# Run the backend (watch mode - auto-restart on file changes)
 dotnet watch --project src/Ttc.WebApi
 
-# Run tests
 dotnet test Ttc.slnx
-
-# Format code
 dotnet format Ttc.slnx
-
-# Check formatting (used by pre-commit hook)
 dotnet format Ttc.slnx --verify-no-changes
 ```
-
-## Git Hooks
-
-The repository uses git hooks for quality checks:
-
-- **pre-commit**: Runs `dotnet format --verify-no-changes` and `dotnet build`
-- **pre-push**: Runs `dotnet build` and `dotnet test`
 
 ## Deploy
 
@@ -79,9 +64,6 @@ dotnet ef database drop -f
 
 Go to Admin > Params and update the "year" param.
 
-Use `SportaMatchesScoresheetsExcelCreation` "UnitTest" to create the Sporta Excels.
-
-ATTN: Check instead: Perhaps fill in on the site directly?
 
 ## Snippets
 
